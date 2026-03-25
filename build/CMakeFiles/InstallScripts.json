@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Dev/pixelfall/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

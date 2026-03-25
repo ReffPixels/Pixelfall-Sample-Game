@@ -1,0 +1,10 @@
+^C:\DEV\PIXELFALL\BUILD\CMAKEFILES\27EB5AC3D5E9AA44C253376A20FB259A\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Dev/pixelfall -BC:/Dev/pixelfall/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Dev/pixelfall/build/pixelfall.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
