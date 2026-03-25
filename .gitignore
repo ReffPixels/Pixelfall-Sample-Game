@@ -24,9 +24,19 @@
 *.lai
 *.la
 *.a
-*.lib
 
 # Executables
 *.exe
 *.out
 *.app
+
+# Visual Studio
+.vs/
+*.user
+
+# Build
+build/
+
+# Exceptions
+!external/**/*.dll
+!external/**/*.lib
