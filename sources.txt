@@ -1,1 +1,3 @@
-src/main.cpp
+src/core/engine.cpp
+src/platform/sdl/sdl_callbacks.cpp
+src/platform/sdl//app_window.cpp
