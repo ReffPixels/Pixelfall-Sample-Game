@@ -9,9 +9,6 @@
 // Engine
 #include "engine/core/engine.h"
 #include "engine/config/engine_config.h"
-#include "engine/core/window.h"
-// Application
-#include "application/my_game.h"
 
 // This function runs once at startup.
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
@@ -40,7 +37,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
     }
 
     // Create the application (Owned by Engine)
-    if (!engine->startApplication(std::make_unique<MyGame>())) {
+    if (!engine->startApplication(Application::create())) {
         delete engine;
         SDL_Log("Couldn't create application: %s", SDL_GetError());
         return SDL_APP_FAILURE;

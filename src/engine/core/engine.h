@@ -9,17 +9,17 @@
 
 class Engine {
 public:
-    // Methods
-    bool init();
-    bool startApplication(std::unique_ptr<Application> application);
-    bool update();
-
     // Getters
     Window* getWindow() { return window.get(); };
     Clock* getClock() { return clock.get(); };
 
     // Setters
     void setProjectPath(std::filesystem::path projectPath) { this->projectPath = projectPath; };
+
+    // Methods
+    bool init();
+    bool startApplication(std::unique_ptr<Application> application);
+    bool update();
 
     // Destructor
     ~Engine();
