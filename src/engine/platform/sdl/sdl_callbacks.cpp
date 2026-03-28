@@ -1,4 +1,5 @@
-// This defines the start point of the application, creates the window, iterates the main loop and handles closing.
+// If using SDL as a platform, this defines the start point of the application, creates the window, 
+// iterates the main loop and handles closing.
 
 // Use SDL3 Callbacks instead of main()
 #define SDL_MAIN_USE_CALLBACKS 1
@@ -13,7 +14,7 @@
 #include "application/my_game.h"
 
 // This function runs once at startup.
-SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
+SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
 
     SDL_SetAppMetadata(
         engine::appTitle.data(),
@@ -24,14 +25,14 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
         SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
-    
+
     if (!TTF_Init()) {
         SDL_Log("Couldn't initialize SDL_ttf: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
 
-    // Create the Engine (It owns the window and renderer that SDL needs) 
-    auto *engine = new Engine();
+    // Create the Engine
+    auto* engine = new Engine();
     if (!engine->init()) {
         delete engine;
         SDL_Log("Couldn't create engine: %s", SDL_GetError());
@@ -45,6 +46,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
         return SDL_APP_FAILURE;
     }
 
+    // Store project path
+    engine->setProjectPath(std::filesystem::weakly_canonical(SDL_GetBasePath()));
+
     *appstate = engine;
     return SDL_APP_CONTINUE;
 }
@@ -55,11 +59,25 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
     return SDL_APP_CONTINUE;
 }
 
-SDL_AppResult SDL_AppIterate(void *appstate) {
-    return static_cast<Engine *>(appstate)->update()
+// This function runs every frame.
+SDL_AppResult SDL_AppIterate(void* appstate) {
+
+    // Get Engine
+    Engine* engine = static_cast<Engine*>(appstate);
+
+    // Update Time
+    engine->getClock()->update();
+
+    // Limit Frame Rate
+    if (engine->getClock()->getLimitFrameRate())
+        engine->getClock()->limitFPS();
+
+    // Main Loop
+    return engine->update()
         ? SDL_APP_CONTINUE : SDL_APP_SUCCESS;
 }
 
+// Quits SDL and closes the application.
 void SDL_AppQuit(void* appstate, SDL_AppResult result) {
     delete static_cast<Engine*>(appstate);
     TTF_Quit();

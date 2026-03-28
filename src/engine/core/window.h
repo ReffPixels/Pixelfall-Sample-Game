@@ -19,11 +19,11 @@ public:
     );
 
     // Getters
-    const Vector2Int &getPhysicalSize() const { return physicalSize; };
+    const Vector2Int& getPhysicalSize() const { return physicalSize; };
     float getDprScale() const { return dprScale; };
-    const Vector2Int &getLogicalSize() const { return logicalSize; };
+    const Vector2Int& getLogicalSize() const { return logicalSize; };
     float getAspectRatio() const { return aspectRatio; };
-    const Vector2 &getScale() const { return scale; };
+    const Vector2& getScale() const { return scale; };
 
     // Setters
     void setWindowTitle(std::string windowTitle);
@@ -59,7 +59,7 @@ private:
 
     // Platform Implementation (Each platform fills this struct with their necessary components)
     struct PlatformComponents;
-    PlatformComponents *platformComponents = nullptr;
+    PlatformComponents* platformComponents = nullptr;
 
     // Methods
     void updateLogicalPresentation();

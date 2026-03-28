@@ -5,17 +5,26 @@
 
 // Creates the engine and executes application onStart()
 bool Engine::init() {
-    if (!window.init()) {
+    window = std::make_unique<Window>();
+    clock = std::make_unique<Clock>();
+
+    if (!window->init()) {
         std::cout << "ERROR: Failed to create engine window" << std::endl;
         isRunning = false;
+        return false;
     }
-    else {
-        isRunning = true;
+    if (!clock->init()) {
+        std::cout << "ERROR: Failed to create engine clock" << std::endl;
+        isRunning = false;
+        return false;
     }
-    return isRunning;
+
+    // Engine creation success
+    isRunning = true;
+    return true;
 }
 
-bool Engine::startApplication(Application *application) {
+bool Engine::startApplication(Application* application) {
     this->application = application;
     if (!application->onStart()) {
         std::cout << "ERROR: Failed to create application" << std::endl;
@@ -32,13 +41,13 @@ bool Engine::update() {
 
     // Update
     application->onUpdate();
-    window.updateWindowData();
+    window->updateWindowData();
 
     // Rendering
-    window.clear();
+    window->clear();
     application->onRender();
-    window.debug();
-    window.present();
+    window->debug();
+    window->present();
 
     return isRunning;
 }

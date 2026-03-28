@@ -2,7 +2,9 @@
 
 #pragma once
 #include <filesystem>
+#include <memory>
 #include "engine/core/window.h"
+#include "engine/core/clock.h"
 #include "engine/core/application.h"
 
 class Engine {
@@ -12,6 +14,13 @@ public:
     bool startApplication(Application* application);
     bool update();
 
+    // Getters
+    Window* getWindow() { return window.get(); };
+    Clock* getClock() { return clock.get(); };
+
+    // Setters
+    void setProjectPath(std::filesystem::path projectPath) { this->projectPath = projectPath; };
+
     // Destructor
     ~Engine();
 
@@ -20,8 +29,12 @@ private:
     bool isRunning = false;
 
     // Engine Components
-    Window window;
+    std::unique_ptr<Window> window;
+    std::unique_ptr<Clock> clock;
+
+    // Store path
+    std::filesystem::path projectPath;
 
     // This application will be created by the platform and owned by Engine.
-    Application *application = nullptr;
+    Application* application = nullptr;
 };

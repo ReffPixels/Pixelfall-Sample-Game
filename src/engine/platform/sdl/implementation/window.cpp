@@ -1,4 +1,4 @@
-// Implementation of Window for SDL.
+// Implementation of window.h for SDL.
 
 #include "engine/core/window.h"
 #include <SDL3/SDL.h>
@@ -19,7 +19,7 @@ Window::Window(
     float maxAspectRatio,
     float dprScale,
     window::PresentationMode presentationMode
-    ) :
+) :
     windowTitle(windowTitle),
     physicalSize(physicalSize),
     minWindowSize(minWindowSize),
@@ -136,7 +136,8 @@ void Window::updateLogicalPresentation() {
             logicalSize.y,
             SDL_LOGICAL_PRESENTATION_STRETCH
         );
-        break;}
+        break;
+    }
     case window::PresentationMode::ExpandHorizontal: {
         logicalSize = {(int)(physicalSize.x / scale.y), (int)(physicalSize.y / scale.y)};
         SDL_SetRenderLogicalPresentation(
@@ -168,7 +169,7 @@ void Window::updateLogicalPresentation() {
 
 void Window::debug() {
     SDL_SetRenderDrawColorFloat(platformComponents->renderer, 1.0f, 0.0f, 0.0f, SDL_ALPHA_OPAQUE_FLOAT);
-    SDL_FRect rect {10, 10, (float)window::default::referenceSize.x - 20.0f, (float)window::default::referenceSize.y - 20.0f};
+    SDL_FRect rect{10, 10, (float)window::default::referenceSize.x - 20.0f, (float)window::default::referenceSize.y - 20.0f};
     SDL_RenderFillRect(platformComponents->renderer, &rect);
 }
 
