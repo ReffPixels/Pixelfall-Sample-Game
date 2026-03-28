@@ -25,8 +25,8 @@ namespace window {
         // Default window values
         constexpr std::string_view windowTitle{"Pixelfall"};
 
-        inline const Vector2Int physicalSize{1920, 1080};
-        inline const Vector2Int referenceSize{1920, 1080};
+        inline const Vector2Int physicalSize{1280, 720};
+        inline const Vector2Int referenceSize{1280, 720};
         inline const Vector2Int minWindowSize{320, 180};
         constexpr float minAspectRatio{1.0f / 1.0f};
         constexpr float maxAspectRatio{32.0f / 9.0f};

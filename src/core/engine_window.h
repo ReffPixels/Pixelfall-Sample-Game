@@ -21,7 +21,7 @@ public:
     const Vector2Int &getLogicalSize() const { return logicalSize; };
     float getAspectRatio() const { return aspectRatio; };
     const Vector2 &getScale() const { return scale; };
-#
+
     // Setters
     void setWindowTitle(std::string windowTitle);
     void setDprScale(float dprScale) { this->dprScale = dprScale; };
@@ -30,9 +30,11 @@ public:
     };
 
     // Methods
-    bool init(); // Bool type to check for success/failure
+    bool init();
     void clear();
     void present();
+    void updateWindowData();
+    void debug();
 
     // Destroyers
     ~EngineWindow();
@@ -57,5 +59,5 @@ private:
     PlatformComponents *platformComponents = nullptr;
 
     // Methods
-    void recalculate();
+    void updateLogicalSize();
 };

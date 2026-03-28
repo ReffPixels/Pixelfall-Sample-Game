@@ -30,9 +30,10 @@ bool Engine::startApplication(Application *application) {
 bool Engine::update() {
 
     application->onUpdate();
-    application->onRender();
-
     window.clear();
+    application->onRender();
+    window.updateWindowData();
+    window.debug();
     window.present();
 
     return isRunning;
