@@ -24,16 +24,16 @@ bool Engine::init() {
     return true;
 }
 
-bool Engine::startApplication(Application* application) {
-    this->application = application;
-    if (!application->onStart()) {
+bool Engine::startApplication(std::unique_ptr<Application> application) {
+    this->application = std::move(application);
+    if (!this->application->onStart()) {
         std::cout << "ERROR: Failed to create application" << std::endl;
         isRunning = false;
+        return false;
     }
-    else {
-        isRunning = true;
-    }
-    return isRunning;
+
+    isRunning = true;
+    return true;
 }
 
 // Main loop. This iterates every frame and executes the application's onUpdate()
@@ -46,12 +46,14 @@ bool Engine::update() {
     // Rendering
     window->clear();
     application->onRender();
+#ifndef NDEBUG
     window->debug();
+#endif
     window->present();
 
     return isRunning;
 }
 
+// Destructor
 Engine::~Engine() {
-    delete application;
 }

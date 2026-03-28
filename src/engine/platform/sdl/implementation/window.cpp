@@ -46,7 +46,6 @@ bool Window::init() {
     SDL_SetWindowMinimumSize(platformComponents->window, minWindowSize.x, minWindowSize.y);
     SDL_SetWindowAspectRatio(platformComponents->window, minAspectRatio, maxAspectRatio);
     updateWindowData();
-    Window::setPresentationMode(presentationMode);
     return true;
 }
 
@@ -68,6 +67,11 @@ void Window::setWindowTitle(std::string windowTitle) {
         SDL_SetWindowTitle(platformComponents->window, windowTitle.c_str());
 }
 
+void Window::setPresentationMode(window::PresentationMode presentationMode) {
+    this->presentationMode = presentationMode;
+    updateLogicalPresentation();
+}
+
 // Recalculates the variable information of the window, like its size or aspect ratio.
 void Window::updateWindowData() {
 
@@ -79,8 +83,8 @@ void Window::updateWindowData() {
 
     // Get current scale (How the current window size differs from the base window size)
     scale = Vector2(
-        (float)physicalSize.x / window::default::referenceSize.x,
-        (float)physicalSize.y / window::default::referenceSize.y
+        (float)physicalSize.x / window::defaults::referenceSize.x,
+        (float)physicalSize.y / window::defaults::referenceSize.y
     );
 
     // Update Render Scale
@@ -101,29 +105,29 @@ void Window::updateLogicalPresentation() {
         );
         break;
     case window::PresentationMode::Letterbox:
-        logicalSize = window::default::referenceSize;
+        logicalSize = window::defaults::referenceSize;
         SDL_SetRenderLogicalPresentation(
             platformComponents->renderer,
-            window::default::referenceSize.x,
-            window::default::referenceSize.y,
+            window::defaults::referenceSize.x,
+            window::defaults::referenceSize.y,
             SDL_LOGICAL_PRESENTATION_LETTERBOX
         );
         break;
     case window::PresentationMode::Crop:
-        logicalSize = window::default::referenceSize;
+        logicalSize = window::defaults::referenceSize;
         SDL_SetRenderLogicalPresentation(
             platformComponents->renderer,
-            window::default::referenceSize.x,
-            window::default::referenceSize.y,
+            window::defaults::referenceSize.x,
+            window::defaults::referenceSize.y,
             SDL_LOGICAL_PRESENTATION_OVERSCAN
         );
         break;
     case window::PresentationMode::Stretch:
-        logicalSize = window::default::referenceSize;
+        logicalSize = window::defaults::referenceSize;
         SDL_SetRenderLogicalPresentation(
             platformComponents->renderer,
-            window::default::referenceSize.x,
-            window::default::referenceSize.y,
+            window::defaults::referenceSize.x,
+            window::defaults::referenceSize.y,
             SDL_LOGICAL_PRESENTATION_STRETCH
         );
         break;
@@ -169,7 +173,7 @@ void Window::updateLogicalPresentation() {
 
 void Window::debug() {
     SDL_SetRenderDrawColorFloat(platformComponents->renderer, 1.0f, 0.0f, 0.0f, SDL_ALPHA_OPAQUE_FLOAT);
-    SDL_FRect rect{10, 10, (float)window::default::referenceSize.x - 20.0f, (float)window::default::referenceSize.y - 20.0f};
+    SDL_FRect rect{10, 10, (float)window::defaults::referenceSize.x - 20.0f, (float)window::defaults::referenceSize.y - 20.0f};
     SDL_RenderFillRect(platformComponents->renderer, &rect);
 }
 

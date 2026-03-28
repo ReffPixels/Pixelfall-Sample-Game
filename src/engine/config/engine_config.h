@@ -10,7 +10,7 @@ namespace engine {
     constexpr std::string_view appIdentifier = "pixelfall";
     constexpr std::string_view appVersion = "0.0";
 
-    namespace default {
+    namespace defaults {
         constexpr bool limitFrameRate{false};
         constexpr double fpsLimit = 120.0;
     }

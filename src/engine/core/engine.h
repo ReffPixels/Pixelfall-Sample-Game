@@ -11,7 +11,7 @@ class Engine {
 public:
     // Methods
     bool init();
-    bool startApplication(Application* application);
+    bool startApplication(std::unique_ptr<Application> application);
     bool update();
 
     // Getters
@@ -36,5 +36,5 @@ private:
     std::filesystem::path projectPath;
 
     // This application will be created by the platform and owned by Engine.
-    Application* application = nullptr;
+    std::unique_ptr<Application> application;
 };

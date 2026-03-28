@@ -17,7 +17,7 @@ namespace window {
         ExpandVertical,
     };
 
-    namespace default {
+    namespace defaults {
 
         // Default window values
         constexpr std::string_view windowTitle{"Pixelfall"};

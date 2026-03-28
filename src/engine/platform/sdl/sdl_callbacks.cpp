@@ -40,7 +40,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
     }
 
     // Create the application (Owned by Engine)
-    if (!engine->startApplication(new MyGame())) {
+    if (!engine->startApplication(std::make_unique<MyGame>())) {
         delete engine;
         SDL_Log("Couldn't create application: %s", SDL_GetError());
         return SDL_APP_FAILURE;
@@ -68,12 +68,14 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
     // Update Time
     engine->getClock()->update();
 
+    // Main Loop
+    bool mainLoop{engine->update()};
+
     // Limit Frame Rate
     if (engine->getClock()->getLimitFrameRate())
         engine->getClock()->limitFPS();
 
-    // Main Loop
-    return engine->update()
+    return mainLoop
         ? SDL_APP_CONTINUE : SDL_APP_SUCCESS;
 }
 

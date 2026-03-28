@@ -27,6 +27,6 @@ private:
     double fps;
 
     // Settings
-    bool limitFrameRate = engine::default::limitFrameRate;
-    double fpsLimit = engine::default::fpsLimit;
+    bool limitFrameRate = engine::defaults::limitFrameRate;
+    double fpsLimit = engine::defaults::fpsLimit;
 };

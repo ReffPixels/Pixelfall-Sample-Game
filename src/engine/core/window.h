@@ -9,13 +9,13 @@
 class Window {
 public:
     Window(
-        std::string windowTitle = window::default::windowTitle.data(),
-        Vector2Int physicalSize = window::default::physicalSize,
-        Vector2Int minWindowSize = window::default::minWindowSize,
-        float minAspectRatio = window::default::minAspectRatio,
-        float maxAspectRatio = window::default::maxAspectRatio,
-        float dprScale = window::default::dprScale,
-        window::PresentationMode presentationMode = window::default::presentationMode
+        std::string windowTitle = window::defaults::windowTitle.data(),
+        Vector2Int physicalSize = window::defaults::physicalSize,
+        Vector2Int minWindowSize = window::defaults::minWindowSize,
+        float minAspectRatio = window::defaults::minAspectRatio,
+        float maxAspectRatio = window::defaults::maxAspectRatio,
+        float dprScale = window::defaults::dprScale,
+        window::PresentationMode presentationMode = window::defaults::presentationMode
     );
 
     // Getters
@@ -28,9 +28,7 @@ public:
     // Setters
     void setWindowTitle(std::string windowTitle);
     void setDprScale(float dprScale) { this->dprScale = dprScale; };
-    void setPresentationMode(window::PresentationMode presentationMode) {
-        this->presentationMode = presentationMode;
-    };
+    void setPresentationMode(window::PresentationMode presentationMode);
 
     // Methods
     bool init();

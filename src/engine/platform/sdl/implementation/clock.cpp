@@ -24,8 +24,8 @@ void Clock::update() {
 
 // Resets time values to 0
 void Clock::reset() {
-    frameStartTime = 0.0;
-    lastFrameStartTime = 0.0;
+    frameStartTime = 0;
+    lastFrameStartTime = 0;
     deltaTime = 0.0;
     fps = 0.0;
 }
