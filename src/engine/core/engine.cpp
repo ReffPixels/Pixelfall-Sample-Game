@@ -1,5 +1,6 @@
-#include "core/engine.h"
-// Basic
+// Implementation of engine.h - This is where the steps of the main loop are defined
+
+#include "engine/core/engine.h"
 #include <iostream>
 
 // Creates the engine and executes application onStart()
@@ -26,13 +27,16 @@ bool Engine::startApplication(Application *application) {
     return isRunning;
 }
 
-// Iterates every frame and executes application onUpdate()
+// Main loop. This iterates every frame and executes the application's onUpdate()
 bool Engine::update() {
 
+    // Update
     application->onUpdate();
+    window.updateWindowData();
+
+    // Rendering
     window.clear();
     application->onRender();
-    window.updateWindowData();
     window.debug();
     window.present();
 

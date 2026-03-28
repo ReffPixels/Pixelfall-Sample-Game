@@ -1,9 +1,9 @@
+// Defines the Engine class, which controls the state of the application and owns the main loop.
+
 #pragma once
-// Basic
 #include <filesystem>
-// Engine Components
-#include "core/engine_window.h"
-#include "core/application.h"
+#include "engine/core/window.h"
+#include "engine/core/application.h"
 
 class Engine {
 public:
@@ -20,7 +20,7 @@ private:
     bool isRunning = false;
 
     // Engine Components
-    EngineWindow window;
+    Window window;
 
     // This application will be created by the platform and owned by Engine.
     Application *application = nullptr;

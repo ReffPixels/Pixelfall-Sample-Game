@@ -7,9 +7,9 @@
 #include <SDL3/SDL_main.h>
 #include <SDL3_ttf/SDL_ttf.h>
 // Engine
-#include "core/engine.h"
-#include "config/engine_config.h"
-#include "core/engine_window.h"
+#include "engine/core/engine.h"
+#include "engine/config/engine_config.h"
+#include "engine/core/window.h"
 // Application
 #include "application/my_game.h"
 

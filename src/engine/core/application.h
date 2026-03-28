@@ -1,3 +1,5 @@
+// Virtual class that an application can override to gain access to the basic engine functions.
+
 #pragma once
 
 class Application {

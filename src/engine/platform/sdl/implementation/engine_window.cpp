@@ -1,17 +1,17 @@
 // Implementation of App Window for SDL
 
-#include "core/engine_window.h"
+#include "engine/core/window.h"
 #include <SDL3/SDL.h>
 
 // Define components specific to the platform
 // SDL needs an SDL_Window pointer and an SDL_Renderer pointer
-struct EngineWindow::PlatformComponents {
+struct Window::PlatformComponents {
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
 };
 
 // Constructor
-EngineWindow::EngineWindow(
+Window::Window(
     std::string windowTitle,
     Vector2Int physicalSize,
     Vector2Int minWindowSize,
@@ -32,7 +32,7 @@ EngineWindow::EngineWindow(
 
 // Executes when the window is initialized by the engine.
 // In the case of SDL, we need to create the window and renderer with its default values.
-bool EngineWindow::init() {
+bool Window::init() {
     if (!SDL_CreateWindowAndRenderer(
         windowTitle.c_str(),
         physicalSize.x,
@@ -46,30 +46,30 @@ bool EngineWindow::init() {
     SDL_SetWindowMinimumSize(platformComponents->window, minWindowSize.x, minWindowSize.y);
     SDL_SetWindowAspectRatio(platformComponents->window, minAspectRatio, maxAspectRatio);
     updateWindowData();
-    EngineWindow::setPresentationMode(presentationMode);
+    Window::setPresentationMode(presentationMode);
     return true;
 }
 
 // Clears the window to a flat background colour so we can render onto a clean surface.
-void EngineWindow::clear() {
+void Window::clear() {
     SDL_SetRenderDrawColorFloat(platformComponents->renderer, 1.0f, 1.0f, 1.0f, SDL_ALPHA_OPAQUE_FLOAT);
     SDL_RenderClear(platformComponents->renderer);
 }
 
 // Presents the new render with whatever we've drawn onto it.
-void EngineWindow::present() {
+void Window::present() {
     SDL_RenderPresent(platformComponents->renderer);
 }
 
 // Changes the title displayed on the window bar.
-void EngineWindow::setWindowTitle(std::string windowTitle) {
+void Window::setWindowTitle(std::string windowTitle) {
     this->windowTitle = windowTitle;
     if (platformComponents->window)
         SDL_SetWindowTitle(platformComponents->window, windowTitle.c_str());
 }
 
 // Recalculates the variable information of the window, like its size or aspect ratio.
-void EngineWindow::updateWindowData() {
+void Window::updateWindowData() {
 
     // Get current physical size of the window
     SDL_GetWindowSize(platformComponents->window, &physicalSize.x, &physicalSize.y);
@@ -86,12 +86,12 @@ void EngineWindow::updateWindowData() {
     // Update Render Scale
     SDL_SetRenderScale(platformComponents->renderer, dprScale, dprScale);
 
-    // Update Logical Size (Also updates logical presentation mode)
-    updateLogicalSize();
+    // Updates Logical Presentation (This process also updates logical size to match the new presentation)
+    updateLogicalPresentation();
 }
 
-// Calculates the logical size depending on the presentation mode.
-void EngineWindow::updateLogicalSize() {
+// Calculates the logical size depending on the presentation mode and updates presentation mode.
+void Window::updateLogicalPresentation() {
     switch (presentationMode) {
     case window::PresentationMode::Free:
         logicalSize = physicalSize;
@@ -166,14 +166,14 @@ void EngineWindow::updateLogicalSize() {
     }
 }
 
-void EngineWindow::debug() {
+void Window::debug() {
     SDL_SetRenderDrawColorFloat(platformComponents->renderer, 1.0f, 0.0f, 0.0f, SDL_ALPHA_OPAQUE_FLOAT);
     SDL_FRect rect {10, 10, (float)window::default::referenceSize.x - 20.0f, (float)window::default::referenceSize.y - 20.0f};
     SDL_RenderFillRect(platformComponents->renderer, &rect);
 }
 
 // Destructor
-EngineWindow::~EngineWindow() {
+Window::~Window() {
     if (platformComponents->window) SDL_DestroyWindow(platformComponents->window);
     if (platformComponents->renderer) SDL_DestroyRenderer(platformComponents->renderer);
     delete platformComponents;

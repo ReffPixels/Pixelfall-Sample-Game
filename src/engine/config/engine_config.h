@@ -1,6 +1,5 @@
 // Defines basic information about the project.
 
-// Basic
 #pragma once
 #include <string_view>
 

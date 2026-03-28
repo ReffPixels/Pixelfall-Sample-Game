@@ -1,11 +1,8 @@
 // Defines information about the window.
 
-// Basic
 #pragma once
 #include <string_view>
-#include <string_view>
-// Math
-#include "math/vector2.h"
+#include "engine/math/vector2.h"
 
 namespace window {
 

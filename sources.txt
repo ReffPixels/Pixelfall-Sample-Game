@@ -1,4 +1,4 @@
-src/core/engine.cpp
 src/application/my_game.cpp
-src/platform/sdl/sdl_callbacks.cpp
-src/platform/sdl/engine_window.cpp
+src/engine/core/engine.cpp
+src/engine/platform/sdl/sdl_callbacks.cpp
+src/engine/platform/sdl/implementation/engine_window.cpp

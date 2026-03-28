@@ -1,11 +1,14 @@
+// Defines a window and all of the parameters and functions it should contain. 
+// The actual implementation is platform specific.
+
 #pragma once
 #include <string>
-#include "math/vector2.h"
-#include "config/window_config.h"
+#include "engine/math/vector2.h"
+#include "engine/config/window_config.h"
 
-class EngineWindow {
+class Window {
 public:
-    EngineWindow(
+    Window(
         std::string windowTitle = window::default::windowTitle.data(),
         Vector2Int physicalSize = window::default::physicalSize,
         Vector2Int minWindowSize = window::default::minWindowSize,
@@ -37,7 +40,7 @@ public:
     void debug();
 
     // Destroyers
-    ~EngineWindow();
+    ~Window();
 
 private:
     // Variables
@@ -59,5 +62,5 @@ private:
     PlatformComponents *platformComponents = nullptr;
 
     // Methods
-    void updateLogicalSize();
+    void updateLogicalPresentation();
 };
