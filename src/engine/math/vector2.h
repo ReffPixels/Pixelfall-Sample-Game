@@ -1,9 +1,10 @@
+// Defines a basic Vector2 and Vector2Int.
+
 #pragma once
 #include <cmath>
 #include <algorithm>
 #include "engine/math/numbers.h"
 
-// Basic Vector2 defined by float x and float y
 class Vector2 {
 public:
     // Members

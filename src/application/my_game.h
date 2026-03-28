@@ -1,3 +1,5 @@
+// Overwrites the main functions defined in the engine to be used for this specific application.
+
 #pragma once
 #include "engine/core/application.h"
 

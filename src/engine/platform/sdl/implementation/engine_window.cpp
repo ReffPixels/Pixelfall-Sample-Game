@@ -1,4 +1,4 @@
-// Implementation of App Window for SDL
+// Implementation of Window for SDL.
 
 #include "engine/core/window.h"
 #include <SDL3/SDL.h>

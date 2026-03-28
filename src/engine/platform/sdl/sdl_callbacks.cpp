@@ -1,5 +1,4 @@
-// This defines the start point of the application, creates the window,
-// iterates the main loop and handles closing the application.
+// This defines the start point of the application, creates the window, iterates the main loop and handles closing.
 
 // Use SDL3 Callbacks instead of main()
 #define SDL_MAIN_USE_CALLBACKS 1

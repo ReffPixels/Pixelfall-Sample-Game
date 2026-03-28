@@ -1,3 +1,5 @@
+// Defines values of common mathematical constants.
+
 #pragma once
 #include <string>
 

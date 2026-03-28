@@ -1,4 +1,4 @@
-// Implementation of engine.h - This is where the steps of the main loop are defined
+// Implementation of engine.h - This is where the steps of the main loop are defined.
 
 #include "engine/core/engine.h"
 #include <iostream>
