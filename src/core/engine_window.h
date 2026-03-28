@@ -1,11 +1,11 @@
 #pragma once
 #include <string>
 #include "math/vector2.h"
-#include "core/window_config.h"
+#include "config/window_config.h"
 
-class AppWindow {
+class EngineWindow {
 public:
-    AppWindow(
+    EngineWindow(
         std::string windowTitle = window::default::windowTitle.data(),
         Vector2Int physicalSize = window::default::physicalSize,
         Vector2Int minWindowSize = window::default::minWindowSize,
@@ -35,7 +35,7 @@ public:
     void present();
 
     // Destroyers
-    ~AppWindow();
+    ~EngineWindow();
 
 private:
     // Variables
@@ -52,9 +52,9 @@ private:
     float aspectRatio;
     Vector2 scale;
 
-    // Platform Implementations
-    struct AppWindowSDL;
-    AppWindowSDL *appWindowSDL = nullptr;
+    // Platform Implementation (Each platform fills this struct with their necessary components)
+    struct PlatformComponents;
+    PlatformComponents *platformComponents = nullptr;
 
     // Methods
     void recalculate();

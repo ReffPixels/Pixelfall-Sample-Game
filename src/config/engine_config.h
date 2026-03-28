@@ -4,7 +4,7 @@
 #pragma once
 #include <string_view>
 
-namespace metadata {
+namespace engine {
 
     constexpr std::string_view appTitle = "Pixelfall";
     constexpr std::string_view appIdentifier = "pixelfall";

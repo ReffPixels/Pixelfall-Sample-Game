@@ -1,14 +1,14 @@
 // Implementation of App Window for SDL
 
-#include "core/app_window.h"
+#include "core/engine_window.h"
 #include <SDL3/SDL.h>
 
-struct AppWindow::AppWindowSDL {
+struct EngineWindow::PlatformComponents {
     SDL_Window *window = nullptr;
     SDL_Renderer *renderer = nullptr;
 };
 
-AppWindow::AppWindow(
+EngineWindow::EngineWindow(
     // Values inherited from Base Class (Widget)
     std::string windowTitle,
     Vector2Int physicalSize,
@@ -25,45 +25,46 @@ AppWindow::AppWindow(
     maxAspectRatio(maxAspectRatio),
     dprScale(dprScale),
     presentationMode(presentationMode),
-    appWindowSDL(new AppWindowSDL()){
+    platformComponents(new PlatformComponents()) {
 };
 
-AppWindow::~AppWindow() {
-    if (appWindowSDL->window) SDL_DestroyWindow(appWindowSDL->window);
-    delete appWindowSDL;
+EngineWindow::~EngineWindow() {
+    if (platformComponents->window) SDL_DestroyWindow(platformComponents->window);
+    if (platformComponents->renderer) SDL_DestroyRenderer(platformComponents->renderer);
+    delete platformComponents;
 }
 
-bool AppWindow::init() {
+bool EngineWindow::init() {
     if (!SDL_CreateWindowAndRenderer(
         windowTitle.c_str(),
         physicalSize.x,
         physicalSize.y,
         SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_RESIZABLE,
-        &appWindowSDL->window,
-        &appWindowSDL->renderer)) {
+        &platformComponents->window,
+        &platformComponents->renderer)) {
         return false;
     }
 
-    SDL_SetWindowMinimumSize(appWindowSDL->window, minWindowSize.x, minWindowSize.y);
-    SDL_SetWindowAspectRatio(appWindowSDL->window, minAspectRatio, maxAspectRatio);
+    SDL_SetWindowMinimumSize(platformComponents->window, minWindowSize.x, minWindowSize.y);
+    SDL_SetWindowAspectRatio(platformComponents->window, minAspectRatio, maxAspectRatio);
     return true;
 }
 
-void AppWindow::clear() {
-    SDL_SetRenderDrawColorFloat(appWindowSDL->renderer, 1.0f, 1.0f, 1.0f, SDL_ALPHA_OPAQUE_FLOAT);
-    SDL_RenderClear(appWindowSDL->renderer);
+void EngineWindow::clear() {
+    SDL_SetRenderDrawColorFloat(platformComponents->renderer, 1.0f, 1.0f, 1.0f, SDL_ALPHA_OPAQUE_FLOAT);
+    SDL_RenderClear(platformComponents->renderer);
 }
 
-void AppWindow::present() {
-    SDL_RenderPresent(appWindowSDL->renderer);
+void EngineWindow::present() {
+    SDL_RenderPresent(platformComponents->renderer);
 }
 
-void AppWindow::setWindowTitle(std::string windowTitle) {
+void EngineWindow::setWindowTitle(std::string windowTitle) {
     this->windowTitle = windowTitle;
-    if (appWindowSDL->window)
-        SDL_SetWindowTitle(appWindowSDL->window, windowTitle.c_str());
+    if (platformComponents->window)
+        SDL_SetWindowTitle(platformComponents->window, windowTitle.c_str());
 }
 
-void AppWindow::recalculate() {
+void EngineWindow::recalculate() {
     // TODO
 }

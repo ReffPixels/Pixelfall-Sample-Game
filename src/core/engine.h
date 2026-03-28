@@ -2,21 +2,26 @@
 // Basic
 #include <filesystem>
 // Engine Components
-#include "core/app_window.h"
+#include "core/engine_window.h"
+#include "core/application.h"
 
 class Engine {
 public:
     // Methods
     bool init();
-    bool iterate();
+    bool startApplication(Application* application);
+    bool update();
 
     // Destructor
     ~Engine();
 
 private:
+    // isRunning is set to true on init(), and if set to false it will stop the engine.
     bool isRunning = false;
-    std::filesystem::path projectPath;
 
     // Engine Components
-    AppWindow window;
+    EngineWindow window;
+
+    // This application will be created by the platform and owned by Engine.
+    Application *application = nullptr;
 };
