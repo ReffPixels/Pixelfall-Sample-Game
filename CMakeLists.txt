@@ -8,6 +8,11 @@ add_executable(pixelfall ${SOURCES})
 
 target_include_directories(pixelfall PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
+# OpenGL with GLAD
+add_library(glad STATIC external/glad/src/glad.c)
+target_include_directories(glad PUBLIC external/glad/include)
+target_link_libraries(pixelfall PRIVATE glad)
+
 if(WIN32)
     target_include_directories(
         pixelfall PRIVATE ${CMAKE_SOURCE_DIR}/external/sdl/include
