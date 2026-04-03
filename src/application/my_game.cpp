@@ -1,12 +1,10 @@
 // Defines the Loop of this application.
 
 #include "application/my_game.h"
-#include <memory>
+// Output to console
 #include <iostream>
+// Shaders
 #include <glad/glad.h>
-#include <fstream>
-#include <sstream>
-#include "engine/core/shader.h"
 
 std::unique_ptr<Application> Application::create() {
     return std::make_unique<MyGame>();
