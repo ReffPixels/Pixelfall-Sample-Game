@@ -1,6 +1,6 @@
 src/application/my_game.cpp
-src/engine/core/engine.cpp
-src/engine/platform/sdl/sdl_callbacks.cpp
-src/engine/platform/sdl/implementation/clock.cpp
-src/engine/platform/sdl/implementation/window.cpp
-src/engine/platform/opengl/implementation/shader.cpp
+src/pixelfall/engine/core/engine.cpp
+src/pixelfall/platform/sdl/sdl_callbacks.cpp
+src/pixelfall/platform/sdl/implementation/clock.cpp
+src/pixelfall/platform/sdl/implementation/window.cpp
+src/pixelfall/platform/opengl/implementation/shader.cpp

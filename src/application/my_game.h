@@ -1,9 +1,9 @@
 // Overwrites the main functions defined in the engine to be used for this specific application.
 
 #pragma once
-#include "engine/core/application.h"
+#include "pixelfall/engine/core/application.h"
 // Shaders
-#include "engine/core/shader.h"
+#include "pixelfall/engine/rendering/shader.h"
 #include <optional>
 
 class MyGame : public Application {

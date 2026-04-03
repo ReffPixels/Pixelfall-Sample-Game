@@ -1,7 +1,7 @@
 // Defines time information, such as fps and deltaTime.
 #pragma once
 #include <stdint.h>
-#include "engine/config/engine_config.h"
+#include "pixelfall/engine/config/engine_config.h"
 
 class Clock {
 public:

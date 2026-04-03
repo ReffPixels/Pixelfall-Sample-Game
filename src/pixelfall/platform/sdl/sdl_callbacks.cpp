@@ -7,8 +7,8 @@
 #include <SDL3/SDL_main.h>
 #include <SDL3_ttf/SDL_ttf.h>
 // Engine
-#include "engine/core/engine.h"
-#include "engine/config/engine_config.h"
+#include "pixelfall/engine/core/engine.h"
+#include "pixelfall/engine/config/engine_config.h"
 
 // This function runs once at startup.
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {

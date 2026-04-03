@@ -1,4 +1,4 @@
-// Defines a window with all of the parameters and functions it should contain. 
+// Defines a basic shader class that creates a shader from the path to a pair of vertex and fragment shader files.
 // The actual implementation is platform specific.
 
 #pragma once
