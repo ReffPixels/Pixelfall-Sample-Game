@@ -13,22 +13,14 @@ std::unique_ptr<Application> Application::create() {
 
 // Create vertex array object (VAO) - Required when using OpenGL Core
 unsigned int VAO;
-// Create vertex shader object
+// Create element buffer object (EBO) to store indices (Avoids sending duplicate vertices to draw overlapping triangles)
 unsigned int VBO;
-// Create element buffer object (EBO) to store indices (Avoids sending duplicate vertices to draw overlapping triangles)
-unsigned int EBO;
-// Create vertex array object (VAO) - Required when using OpenGL Core
-unsigned int VAOy;
 // Create vertex shader object
-unsigned int VBOy;
-// Create element buffer object (EBO) to store indices (Avoids sending duplicate vertices to draw overlapping triangles)
-unsigned int EBOy;
+unsigned int EBO;
 // Create vertex buffer object (VBO) to send our vertices to the GPU in batches.
 unsigned int vertexShader;
 // Create shader program
 unsigned int shaderProgram;
-// Create shader program
-unsigned int shaderProgramY;
 
 // Load shaders from files
 static std::string loadShaderSource(const std::filesystem::path& path) {
@@ -47,30 +39,26 @@ bool MyGame::onStart(std::filesystem::path projectPath) {
     // Load shaders from files (Store as string but use const char* for OpenGL)
     std::string vertSrc = loadShaderSource(projectPath / "assets/shaders/vertex_shader.glsl");
     std::string fragSrc = loadShaderSource(projectPath / "assets/shaders/fragment_shader.glsl");
-    std::string fragYSrc = loadShaderSource(projectPath / "assets/shaders/fragment_shader_yellow.glsl");
     const char* vertexShaderSource = vertSrc.c_str();
     const char* fragmentShaderSource = fragSrc.c_str();
-    const char* fragmentYShaderSource = fragYSrc.c_str();
 
     std::cout << "START" << std::endl;
 
     // Define vertices in Normalized Device Coordinates (NDC) 
     //Keep Z axis to 0 for 2D (Equal depth)
     float vertices[] = {
+        // Triangle 1
         -0.5f,  -0.5f, 0.0f,
         -0.25f,  0.5f, 0.0f,
+        // Shared Corner
         0.0f,  -0.5f, 0.0f,
-    };
-    unsigned int indices[] = {
-        0, 1, 2
-    };
-    float verticesY[] = {
-        0.0f,  -0.5f, 0.0f,
+        // Triangle 2
         0.5f, -0.5f, 0.0f,
         0.25f, 0.5f, 0.0f,
     };
-    unsigned int indicesY[] = {
-        0, 1, 2
+    unsigned int indices[] = {
+        0, 1, 2, // Top right triangle
+        2, 3, 4 // Bottom left triangle
     };
 
     // Set up VAO
@@ -91,28 +79,6 @@ bool MyGame::onStart(std::filesystem::path projectPath) {
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // Link Vertex Attributes (Tell the GPU how to interpret the vertex data we provided)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // Set up VAOy
-    glGenVertexArrays(1, &VAOy);
-    glBindVertexArray(VAOy);
-
-    // Set up VBOy
-    glGenBuffers(1, &VBOy);
-    glBindBuffer(GL_ARRAY_BUFFER, VBOy);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verticesY), verticesY, GL_STATIC_DRAW);
-
-    // Set up EBOy
-    glGenBuffers(1, &EBOy);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOy);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicesY), indicesY, GL_STATIC_DRAW);
-
-    // Link Vertex Attributes for VAOy (while VAOy is still bound)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
 
     // Set up vertex shader object
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -147,23 +113,6 @@ bool MyGame::onStart(std::filesystem::path projectPath) {
         std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << fragmentShaderinfoLog << std::endl;
     }
 
-    // Create fragment shader y object
-    unsigned int fragmentShaderY;
-    fragmentShaderY = glCreateShader(GL_FRAGMENT_SHADER);
-
-    // Attach shader source code
-    glShaderSource(fragmentShaderY, 1, &fragmentYShaderSource, NULL);
-    glCompileShader(fragmentShaderY);
-
-    // Check if compilation was succesful
-    int fragmentShaderYSuccess;
-    char fragmentShaderYinfoLog[512];
-    glGetShaderiv(fragmentShaderY, GL_COMPILE_STATUS, &fragmentShaderYSuccess);
-    if (!fragmentShaderYSuccess) {
-        glGetShaderInfoLog(fragmentShaderY, 512, NULL, fragmentShaderYinfoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << fragmentShaderYinfoLog << std::endl;
-    }
-
     // Set up shader program
     shaderProgram = glCreateProgram();
 
@@ -181,27 +130,13 @@ bool MyGame::onStart(std::filesystem::path projectPath) {
         std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << shaderProgramInfoLog << std::endl;
     }
 
-    // Set up shader program y
-    shaderProgramY = glCreateProgram();
-
-    // Link shaders to the shader y program
-    glAttachShader(shaderProgramY, vertexShader);
-    glAttachShader(shaderProgramY, fragmentShaderY);
-    glLinkProgram(shaderProgramY);
-
-    // Check if linking was succesful
-    int shaderProgramYSuccess;
-    char shaderProgramYInfoLog[512];
-    glGetProgramiv(shaderProgramY, GL_LINK_STATUS, &shaderProgramYSuccess);
-    if (!shaderProgramYSuccess) {
-        glGetProgramInfoLog(shaderProgramY, 512, NULL, shaderProgramYInfoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << shaderProgramYInfoLog << std::endl;
-    }
-
     // Delete shader objects (We don't need them anymore)
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
-    glDeleteShader(fragmentShaderY);
+
+    // Link Vertex Attributes (Tell the GPU how to interpret the vertex data we provided)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
     return true;
 }
@@ -211,15 +146,11 @@ void MyGame::onUpdate() {
 
 void MyGame::onRender() {
     // Wireframe mode
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Use shader program
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-    glUseProgram(shaderProgramY);
-    glBindVertexArray(VAOy);
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
