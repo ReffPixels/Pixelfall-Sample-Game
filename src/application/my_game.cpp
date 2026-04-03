@@ -6,7 +6,7 @@
 #include <glad/glad.h>
 #include <fstream>
 #include <sstream>
-#include <SDL3/SDL.h>
+#include "engine/core/shader.h"
 
 std::unique_ptr<Application> Application::create() {
     return std::make_unique<MyGame>();
@@ -18,32 +18,15 @@ unsigned int VAO;
 unsigned int VBO;
 // Create vertex shader object
 unsigned int EBO;
-// Create vertex buffer object (VBO) to send our vertices to the GPU in batches.
-unsigned int vertexShader;
-// Create shader program
-unsigned int shaderProgram;
-
-// Load shaders from files
-static std::string loadShaderSource(const std::filesystem::path& path) {
-    std::ifstream file(path);
-    if (!file.is_open()) {
-        std::cout << "ERROR::SHADER::FILE_NOT_FOUND: " << path << std::endl;
-        return "";
-    }
-    std::stringstream ss;
-    ss << file.rdbuf();
-    return ss.str();
-}
 
 bool MyGame::onStart(std::filesystem::path projectPath) {
-
-    // Load shaders from files (Store as string but use const char* for OpenGL)
-    std::string vertSrc = loadShaderSource(projectPath / "assets/shaders/vertex_shader.glsl");
-    std::string fragSrc = loadShaderSource(projectPath / "assets/shaders/fragment_shader.glsl");
-    const char* vertexShaderSource = vertSrc.c_str();
-    const char* fragmentShaderSource = fragSrc.c_str();
-
+    // Debug
     std::cout << "START" << std::endl;
+
+    basicShader.emplace(
+        (projectPath / "assets/shaders/vertex_shader.glsl"),
+        (projectPath / "assets/shaders/fragment_shader.glsl")
+    );
 
     // Define vertices in Normalized Device Coordinates (NDC) 
     //Keep Z axis to 0 for 2D (Equal depth)
@@ -89,60 +72,6 @@ bool MyGame::onStart(std::filesystem::path projectPath) {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // Set up vertex shader object
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-    // Attach shader source code
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-
-    // Check if compilation was succesful
-    int vertexShaderSuccess;
-    char vertexShaderinfoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &vertexShaderSuccess);
-    if (!vertexShaderSuccess) {
-        glGetShaderInfoLog(vertexShader, 512, NULL, vertexShaderinfoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << vertexShaderinfoLog << std::endl;
-    }
-
-    // Create fragment shader object
-    unsigned int fragmentShader;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-    // Attach shader source code
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    // Check if compilation was succesful
-    int fragmentShaderSuccess;
-    char fragmentShaderinfoLog[512];
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &fragmentShaderSuccess);
-    if (!fragmentShaderSuccess) {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, fragmentShaderinfoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << fragmentShaderinfoLog << std::endl;
-    }
-
-    // Set up shader program
-    shaderProgram = glCreateProgram();
-
-    // Link shaders to the shader program
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    // Check if linking was succesful
-    int shaderProgramSuccess;
-    char shaderProgramInfoLog[512];
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &shaderProgramSuccess);
-    if (!shaderProgramSuccess) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, shaderProgramInfoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << shaderProgramInfoLog << std::endl;
-    }
-
-    // Delete shader objects (We don't need them anymore)
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
     return true;
 }
 
@@ -154,8 +83,13 @@ void MyGame::onRender() {
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Use shader program
-    glUseProgram(shaderProgram);
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+    if (basicShader) {
+        basicShader->use();
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
+    else {
+        std::cout << "ERROR: Shader uninitialized (Has onRender been called before onStart?)" << std::endl;
+    }
 }

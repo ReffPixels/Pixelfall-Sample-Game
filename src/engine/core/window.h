@@ -1,4 +1,4 @@
-// Defines a window and all of the parameters and functions it should contain. 
+// Defines a window with all of the parameters and functions it should contain. 
 // The actual implementation is platform specific.
 
 #pragma once

@@ -3,3 +3,4 @@ src/engine/core/engine.cpp
 src/engine/platform/sdl/sdl_callbacks.cpp
 src/engine/platform/sdl/implementation/clock.cpp
 src/engine/platform/sdl/implementation/window.cpp
+src/engine/platform/opengl/implementation/shader.cpp
