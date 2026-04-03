@@ -6,6 +6,7 @@
 #include <glad/glad.h>
 #include <fstream>
 #include <sstream>
+#include <SDL3/SDL.h>
 
 std::unique_ptr<Application> Application::create() {
     return std::make_unique<MyGame>();
@@ -146,10 +147,15 @@ void MyGame::onUpdate() {
 
 void MyGame::onRender() {
     // Wireframe mode
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    float timeValue = SDL_GetTicks() / 1000.0f;
+    float colourOverTime = (sin(timeValue) / 2.0f) + 0.5f;
+    int vertexColourLocation = glGetUniformLocation(shaderProgram, "customColor");
 
     // Use shader program
     glUseProgram(shaderProgram);
+    glUniform4f(vertexColourLocation, 0.0f, colourOverTime, 0.0f, 1.0f);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
