@@ -12,6 +12,7 @@ public:
     // Getters
     Window* getWindow() { return window.get(); };
     Clock* getClock() { return clock.get(); };
+    std::filesystem::path getProjectPath() { return projectPath; };
 
     // Setters
     void setProjectPath(std::filesystem::path projectPath) { this->projectPath = projectPath; };

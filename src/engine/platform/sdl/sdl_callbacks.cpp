@@ -36,15 +36,15 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
         return SDL_APP_FAILURE;
     }
 
+    // Store project path
+    engine->setProjectPath(std::filesystem::weakly_canonical(SDL_GetBasePath()));
+
     // Create the application (Owned by Engine)
     if (!engine->startApplication(Application::create())) {
         delete engine;
         SDL_Log("Couldn't create application: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
-
-    // Store project path
-    engine->setProjectPath(std::filesystem::weakly_canonical(SDL_GetBasePath()));
 
     *appstate = engine;
     return SDL_APP_CONTINUE;

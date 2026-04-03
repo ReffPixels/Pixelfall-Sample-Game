@@ -5,7 +5,7 @@
 
 class MyGame : public Application {
 public:
-    bool onStart()  override;
+    bool onStart(std::filesystem::path projectPath)  override;
     void onUpdate() override;
     void onRender() override;
 };

@@ -4,45 +4,61 @@
 #include <memory>
 #include <iostream>
 #include <glad/glad.h>
+#include <fstream>
+#include <sstream>
 
 std::unique_ptr<Application> Application::create() {
     return std::make_unique<MyGame>();
 }
 
-// Temporary Shader definition
-const char* vertexShaderSource =
-"#version 330 core\n"
-"layout(location = 0) in vec3 aPos;\n"
-"void main() {\n"
-"    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-
-const char* fragmentShaderSource =
-"#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main() {\n"
-"    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-"}\0";
-
-
 // Create vertex array object (VAO) - Required when using OpenGL Core
 unsigned int VAO;
-// Create vertex buffer object (VBO) to send our vertices to the GPU in batches.
+// Create element buffer object (EBO) to store indices (Avoids sending duplicate vertices to draw overlapping triangles)
 unsigned int VBO;
 // Create vertex shader object
+unsigned int EBO;
+// Create vertex buffer object (VBO) to send our vertices to the GPU in batches.
 unsigned int vertexShader;
 // Create shader program
 unsigned int shaderProgram;
 
-bool MyGame::onStart() {
+// Load shaders from files
+static std::string loadShaderSource(const std::filesystem::path& path) {
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        std::cout << "ERROR::SHADER::FILE_NOT_FOUND: " << path << std::endl;
+        return "";
+    }
+    std::stringstream ss;
+    ss << file.rdbuf();
+    return ss.str();
+}
+
+bool MyGame::onStart(std::filesystem::path projectPath) {
+
+    // Load shaders from files (Store as string but use const char* for OpenGL)
+    std::string vertSrc = loadShaderSource(projectPath / "assets/shaders/vertex_shader.glsl");
+    std::string fragSrc = loadShaderSource(projectPath / "assets/shaders/fragment_shader.glsl");
+    const char* vertexShaderSource = vertSrc.c_str();
+    const char* fragmentShaderSource = fragSrc.c_str();
+
     std::cout << "START" << std::endl;
 
     // Define vertices in Normalized Device Coordinates (NDC) 
     //Keep Z axis to 0 for 2D (Equal depth)
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
+        // Triangle 1
+        -0.5f,  -0.5f, 0.0f,
+        -0.25f,  0.5f, 0.0f,
+        // Shared Corner
+        0.0f,  -0.5f, 0.0f,
+        // Triangle 2
         0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f
+        0.25f, 0.5f, 0.0f,
+    };
+    unsigned int indices[] = {
+        0, 1, 2, // Top right triangle
+        2, 3, 4 // Bottom left triangle
     };
 
     // Set up VAO
@@ -58,6 +74,11 @@ bool MyGame::onStart() {
     // Copy user defined data into the currently bound buffer. 
     // Set GPU mode to STATIC DRAW since the triangle won't change often.
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // Set up EBO
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Set up vertex shader object
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -124,8 +145,12 @@ void MyGame::onUpdate() {
 }
 
 void MyGame::onRender() {
+    // Wireframe mode
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
     // Use shader program
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }
