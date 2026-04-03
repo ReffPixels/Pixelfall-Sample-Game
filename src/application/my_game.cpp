@@ -48,18 +48,18 @@ bool MyGame::onStart(std::filesystem::path projectPath) {
     // Define vertices in Normalized Device Coordinates (NDC) 
     //Keep Z axis to 0 for 2D (Equal depth)
     float vertices[] = {
-        // Triangle 1
-        -0.5f,  -0.5f, 0.0f,
-        -0.25f,  0.5f, 0.0f,
-        // Shared Corner
-        0.0f,  -0.5f, 0.0f,
-        // Triangle 2
-        0.5f, -0.5f, 0.0f,
-        0.25f, 0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+
+        -0.25f, 0.5f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+
+        0.0f, -0.5f, 0.0f,
+        0.0f, 0.0f, 1.0f
+
     };
     unsigned int indices[] = {
-        0, 1, 2, // Top right triangle
-        2, 3, 4 // Bottom left triangle
+        0, 1, 2
     };
 
     // Set up VAO
@@ -80,6 +80,14 @@ bool MyGame::onStart(std::filesystem::path projectPath) {
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // Link Vertex Attributes (Tell the GPU how to interpret the vertex data we provided)
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // Set up vertex shader object
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -135,10 +143,6 @@ bool MyGame::onStart(std::filesystem::path projectPath) {
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    // Link Vertex Attributes (Tell the GPU how to interpret the vertex data we provided)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
     return true;
 }
 
@@ -149,13 +153,8 @@ void MyGame::onRender() {
     // Wireframe mode
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    float timeValue = SDL_GetTicks() / 1000.0f;
-    float colourOverTime = (sin(timeValue) / 2.0f) + 0.5f;
-    int vertexColourLocation = glGetUniformLocation(shaderProgram, "customColor");
-
     // Use shader program
     glUseProgram(shaderProgram);
-    glUniform4f(vertexColourLocation, 0.0f, colourOverTime, 0.0f, 1.0f);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
