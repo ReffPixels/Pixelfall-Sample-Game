@@ -15,15 +15,18 @@ public:
     Window(
         std::string windowTitle = window::defaults::windowTitle.data(),
         Vector2Int physicalSize = window::defaults::physicalSize,
+        Vector2Int referenceSize = window::defaults::referenceSize,
         Vector2Int minWindowSize = window::defaults::minWindowSize,
         float minAspectRatio = window::defaults::minAspectRatio,
         float maxAspectRatio = window::defaults::maxAspectRatio,
         float dprScale = window::defaults::dprScale,
-        window::PresentationMode presentationMode = window::defaults::presentationMode
-    );
+        window::PresentationMode presentationMode = window::defaults::presentationMode,
+        Color clearColor = window::defaults::clearColor
+        );
 
     // Getters
     const Vector2Int& getPhysicalSize() const { return physicalSize; };
+    const Vector2Int& getReferenceSize() const { return referenceSize; };
     float getDprScale() const { return dprScale; };
     const Vector2Int& getLogicalSize() const { return logicalSize; };
     float getAspectRatio() const { return aspectRatio; };
@@ -31,6 +34,7 @@ public:
 
     // Setters
     void setWindowTitle(std::string windowTitle);
+    void setWReferenceSize(Vector2Int referenceSize) { this->referenceSize = referenceSize; };
     void setDprScale(float dprScale) { this->dprScale = dprScale; };
     void setPresentationMode(window::PresentationMode presentationMode);
 
@@ -39,7 +43,6 @@ public:
     void clear();
     void present();
     void updateWindowData();
-    void debug();
 
     // Destroyers
     ~Window();
@@ -48,11 +51,13 @@ private:
     // Variables
     std::string windowTitle;
     Vector2Int physicalSize;
+    Vector2Int referenceSize;
     Vector2Int minWindowSize;
     float minAspectRatio;
     float maxAspectRatio;
     float dprScale;
     window::PresentationMode presentationMode;
+    Color clearColor;
 
     // Derived Variables
     Vector2Int logicalSize;

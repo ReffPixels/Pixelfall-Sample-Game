@@ -1,6 +1,8 @@
 // Implementation of window.h for SDL.
 
 #include "pixelfall/engine/core/window.h"
+// Standard Library
+#include <algorithm>
 // SDL
 #include <SDL3/SDL.h>
 // OpenGL
@@ -16,20 +18,24 @@ struct Window::PlatformComponents {
 Window::Window(
     std::string windowTitle,
     Vector2Int physicalSize,
+    Vector2Int referenceSize,
     Vector2Int minWindowSize,
     float minAspectRatio,
     float maxAspectRatio,
     float dprScale,
-    window::PresentationMode presentationMode
-) :
+    window::PresentationMode presentationMode,
+    Color clearColor
+    ) :
     windowTitle(windowTitle),
     physicalSize(physicalSize),
+    referenceSize(referenceSize),
     minWindowSize(minWindowSize),
     minAspectRatio(minAspectRatio),
     maxAspectRatio(maxAspectRatio),
     dprScale(dprScale),
     presentationMode(presentationMode),
-    platform(std::make_unique<PlatformComponents>()) {
+    platform(std::make_unique<PlatformComponents>()),
+    clearColor(clearColor) {
 };
 
 // Executes when the window is initialized by the engine.
@@ -66,7 +72,7 @@ bool Window::init() {
     // Define Window properties
     SDL_SetWindowMinimumSize(platform->window, minWindowSize.x, minWindowSize.y);
     SDL_SetWindowAspectRatio(platform->window, minAspectRatio, maxAspectRatio);
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
     updateWindowData();
 
     return true;
@@ -105,8 +111,8 @@ void Window::updateWindowData() {
 
     // Get current scale (Relative to the reference size)
     scale = Vector2(
-        (float)physicalSize.x / window::defaults::referenceSize.x,
-        (float)physicalSize.y / window::defaults::referenceSize.y
+        (float)physicalSize.x / referenceSize.x,
+        (float)physicalSize.y / referenceSize.y
     );
 
     // Set OpenGL viewport to fill the window
@@ -118,88 +124,83 @@ void Window::updateWindowData() {
 
 // Calculates the logical size depending on the presentation mode and updates presentation mode.
 void Window::updateLogicalPresentation() {
-    // Simplified for now to set up OpenGL
-    logicalSize = physicalSize;
+    float refW = (float)referenceSize.x;
+    float refH = (float)referenceSize.y;
+    float winW = (float)physicalSize.x;
+    float winH = (float)physicalSize.y;
 
-    // switch (presentationMode) {
-    // case window::PresentationMode::Free:
-    //     logicalSize = physicalSize;
-    //     SDL_SetRenderLogicalPresentation(
-    //         platform->renderer,
-    //         0, 0, SDL_LOGICAL_PRESENTATION_DISABLED
-    //     );
-    //     break;
-    // case window::PresentationMode::Letterbox:
-    //     logicalSize = window::defaults::referenceSize;
-    //     SDL_SetRenderLogicalPresentation(
-    //         platform->renderer,
-    //         window::defaults::referenceSize.x,
-    //         window::defaults::referenceSize.y,
-    //         SDL_LOGICAL_PRESENTATION_LETTERBOX
-    //     );
-    //     break;
-    // case window::PresentationMode::Crop:
-    //     logicalSize = window::defaults::referenceSize;
-    //     SDL_SetRenderLogicalPresentation(
-    //         platform->renderer,
-    //         window::defaults::referenceSize.x,
-    //         window::defaults::referenceSize.y,
-    //         SDL_LOGICAL_PRESENTATION_OVERSCAN
-    //     );
-    //     break;
-    // case window::PresentationMode::Stretch:
-    //     logicalSize = window::defaults::referenceSize;
-    //     SDL_SetRenderLogicalPresentation(
-    //         platform->renderer,
-    //         window::defaults::referenceSize.x,
-    //         window::defaults::referenceSize.y,
-    //         SDL_LOGICAL_PRESENTATION_STRETCH
-    //     );
-    //     break;
-    // case window::PresentationMode::Expand: {
-    //     float smallestScale = std::min(scale.x, scale.y);
-    //     logicalSize = {(int)(physicalSize.x / smallestScale), (int)(physicalSize.y / smallestScale)};
-    //     SDL_SetRenderLogicalPresentation(
-    //         platform->renderer,
-    //         logicalSize.x,
-    //         logicalSize.y,
-    //         SDL_LOGICAL_PRESENTATION_STRETCH
-    //     );
-    //     break;
-    // }
-    // case window::PresentationMode::ExpandHorizontal: {
-    //     logicalSize = {(int)(physicalSize.x / scale.y), (int)(physicalSize.y / scale.y)};
-    //     SDL_SetRenderLogicalPresentation(
-    //         platform->renderer,
-    //         logicalSize.x,
-    //         logicalSize.y,
-    //         SDL_LOGICAL_PRESENTATION_STRETCH
-    //     );
-    //     break;
-    // }
-    // case window::PresentationMode::ExpandVertical: {
-    //     logicalSize = {(int)(physicalSize.x / scale.x), (int)(physicalSize.y / scale.x)};
-    //     SDL_SetRenderLogicalPresentation(
-    //         platform->renderer,
-    //         logicalSize.x,
-    //         logicalSize.y,
-    //         SDL_LOGICAL_PRESENTATION_STRETCH
-    //     );
-    //     break;
-    // }
-    // default:
-    //     logicalSize = physicalSize;
-    //     SDL_SetRenderLogicalPresentation(
-    //         platform->renderer,
-    //         0, 0, SDL_LOGICAL_PRESENTATION_DISABLED
-    //     );
-    // }
-}
+    switch (presentationMode) {
 
-void Window::debug() {
-    // SDL_SetRenderDrawColorFloat(platform->renderer, 1.0f, 0.0f, 0.0f, SDL_ALPHA_OPAQUE_FLOAT);
-    // SDL_FRect rect{10, 10, (float)window::defaults::referenceSize.x - 20.0f, (float)window::defaults::referenceSize.y - 20.0f};
-    // SDL_RenderFillRect(platform->renderer, &rect);
+    case window::PresentationMode::Free:
+        // Viewport at position (0, 0) and the full size of the window.
+        // Coordinates (logical size) are just the window size.
+        glViewport(0, 0, physicalSize.x, physicalSize.y);
+        logicalSize = physicalSize;
+        break;
+
+    case window::PresentationMode::Letterbox: {
+        // Viewport centered, scales reference size to the smallest axis of the window.
+        // Coordinates (logical size) based on reference size.
+        float smallScale = std::min(scale.x, scale.y);
+        int vpW = (int)(refW * smallScale);
+        int vpH = (int)(refH * smallScale);
+        int vpX = (int)((winW - vpW) / 2);
+        int vpY = (int)((winH - vpH) / 2);
+        glViewport(vpX, vpY, vpW, vpH);
+        logicalSize = referenceSize;
+        break;
+    }
+
+    case window::PresentationMode::Crop: {
+        // Viewport centered, scales reference size to the biggest axis of the window.
+        // Coordinates (logical size) based on reference size.
+        float bigScale = std::max(winW / refW, winH / refH);
+        int vpW = (int)(refW * bigScale);
+        int vpH = (int)(refH * bigScale);
+        int vpX = (int)((winW - vpW) / 2);
+        int vpY = (int)((winH - vpH) / 2);
+        glViewport(vpX, vpY, vpW, vpH);
+        logicalSize = referenceSize;
+        break;
+    }
+
+    case window::PresentationMode::Stretch:
+        // Viewport at position (0, 0) and the full size of the window.
+        // Coordinates (logical size) based on reference size.
+        glViewport(0, 0, physicalSize.x, physicalSize.y);
+        logicalSize = referenceSize;
+        break;
+
+    case window::PresentationMode::Expand: {
+        // Viewport at position (0, 0) and the full size of the window.
+        // Coordinates (logical size) are the reference size scaled to fill the middle section of the screen.
+        float smallScale = std::min(scale.x, scale.y);
+        glViewport(0, 0, physicalSize.x, physicalSize.y);
+        logicalSize = {(int)(refW * smallScale), (int)(refH * smallScale)};
+        break;
+    }
+
+    case window::PresentationMode::ExpandHorizontal: {
+        // Viewport at position (0, 0) and the full size of the window.
+        // Coordinates (logical size) are the reference size scaled to fill the height of the screen.
+        glViewport(0, 0, physicalSize.x, physicalSize.y);
+        logicalSize = {(int)(refW * scale.y), (int)(refH * scale.y)};
+        break;
+    }
+
+    case window::PresentationMode::ExpandVertical: {
+        // Viewport at position (0, 0) and the full size of the window.
+        // Coordinates (logical size) are the reference size scaled to fill the width of the screen.
+        glViewport(0, 0, physicalSize.x, physicalSize.y);
+        logicalSize = {(int)(refW * scale.x), (int)(refH * scale.x)};
+        break;
+    }
+
+    default:
+        glViewport(0, 0, physicalSize.x, physicalSize.y);
+        logicalSize = physicalSize;
+        break;
+    }
 }
 
 // Destructor

@@ -26,7 +26,7 @@ bool Engine::init() {
 
 bool Engine::startApplication(std::unique_ptr<Application> application) {
     this->application = std::move(application);
-    this->application->setup(projectPath);
+    this->application->setup(projectPath, *window);
     if (!this->application->onStart()) {
         std::cout << "ERROR: Failed to create application" << std::endl;
         isRunning = false;
@@ -47,9 +47,6 @@ bool Engine::update() {
     // Rendering
     window->clear();
     application->onRender();
-#ifndef NDEBUG
-    window->debug();
-#endif
     window->present();
 
     return isRunning;

@@ -5,6 +5,8 @@
 #include <memory>
 #include <filesystem>
 #include <optional>
+// Core
+#include "pixelfall/engine/core/window.h"
 // Graphics
 #include "pixelfall/engine/graphics/shader.h"
 #include "pixelfall/engine/graphics/painter.h"
@@ -14,7 +16,7 @@ public:
     static std::unique_ptr<Application> create();
     virtual ~Application() = default;
 
-    void setup(std::filesystem::path projectPath);
+    void setup(std::filesystem::path projectPath, Window& window);
 
     virtual bool onStart() { return true; }
     virtual void onUpdate() {}

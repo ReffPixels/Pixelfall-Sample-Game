@@ -63,6 +63,9 @@ void Shader::setUniformFloat(const std::string& name, float value) const {
 void Shader::setUniformVec4(const std::string& name, float x, float y, float z, float w) const {
     glUniform4f(glGetUniformLocation(shaderID, name.c_str()), x, y, z, w);
 }
+void Shader::setUniformMat4(const std::string& name, float* matrix) const {
+    glUniformMatrix4fv(glGetUniformLocation(shaderID, name.c_str()), 1, GL_FALSE, matrix);
+}
 
 // Load shaders from files
 std::string Shader::getShaderCode(const std::filesystem::path& path) {

@@ -21,6 +21,7 @@ public:
     void setUniformInt(const std::string& name, int value) const;
     void setUniformFloat(const std::string& name, float value) const;
     void setUniformVec4(const std::string& name, float x, float y, float z, float w) const;
+    void setUniformMat4(const std::string& name, float* matrix) const;
 
     // Destroyers
     ~Shader();
