@@ -1,10 +1,13 @@
 // Defines the Engine class, which controls the state of the application and owns the main loop.
 
 #pragma once
+// Standard Library
 #include <filesystem>
 #include <memory>
+// Engine Components
 #include "pixelfall/engine/core/window.h"
 #include "pixelfall/engine/core/clock.h"
+// Application
 #include "pixelfall/engine/core/application.h"
 
 class Engine {

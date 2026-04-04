@@ -1,7 +1,7 @@
 // Virtual class that an application can override to gain access to the basic engine functions.
 
 #pragma once
-// Standard
+// Standard Library
 #include <memory>
 #include <filesystem>
 #include <optional>
@@ -19,6 +19,7 @@ public:
     virtual bool onStart() { return true; }
     virtual void onUpdate() {}
     virtual void onRender() {}
+
 protected:
     std::optional<Shader> defaultShader;
     std::optional<Painter> painter;

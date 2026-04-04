@@ -1,11 +1,12 @@
+// Implementation of shader.h for OpenGL.
+
 #include "pixelfall/engine/graphics/shader.h"
-// OpenGL
-#include <glad/glad.h>
-// File Management
+// Standard Library
 #include <fstream>
 #include <sstream>
-// Printing to Console
 #include <iostream>
+// OpenGL
+#include <glad/glad.h>
 
 // Define components specific to the platform (OpenGL)
 struct Shader::PlatformComponents {

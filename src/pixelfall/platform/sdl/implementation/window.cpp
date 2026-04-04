@@ -1,8 +1,10 @@
 // Implementation of window.h for SDL.
 
 #include "pixelfall/engine/core/window.h"
-#include <glad/glad.h>
+// SDL
 #include <SDL3/SDL.h>
+// OpenGL
+#include <glad/glad.h>
 
 // Define components specific to the platform (SDL and OpenGL)
 struct Window::PlatformComponents {

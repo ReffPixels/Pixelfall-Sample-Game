@@ -1,11 +1,8 @@
-// Defines functions to draw geometrical shapes by creating meshes.
+// Allows drawing geometrical shapes by creating meshes.
+
 #pragma once
-// Standard Library
-#include <optional>
-#include <memory>
 // Graphics
 #include "pixelfall/engine/graphics/shader.h"
-#include "pixelfall/engine/graphics/mesh.h"
 #include "pixelfall/engine/graphics/color.h"
 // Math
 #include "pixelfall/engine/math/vector2.h"

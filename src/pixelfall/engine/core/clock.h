@@ -1,6 +1,10 @@
-// Defines time information, such as fps and deltaTime.
+// Manages time information, such as fps and deltaTime.
+// The actual implementation is platform specific.
+
 #pragma once
+// Standard Library
 #include <stdint.h>
+// Configuration
 #include "pixelfall/engine/config/engine_config.h"
 
 class Clock {

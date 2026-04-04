@@ -1,4 +1,5 @@
-// Overwrites the main functions defined in the engine to be used for this specific application.
+// Defines the loop of this specific application. 
+// Overwrites the main functions defined in application.h (Run by the engine).
 
 #pragma once
 #include "pixelfall/engine/core/application.h"

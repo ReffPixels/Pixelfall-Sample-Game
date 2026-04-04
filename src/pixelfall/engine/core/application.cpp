@@ -1,3 +1,5 @@
+// Implementation of application.h
+
 #include "pixelfall/engine/core/application.h"
 
 void Application::setup(std::filesystem::path projectPath) {

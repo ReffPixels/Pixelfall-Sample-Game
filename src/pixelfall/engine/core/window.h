@@ -2,9 +2,12 @@
 // The actual implementation is platform specific.
 
 #pragma once
+// Standard Library
 #include <string>
 #include <memory>
+// Variable Types
 #include "pixelfall/engine/math/vector2.h"
+// Configuration
 #include "pixelfall/engine/config/window_config.h"
 
 class Window {

@@ -1,8 +1,9 @@
-// Defines a color type (rgba)
-// Default is always opaque white
+// Defines a color type (rgba) and allows transformations from different formats.
 
 #pragma once
+// Standard Library
 #include <string>
+// Variable Types
 #include "pixelfall/engine/math/vectors.h"
 
 class Color {

@@ -1,10 +1,10 @@
+// Implementation for color.h
+
 #include "pixelfall/engine/graphics/color.h"
-// Print to console
+// Standard Library
 #include <iostream>
-// String formatting for hex
 #include <sstream>
 #include <iomanip>
-// Math
 #include <algorithm>
 
 // Static Factory Methods

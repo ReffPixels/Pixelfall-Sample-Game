@@ -1,8 +1,11 @@
 // Defines information about the window.
 
 #pragma once
+// Standard Library
 #include <string_view>
-#include "pixelfall/engine/math/vector2.h"
+// Variable Types
+#include "pixelfall/engine/math/vectors.h"
+#include "pixelfall/engine/graphics/color.h"
 
 namespace window {
 

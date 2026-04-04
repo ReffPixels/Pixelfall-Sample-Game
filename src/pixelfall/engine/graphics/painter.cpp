@@ -1,4 +1,8 @@
+// Implementation for painter.h
+
 #include "pixelfall/engine/graphics/painter.h"
+// Graphics
+#include "pixelfall/engine/graphics/mesh.h"
 
 void Painter::drawTriangle(Vector2 a, Vector2 b, Vector2 c, Color color) {
     std::vector<float> vertices = {

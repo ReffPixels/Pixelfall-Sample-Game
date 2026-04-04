@@ -1,6 +1,7 @@
 // Implementation of mesh.h for OpenGL.
 
 #include "pixelfall/engine/graphics/mesh.h"
+// OpenGL
 #include <glad/glad.h>
 
 // Define components specific to the platform (SDL and OpenGL)

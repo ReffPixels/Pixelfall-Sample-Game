@@ -1,4 +1,4 @@
-// Defines a basic Vector3 and Vector3Int.
+// Defines a basic Vector4 and Vector4Int.
 
 #pragma once
 

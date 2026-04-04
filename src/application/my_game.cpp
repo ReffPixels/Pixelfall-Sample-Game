@@ -1,17 +1,15 @@
-// Defines the Loop of this application.
+// Defines the loop of this specific application.
 
 #include "application/my_game.h"
-// Output to console
+// Standard Library
 #include <iostream>
-// Shaders
-#include <glad/glad.h>
 
+// Create Game
 std::unique_ptr<Application> Application::create() {
     return std::make_unique<MyGame>();
 }
 
 bool MyGame::onStart() {
-    // Debug
     std::cout << "START" << std::endl;
 
     return true;
@@ -21,9 +19,6 @@ void MyGame::onUpdate() {
 }
 
 void MyGame::onRender() {
-    // Wireframe mode
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
     painter->drawTriangle(Vector2(-0.5f, -0.5f), Vector2(-0.25f, 0.5f), Vector2(0.0f, -0.5f), Color::fromHexcode("#ff0000"));
     painter->drawTriangle(Vector2(0.5f, 0.5f), Vector2(0.25f, -0.5f), Vector2(0.0f, 0.5f), Color::fromHexcode("#ffff00"));
 }

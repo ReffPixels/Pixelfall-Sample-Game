@@ -1,8 +1,10 @@
 // Defines a basic Vector2 and Vector2Int.
 
 #pragma once
+// Standard Library
 #include <cmath>
 #include <algorithm>
+// Math
 #include "pixelfall/engine/math/numbers.h"
 
 class Vector2 {
