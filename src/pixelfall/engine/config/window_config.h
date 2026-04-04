@@ -30,7 +30,7 @@ namespace window {
         constexpr float minAspectRatio{1.0f / 1.0f};
         constexpr float maxAspectRatio{32.0f / 9.0f};
         constexpr float dprScale = 1.0f;
-        constexpr PresentationMode presentationMode = PresentationMode::Letterbox;
+        constexpr PresentationMode presentationMode = PresentationMode::Expand;
 
         // The color used to clear the window. It determines the color of the bars in Letterbox presentation
         inline const Color clearColor{Color::fromHexcode("#000000")};

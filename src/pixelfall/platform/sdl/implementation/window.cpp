@@ -173,26 +173,26 @@ void Window::updateLogicalPresentation() {
 
     case window::PresentationMode::Expand: {
         // Viewport at position (0, 0) and the full size of the window.
-        // Coordinates (logical size) are the reference size scaled to fill the middle section of the screen.
+        // Coordinates (logical size) are the reference size scaled to fit the screen.
         float smallScale = std::min(scale.x, scale.y);
         glViewport(0, 0, physicalSize.x, physicalSize.y);
-        logicalSize = {(int)(refW * smallScale), (int)(refH * smallScale)};
+        logicalSize = {(int)(winW / smallScale), (int)(winH / smallScale)};
         break;
     }
 
     case window::PresentationMode::ExpandHorizontal: {
         // Viewport at position (0, 0) and the full size of the window.
-        // Coordinates (logical size) are the reference size scaled to fill the height of the screen.
+        // Coordinates (logical size) are the reference size scaled to fit the height of the screen.
         glViewport(0, 0, physicalSize.x, physicalSize.y);
-        logicalSize = {(int)(refW * scale.y), (int)(refH * scale.y)};
+        logicalSize = {(int)(winW / scale.y), (int)(winH / scale.y)};
         break;
     }
 
     case window::PresentationMode::ExpandVertical: {
         // Viewport at position (0, 0) and the full size of the window.
-        // Coordinates (logical size) are the reference size scaled to fill the width of the screen.
+        // Coordinates (logical size) are the reference size scaled to fit the width of the screen.
         glViewport(0, 0, physicalSize.x, physicalSize.y);
-        logicalSize = {(int)(refW * scale.x), (int)(refH * scale.x)};
+        logicalSize = {(int)(winW / scale.x), (int)(winH / scale.x)};
         break;
     }
 
