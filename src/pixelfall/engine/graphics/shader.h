@@ -4,6 +4,7 @@
 #pragma once
 #include <string>
 #include <filesystem>
+#include <memory>
 
 class Shader {
 public:
@@ -15,9 +16,10 @@ public:
 
     // Methods
     void use();
-    void addUniformBool(const std::string& name, bool value) const;
-    void addUniformInt(const std::string& name, int value) const;
-    void addUniformFloat(const std::string& name, float value) const;
+    void setUniformBool(const std::string& name, bool value) const;
+    void setUniformInt(const std::string& name, int value) const;
+    void setUniformFloat(const std::string& name, float value) const;
+    void setUniformVec4(const std::string& name, float x, float y, float z, float w) const;
 
     // Destroyers
     ~Shader();
@@ -30,7 +32,7 @@ private:
 
     // Platform Implementation (Each platform fills this struct with their necessary components)
     struct PlatformComponents;
-    PlatformComponents* platformComponents = nullptr;
+    std::unique_ptr<PlatformComponents> platform;
 
     // Methods
     std::string Shader::getShaderCode(const std::filesystem::path& path);

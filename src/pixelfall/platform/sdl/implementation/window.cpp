@@ -27,7 +27,7 @@ Window::Window(
     maxAspectRatio(maxAspectRatio),
     dprScale(dprScale),
     presentationMode(presentationMode),
-    platformComponents(new PlatformComponents()) {
+    platform(std::make_unique<PlatformComponents>()) {
 };
 
 // Executes when the window is initialized by the engine.
@@ -41,7 +41,7 @@ bool Window::init() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     // Create the window with an OpenGL Flag
-    if (!(platformComponents->window = SDL_CreateWindow(
+    if (!(platform->window = SDL_CreateWindow(
         windowTitle.c_str(),
         physicalSize.x,
         physicalSize.y,
@@ -51,8 +51,8 @@ bool Window::init() {
     }
 
     // Create the OpenGL context for the window.
-    if (!(platformComponents->context
-        = SDL_GL_CreateContext(platformComponents->window))) {
+    if (!(platform->context
+        = SDL_GL_CreateContext(platform->window))) {
         // ERROR
         return false;
     };
@@ -62,8 +62,8 @@ bool Window::init() {
     gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress);
 
     // Define Window properties
-    SDL_SetWindowMinimumSize(platformComponents->window, minWindowSize.x, minWindowSize.y);
-    SDL_SetWindowAspectRatio(platformComponents->window, minAspectRatio, maxAspectRatio);
+    SDL_SetWindowMinimumSize(platform->window, minWindowSize.x, minWindowSize.y);
+    SDL_SetWindowAspectRatio(platform->window, minAspectRatio, maxAspectRatio);
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     updateWindowData();
 
@@ -77,14 +77,14 @@ void Window::clear() {
 
 // Presents the new render with whatever we've drawn onto it.
 void Window::present() {
-    SDL_GL_SwapWindow(platformComponents->window);
+    SDL_GL_SwapWindow(platform->window);
 }
 
 // Changes the title displayed on the window bar.
 void Window::setWindowTitle(std::string windowTitle) {
     this->windowTitle = windowTitle;
-    if (platformComponents->window)
-        SDL_SetWindowTitle(platformComponents->window, windowTitle.c_str());
+    if (platform->window)
+        SDL_SetWindowTitle(platform->window, windowTitle.c_str());
 }
 
 void Window::setPresentationMode(window::PresentationMode presentationMode) {
@@ -96,7 +96,7 @@ void Window::setPresentationMode(window::PresentationMode presentationMode) {
 void Window::updateWindowData() {
 
     // Get current physical size of the window (In Pixels version is aware of DPR scale)
-    SDL_GetWindowSizeInPixels(platformComponents->window, &physicalSize.x, &physicalSize.y);
+    SDL_GetWindowSizeInPixels(platform->window, &physicalSize.x, &physicalSize.y);
 
     // Get current aspect ratio
     aspectRatio = (float)physicalSize.x / (float)physicalSize.y;
@@ -123,14 +123,14 @@ void Window::updateLogicalPresentation() {
     // case window::PresentationMode::Free:
     //     logicalSize = physicalSize;
     //     SDL_SetRenderLogicalPresentation(
-    //         platformComponents->renderer,
+    //         platform->renderer,
     //         0, 0, SDL_LOGICAL_PRESENTATION_DISABLED
     //     );
     //     break;
     // case window::PresentationMode::Letterbox:
     //     logicalSize = window::defaults::referenceSize;
     //     SDL_SetRenderLogicalPresentation(
-    //         platformComponents->renderer,
+    //         platform->renderer,
     //         window::defaults::referenceSize.x,
     //         window::defaults::referenceSize.y,
     //         SDL_LOGICAL_PRESENTATION_LETTERBOX
@@ -139,7 +139,7 @@ void Window::updateLogicalPresentation() {
     // case window::PresentationMode::Crop:
     //     logicalSize = window::defaults::referenceSize;
     //     SDL_SetRenderLogicalPresentation(
-    //         platformComponents->renderer,
+    //         platform->renderer,
     //         window::defaults::referenceSize.x,
     //         window::defaults::referenceSize.y,
     //         SDL_LOGICAL_PRESENTATION_OVERSCAN
@@ -148,7 +148,7 @@ void Window::updateLogicalPresentation() {
     // case window::PresentationMode::Stretch:
     //     logicalSize = window::defaults::referenceSize;
     //     SDL_SetRenderLogicalPresentation(
-    //         platformComponents->renderer,
+    //         platform->renderer,
     //         window::defaults::referenceSize.x,
     //         window::defaults::referenceSize.y,
     //         SDL_LOGICAL_PRESENTATION_STRETCH
@@ -158,7 +158,7 @@ void Window::updateLogicalPresentation() {
     //     float smallestScale = std::min(scale.x, scale.y);
     //     logicalSize = {(int)(physicalSize.x / smallestScale), (int)(physicalSize.y / smallestScale)};
     //     SDL_SetRenderLogicalPresentation(
-    //         platformComponents->renderer,
+    //         platform->renderer,
     //         logicalSize.x,
     //         logicalSize.y,
     //         SDL_LOGICAL_PRESENTATION_STRETCH
@@ -168,7 +168,7 @@ void Window::updateLogicalPresentation() {
     // case window::PresentationMode::ExpandHorizontal: {
     //     logicalSize = {(int)(physicalSize.x / scale.y), (int)(physicalSize.y / scale.y)};
     //     SDL_SetRenderLogicalPresentation(
-    //         platformComponents->renderer,
+    //         platform->renderer,
     //         logicalSize.x,
     //         logicalSize.y,
     //         SDL_LOGICAL_PRESENTATION_STRETCH
@@ -178,7 +178,7 @@ void Window::updateLogicalPresentation() {
     // case window::PresentationMode::ExpandVertical: {
     //     logicalSize = {(int)(physicalSize.x / scale.x), (int)(physicalSize.y / scale.x)};
     //     SDL_SetRenderLogicalPresentation(
-    //         platformComponents->renderer,
+    //         platform->renderer,
     //         logicalSize.x,
     //         logicalSize.y,
     //         SDL_LOGICAL_PRESENTATION_STRETCH
@@ -188,21 +188,20 @@ void Window::updateLogicalPresentation() {
     // default:
     //     logicalSize = physicalSize;
     //     SDL_SetRenderLogicalPresentation(
-    //         platformComponents->renderer,
+    //         platform->renderer,
     //         0, 0, SDL_LOGICAL_PRESENTATION_DISABLED
     //     );
     // }
 }
 
 void Window::debug() {
-    // SDL_SetRenderDrawColorFloat(platformComponents->renderer, 1.0f, 0.0f, 0.0f, SDL_ALPHA_OPAQUE_FLOAT);
+    // SDL_SetRenderDrawColorFloat(platform->renderer, 1.0f, 0.0f, 0.0f, SDL_ALPHA_OPAQUE_FLOAT);
     // SDL_FRect rect{10, 10, (float)window::defaults::referenceSize.x - 20.0f, (float)window::defaults::referenceSize.y - 20.0f};
-    // SDL_RenderFillRect(platformComponents->renderer, &rect);
+    // SDL_RenderFillRect(platform->renderer, &rect);
 }
 
 // Destructor
 Window::~Window() {
-    if (platformComponents->context) SDL_GL_DestroyContext(platformComponents->context);
-    if (platformComponents->window) SDL_DestroyWindow(platformComponents->window);
-    delete platformComponents;
+    if (platform->context) SDL_GL_DestroyContext(platform->context);
+    if (platform->window) SDL_DestroyWindow(platform->window);
 }

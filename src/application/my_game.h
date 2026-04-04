@@ -2,16 +2,10 @@
 
 #pragma once
 #include "pixelfall/engine/core/application.h"
-// Shaders
-#include "pixelfall/engine/rendering/shader.h"
-#include <optional>
 
 class MyGame : public Application {
 public:
-    bool onStart(std::filesystem::path projectPath)  override;
+    bool onStart()  override;
     void onUpdate() override;
     void onRender() override;
-
-private:
-    std::optional<Shader> basicShader;
 };

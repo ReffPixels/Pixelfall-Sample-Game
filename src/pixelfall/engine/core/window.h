@@ -3,6 +3,7 @@
 
 #pragma once
 #include <string>
+#include <memory>
 #include "pixelfall/engine/math/vector2.h"
 #include "pixelfall/engine/config/window_config.h"
 
@@ -57,7 +58,7 @@ private:
 
     // Platform Implementation (Each platform fills this struct with their necessary components)
     struct PlatformComponents;
-    PlatformComponents* platformComponents = nullptr;
+    std::unique_ptr<PlatformComponents> platform;
 
     // Methods
     void updateLogicalPresentation();

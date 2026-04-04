@@ -1,4 +1,4 @@
-#include "pixelfall/engine/rendering/shader.h"
+#include "pixelfall/engine/graphics/shader.h"
 // OpenGL
 #include <glad/glad.h>
 // File Management
@@ -20,20 +20,20 @@ static void configureShaderProgram(unsigned int shaderID, unsigned int vertexSha
 // Constructor - Creates the shader and fully sets it up  so it's ready to use.
 Shader::Shader(const std::filesystem::path& vertexShaderPath, const std::filesystem::path& fragmentShaderPath) {
     // Create platform components
-    platformComponents = new PlatformComponents();
+    platform = std::make_unique<PlatformComponents>();
 
     // Get shader code (OpenGL needs this in const char* format)
     vertexShaderCode = getShaderCode(vertexShaderPath);
     fragmentShaderCode = getShaderCode(fragmentShaderPath);
-    platformComponents->vertexShaderCodeOpenGL = vertexShaderCode.c_str();
-    platformComponents->fragmentShaderCodeOpenGL = fragmentShaderCode.c_str();
+    platform->vertexShaderCodeOpenGL = vertexShaderCode.c_str();
+    platform->fragmentShaderCodeOpenGL = fragmentShaderCode.c_str();
 
     // Create Shaders
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    configureShader(vertexShader, platformComponents->vertexShaderCodeOpenGL);
+    configureShader(vertexShader, platform->vertexShaderCodeOpenGL);
 
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    configureShader(fragmentShader, platformComponents->fragmentShaderCodeOpenGL);
+    configureShader(fragmentShader, platform->fragmentShaderCodeOpenGL);
 
     // Create Shader Program
     shaderID = glCreateProgram();
@@ -49,16 +49,18 @@ void Shader::use() {
     glUseProgram(shaderID);
 }
 
-void Shader::addUniformBool(const std::string& name, bool value) const {
+// Add Uniforms
+void Shader::setUniformBool(const std::string& name, bool value) const {
     glUniform1i(glGetUniformLocation(shaderID, name.c_str()), (int)value);
 }
-
-void Shader::addUniformInt(const std::string& name, int value) const {
+void Shader::setUniformInt(const std::string& name, int value) const {
     glUniform1i(glGetUniformLocation(shaderID, name.c_str()), value);
 }
-
-void Shader::addUniformFloat(const std::string& name, float value) const {
+void Shader::setUniformFloat(const std::string& name, float value) const {
     glUniform1f(glGetUniformLocation(shaderID, name.c_str()), value);
+}
+void Shader::setUniformVec4(const std::string& name, float x, float y, float z, float w) const {
+    glUniform4f(glGetUniformLocation(shaderID, name.c_str()), x, y, z, w);
 }
 
 // Load shaders from files
@@ -111,6 +113,4 @@ void configureShaderProgram(unsigned int shaderID, unsigned int vertexShader, un
 }
 
 // Destroyer
-Shader::~Shader() {
-    delete platformComponents;
-}
+Shader::~Shader() = default;

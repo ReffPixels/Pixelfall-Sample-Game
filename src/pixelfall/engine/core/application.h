@@ -1,14 +1,25 @@
 // Virtual class that an application can override to gain access to the basic engine functions.
 
 #pragma once
+// Standard
 #include <memory>
 #include <filesystem>
+#include <optional>
+// Graphics
+#include "pixelfall/engine/graphics/shader.h"
+#include "pixelfall/engine/graphics/painter.h"
 
 class Application {
 public:
     static std::unique_ptr<Application> create();
     virtual ~Application() = default;
-    virtual bool onStart(std::filesystem::path projectPath) { return true; }
+
+    void setup(std::filesystem::path projectPath);
+
+    virtual bool onStart() { return true; }
     virtual void onUpdate() {}
     virtual void onRender() {}
+protected:
+    std::optional<Shader> defaultShader;
+    std::optional<Painter> painter;
 };
