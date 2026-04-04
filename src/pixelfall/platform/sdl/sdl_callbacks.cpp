@@ -16,9 +16,9 @@
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
 
     SDL_SetAppMetadata(
-        engine::appTitle.data(),
-        engine::appVersion.data(),
-        engine::appIdentifier.data());
+        engine::engineTitle.data(),
+        engine::engineVersion.data(),
+        engine::engineIdentifier.data());
 
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
         SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());

@@ -11,6 +11,7 @@ std::unique_ptr<Application> Application::create() {
 
 bool MyGame::onStart() {
     std::cout << "START" << std::endl;
+    appWindow->setWindowTitle("My awesome game");
 
     return true;
 }

@@ -16,7 +16,7 @@ public:
     static std::unique_ptr<Application> create();
     virtual ~Application() = default;
 
-    void setup(std::filesystem::path projectPath, Window& window);
+    void setup(std::filesystem::path projectPath, Window& appWindow);
 
     virtual bool onStart() { return true; }
     virtual void onUpdate() {}
@@ -25,4 +25,5 @@ public:
 protected:
     std::optional<Shader> defaultShader;
     std::optional<Painter> painter;
+    Window* appWindow = nullptr;
 };

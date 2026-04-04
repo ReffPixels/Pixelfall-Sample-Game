@@ -23,7 +23,7 @@ namespace window {
     namespace defaults {
 
         // Default window properties
-        constexpr std::string_view windowTitle{"Pixelfall"};
+        constexpr std::string_view windowTitle{"Pixelfall Project"};
         inline const Vector2Int physicalSize{1280, 720};
         inline const Vector2Int referenceSize{1280, 720};
         inline const Vector2Int minWindowSize{320, 180};

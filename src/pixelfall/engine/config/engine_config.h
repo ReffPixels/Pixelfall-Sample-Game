@@ -7,9 +7,9 @@
 namespace engine {
 
     // Metadata
-    constexpr std::string_view appTitle = "Pixelfall";
-    constexpr std::string_view appIdentifier = "pixelfall";
-    constexpr std::string_view appVersion = "0.0";
+    constexpr std::string_view engineTitle = "Pixelfall";
+    constexpr std::string_view engineIdentifier = "pixelfall";
+    constexpr std::string_view engineVersion = "0.0";
 
     namespace defaults {
         constexpr bool limitFrameRate{false};
