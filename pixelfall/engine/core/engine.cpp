@@ -46,6 +46,7 @@ bool Engine::update() {
 
     // Rendering
     window->clear();
+    application->getPainter().begin();
     application->onRender();
     window->present();
 

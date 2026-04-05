@@ -23,14 +23,14 @@ namespace window {
     namespace defaults {
 
         // Default window properties
-        constexpr std::string_view windowTitle{"Default Pixelfall Project"};
-        inline const Vector2Int physicalSize{1280, 720};
-        inline const Vector2Int referenceSize{1280, 720};
-        inline const Vector2Int minWindowSize{320, 180};
-        constexpr float minAspectRatio{1.0f / 1.0f};
-        constexpr float maxAspectRatio{32.0f / 9.0f};
-        constexpr float dprScale = 1.0f;
-        constexpr PresentationMode presentationMode = PresentationMode::Expand;
+        constexpr std::string_view windowTitle {"Default Pixelfall Project"};
+        inline const Vector2Int physicalSize {1280, 720};
+        inline const Vector2Int referenceSize {1280, 720};
+        inline const Vector2Int minWindowSize {320, 180};
+        constexpr float minAspectRatio {1.0f / 1.0f};
+        constexpr float maxAspectRatio {32.0f / 9.0f};
+        constexpr float dprScale {1.0f};
+        constexpr PresentationMode presentationMode {PresentationMode::Free};
 
         // The color used to clear the window. It determines the color of the bars in Letterbox presentation
         inline const Color clearColor{Color::fromHexcode("#000000")};

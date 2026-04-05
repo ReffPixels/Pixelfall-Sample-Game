@@ -20,6 +20,7 @@ public:
     virtual std::string getTitle() const { return appTitle; };
     virtual std::string getIdentifier() const { return appIdentifier; };
     virtual std::string getVersion() const { return appVersion; };
+    Painter& getPainter() { return *painter; };
 
     // Methods
     void onSetup(std::filesystem::path enginePath, Window& appWindow);
