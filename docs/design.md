@@ -1,5 +1,5 @@
 # Configuration Files and Constants
-Constants and default values (Such as the game title or version) are defined in configuration headers. These are files 
+Constants and default values (Such as the project title or version) are defined in configuration headers. These are files 
 ending with _config.h stored in engine/config/ that contain a namespace with relevant constants and attributes.
 
 For string constants, std::string_view is preferable to std::string because it's a read only pointer in static memory. 

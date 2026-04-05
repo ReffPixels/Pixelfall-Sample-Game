@@ -39,12 +39,12 @@ protected:
     Window* appWindow = nullptr;
 };
 
-// Implemented by the game via PIXELFALL_APPLICATION(GameClass)
+// Implemented by the user via PIXELFALL_APPLICATION(ApplicationClass)
 std::unique_ptr<Application> createApplication();
 
-// This is in the user's entry point to the engine. 
-// It creates an instance of their game class that overrides application.
-#define PIXELFALL_APPLICATION(GameClass) \
+// This is in the user's entry point to the engine. It creates an instance of their application class, 
+// which overrides this virtual application class (Granting them access to the engine loop and functions)
+#define PIXELFALL_APPLICATION(ApplicationClass) \
     std::unique_ptr<Application> createApplication() { \
-        return std::make_unique<GameClass>(); \
+        return std::make_unique<ApplicationClass>(); \
     }
