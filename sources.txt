@@ -1,10 +1,1 @@
 src/my_game.cpp
-pixelfall/engine/core/engine.cpp
-pixelfall/engine/core/application.cpp
-pixelfall/engine/graphics/painter.cpp
-pixelfall/engine/graphics/color.cpp
-pixelfall/platform/sdl/sdl_callbacks.cpp
-pixelfall/platform/sdl/implementation/clock.cpp
-pixelfall/platform/sdl/implementation/window.cpp
-pixelfall/platform/opengl/implementation/shader.cpp
-pixelfall/platform/opengl/implementation/mesh.cpp

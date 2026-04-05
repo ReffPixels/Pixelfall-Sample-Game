@@ -1,0 +1,9 @@
+engine/core/engine.cpp
+engine/core/application.cpp
+engine/graphics/painter.cpp
+engine/graphics/color.cpp
+platform/sdl/sdl_callbacks.cpp
+platform/sdl/implementation/clock.cpp
+platform/sdl/implementation/window.cpp
+platform/opengl/implementation/shader.cpp
+platform/opengl/implementation/mesh.cpp
