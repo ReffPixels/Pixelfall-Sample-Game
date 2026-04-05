@@ -38,8 +38,9 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
         return SDL_APP_FAILURE;
     }
 
-    // Store project path
+    // Store paths
     engine->setProjectPath(std::filesystem::weakly_canonical(SDL_GetBasePath()));
+    engine->setEnginePath(std::filesystem::weakly_canonical(SDL_GetBasePath()) / "pixelfall");
 
     // Create the application (Owned by Engine)
     if (!engine->startApplication(Application::create())) {

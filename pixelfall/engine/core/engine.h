@@ -19,6 +19,7 @@ public:
 
     // Setters
     void setProjectPath(std::filesystem::path projectPath) { this->projectPath = projectPath; };
+    void setEnginePath(std::filesystem::path enginePath) { this->enginePath = enginePath; };
 
     // Methods
     bool init();
@@ -36,8 +37,9 @@ private:
     std::unique_ptr<Window> window;
     std::unique_ptr<Clock> clock;
 
-    // Store path
+    // Store paths
     std::filesystem::path projectPath;
+    std::filesystem::path enginePath;
 
     // This application will be created by the platform and owned by Engine.
     std::unique_ptr<Application> application;

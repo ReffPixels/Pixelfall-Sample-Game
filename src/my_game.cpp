@@ -1,6 +1,6 @@
 // Defines the loop of this specific application.
 
-#include "application/my_game.h"
+#include "my_game.h"
 // Standard Library
 #include <iostream>
 

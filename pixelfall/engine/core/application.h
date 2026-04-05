@@ -16,7 +16,7 @@ public:
     static std::unique_ptr<Application> create();
     virtual ~Application() = default;
 
-    void setup(std::filesystem::path projectPath, Window& appWindow);
+    void setup(std::filesystem::path enginePath, Window& appWindow);
 
     virtual bool onStart() { return true; }
     virtual void onUpdate() {}
