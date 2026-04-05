@@ -2,7 +2,7 @@
 
 #include "pixelfall/engine/core/application.h"
 
-void Application::setup(std::filesystem::path enginePath, Window& appWindow) {
+void Application::onSetup(std::filesystem::path enginePath, Window& appWindow) {
     this->appWindow = &appWindow;
     defaultShader.emplace(
         (enginePath / "assets/shaders/vertex_shader.glsl"),

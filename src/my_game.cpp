@@ -10,8 +10,11 @@ std::unique_ptr<Application> Application::create() {
 }
 
 bool MyGame::onStart() {
-    std::cout << "START" << std::endl;
+    // Set Metadata
     appWindow->setWindowTitle("My awesome game");
+    appTitle = "My awesome game";
+    appVersion = "0.1";
+    appIdentifier = "myAwesomeGame";
 
     return true;
 }

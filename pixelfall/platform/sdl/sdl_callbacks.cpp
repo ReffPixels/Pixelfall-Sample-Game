@@ -10,25 +10,9 @@
 #include <SDL3_ttf/SDL_ttf.h>
 // Engine
 #include "pixelfall/engine/core/engine.h"
-#include "pixelfall/engine/config/engine_config.h"
 
 // This function runs once at startup.
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
-
-    SDL_SetAppMetadata(
-        engine::engineTitle.data(),
-        engine::engineVersion.data(),
-        engine::engineIdentifier.data());
-
-    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
-        SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
-    if (!TTF_Init()) {
-        SDL_Log("Couldn't initialize SDL_ttf: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
 
     // Create the Engine
     auto* engine = new Engine();
@@ -38,7 +22,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
         return SDL_APP_FAILURE;
     }
 
-    // Store paths
+    // Set up engine information
     engine->setProjectPath(std::filesystem::weakly_canonical(SDL_GetBasePath()));
     engine->setEnginePath(std::filesystem::weakly_canonical(SDL_GetBasePath()) / "pixelfall");
 
@@ -49,6 +33,30 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
         return SDL_APP_FAILURE;
     }
 
+    // Set app metadata (Takes info from the application)
+    SDL_SetAppMetadata(
+        engine->getApplication()->getTitle().data(),
+        engine->getApplication()->getVersion().data(),
+        engine->getApplication()->getIdentifier().data());
+
+    // SDL Initialization
+    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
+        SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+
+    if (!TTF_Init()) {
+        SDL_Log("Couldn't initialize SDL_ttf: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+
+    // Print metadata
+    SDL_Log("SDL Metadata - Title: %s, Version: %s, ID: %s",
+        SDL_GetAppMetadataProperty(SDL_PROP_APP_METADATA_NAME_STRING),
+        SDL_GetAppMetadataProperty(SDL_PROP_APP_METADATA_VERSION_STRING),
+        SDL_GetAppMetadataProperty(SDL_PROP_APP_METADATA_IDENTIFIER_STRING));
+
+    // Pass the engine as appstate so SDL_AppEvent, SDL_AppIterate and SDL_AppQuit can communicate with the engine.
     *appstate = engine;
     return SDL_APP_CONTINUE;
 }

@@ -13,8 +13,10 @@
 class Engine {
 public:
     // Getters
+    Application* getApplication() { return application.get(); };
     Window* getWindow() { return window.get(); };
     Clock* getClock() { return clock.get(); };
+    std::filesystem::path getEnginePath() { return enginePath; };
     std::filesystem::path getProjectPath() { return projectPath; };
 
     // Setters

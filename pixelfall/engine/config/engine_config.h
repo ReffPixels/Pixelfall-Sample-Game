@@ -1,4 +1,4 @@
-// Defines basic information about the project.
+// Defines basic information about the engine.
 
 #pragma once
 // Standard Library

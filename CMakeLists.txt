@@ -17,11 +17,12 @@ target_include_directories(sampleGame PRIVATE
 # Link Pixelfall Engine
 target_link_libraries(sampleGame PRIVATE pixelfall)
 
-    # Copy necessary engine files into the build folder.
+# Copy necessary engine files into the build folder.
 add_custom_command(TARGET sampleGame POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/pixelfall/assets $<TARGET_FILE_DIR:sampleGame>/pixelfall/assets
 )
 
+# Windows
 if(WIN32)
     # Copy .dll files into the build folder.
     add_custom_command(TARGET sampleGame POST_BUILD
