@@ -10,6 +10,8 @@
 #include <SDL3_ttf/SDL_ttf.h>
 // Engine
 #include "pixelfall/engine/core/engine.h"
+// Application
+#include "pixelfall/engine/core/application.h"
 
 // This function runs once at startup.
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
@@ -27,7 +29,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
     engine->setEnginePath(std::filesystem::weakly_canonical(SDL_GetBasePath()) / "pixelfall");
 
     // Create the application (Owned by Engine)
-    if (!engine->startApplication(Application::create())) {
+    if (!engine->startApplication(createApplication())) {
         delete engine;
         SDL_Log("Couldn't create application: %s", SDL_GetError());
         return SDL_APP_FAILURE;

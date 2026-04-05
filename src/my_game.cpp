@@ -5,9 +5,7 @@
 #include <iostream>
 
 // Create Game
-std::unique_ptr<Application> Application::create() {
-    return std::make_unique<MyGame>();
-}
+PIXELFALL_APPLICATION(MyGame);
 
 bool MyGame::onStart() {
     // Set Metadata

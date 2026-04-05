@@ -16,9 +16,6 @@
 
 class Application {
 public:
-    static std::unique_ptr<Application> create();
-    virtual ~Application() = default;
-
     // Getters
     virtual std::string getTitle() const { return appTitle; };
     virtual std::string getIdentifier() const { return appIdentifier; };
@@ -30,6 +27,9 @@ public:
     virtual void onUpdate() {}
     virtual void onRender() {}
 
+    // Destroyers
+    virtual ~Application() = default;
+
 protected:
     std::string appTitle{application::defaults::appTitle.data()};
     std::string appIdentifier{application::defaults::appIdentifier.data()};
@@ -38,3 +38,13 @@ protected:
     std::optional<Painter> painter;
     Window* appWindow = nullptr;
 };
+
+// Implemented by the game via PIXELFALL_APPLICATION(GameClass)
+std::unique_ptr<Application> createApplication();
+
+// This is in the user's entry point to the engine. 
+// It creates an instance of their game class that overrides application.
+#define PIXELFALL_APPLICATION(GameClass) \
+    std::unique_ptr<Application> createApplication() { \
+        return std::make_unique<GameClass>(); \
+    }
