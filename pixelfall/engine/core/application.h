@@ -35,8 +35,9 @@ protected:
     std::string appTitle{application::defaults::appTitle.data()};
     std::string appIdentifier{application::defaults::appIdentifier.data()};
     std::string appVersion{application::defaults::appVersion.data()};
-    std::optional<Shader> defaultShader;
-    std::optional<Shader> screenShader;
+    std::optional<Shader> geometryShader;
+    std::optional<Shader> fxaaScreenShader;
+    std::optional<Shader> msaaScreenShader;
     std::optional<Painter> painter;
     Window* appWindow = nullptr;
 };

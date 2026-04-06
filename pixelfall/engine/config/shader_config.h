@@ -11,11 +11,16 @@ namespace shader {
 
     namespace defaults {
 
-        // [TO DO] This code explicitly references OpenGL. 
+        // [TO DO] This code explicitly references OpenGL shaders. 
         // This should be separated with an ifdef in the future once that is defined in the CmakeLists
-        constexpr std::string_view defaultVertexShader {"assets/shaders/opengl/vertex_shader.glsl"};
-        constexpr std::string_view defaultFragmentShader {"assets/shaders/opengl/fragment_shader.glsl"};
-        constexpr std::string_view screenVertexShader {"assets/shaders/opengl/screen_vertex_shader.glsl"};
-        constexpr std::string_view fxaaFragmentShader {"assets/shaders/opengl/fxaa_fragment_shader.glsl"};
+        constexpr std::string_view geometryVertShader {"assets/shaders/opengl/geometry.vert.glsl"};
+        constexpr std::string_view geometryFragShader{"assets/shaders/opengl/geometry.frag.glsl"};
+
+        // Screen passes for Anti Aliasing
+        constexpr std::string_view screenVertShader{"assets/shaders/opengl/screen.vert.glsl"};
+        // MSAA
+        constexpr std::string_view msaaFragShader{"assets/shaders/opengl/msaa_screen.frag.glsl"};
+        // FXAA
+        constexpr std::string_view fxaaFragShader{"assets/shaders/opengl/fxaa_screen.frag.glsl"};
     }
 }

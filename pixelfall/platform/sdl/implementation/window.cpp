@@ -3,7 +3,6 @@
 #include "pixelfall/engine/core/window.h"
 // Standard Library
 #include <algorithm>
-#include <iostream>
 // SDL
 #include <SDL3/SDL.h>
 // OpenGL
@@ -72,12 +71,12 @@ bool Window::init() {
     // Load OpenGL functions via GLAD
     gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress);
 
-    int samples;
-    SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &samples);
-    std::cout << "MSAA samples granted: " << samples << std::endl;
-
-    // Enable OpenGL MSAA
+    // Enable OpenGL MSAA and check whether the driver actually granted it.
+    // If no samples are is not granted, the painter will use FXAA for anti aliasing instead.
     glEnable(GL_MULTISAMPLE);
+    int grantedSamples = 0;
+    SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &grantedSamples);
+    msaaGranted = grantedSamples > 0;
 
     // Define Window properties
     SDL_SetWindowMinimumSize(platform->window, minWindowSize.x, minWindowSize.y);

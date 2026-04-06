@@ -5,13 +5,21 @@
 
 void Application::onSetup(std::filesystem::path enginePath, Window& appWindow) {
     this->appWindow = &appWindow;
-    defaultShader.emplace(
-        (enginePath / shader::defaults::defaultVertexShader.data()),
-        (enginePath / shader::defaults::defaultFragmentShader.data())
+
+    geometryShader.emplace(
+        (enginePath / shader::defaults::geometryVertShader.data()),
+        (enginePath / shader::defaults::geometryFragShader.data())
     );
-    screenShader.emplace(
-        (enginePath / shader::defaults::screenVertexShader.data()),
-        (enginePath / shader::defaults::fxaaFragmentShader.data())
+    msaaScreenShader.emplace(
+        (enginePath / shader::defaults::screenVertShader.data()),
+        (enginePath / shader::defaults::msaaFragShader.data())
     );
-    painter.emplace(*defaultShader, *screenShader, appWindow);
+    fxaaScreenShader.emplace(
+        (enginePath / shader::defaults::screenVertShader.data()),
+        (enginePath / shader::defaults::fxaaFragShader.data())
+    );
+
+    // Use FXAA only if the driver did not grant hardware MSAA
+    Shader& activeScreenShader = appWindow.isMSAAEnabled() ? *msaaScreenShader : *fxaaScreenShader;
+    painter.emplace(*geometryShader, activeScreenShader, appWindow);
 }

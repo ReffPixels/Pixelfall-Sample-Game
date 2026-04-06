@@ -2,6 +2,7 @@ File Naming Conventions
 - The default naming convention for files and folders is camelCase.
 - C++ headers use .h
 - .cpp and .h files use snake_case
+- GLSL shader files use the format `name.vert.glsl` or `name.frag.glsl`
 
 Code Conventions
 - Classes and Structs use PascalCase

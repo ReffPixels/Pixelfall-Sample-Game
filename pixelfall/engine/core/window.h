@@ -26,6 +26,7 @@ public:
 
     // Getters
     const Vector2Int& getPhysicalSize() const { return physicalSize; };
+    bool isMSAAEnabled() const { return msaaGranted; };
     const Vector2Int& getReferenceSize() const { return referenceSize; };
     float getDprScale() const { return dprScale; };
     const Vector2Int& getLogicalSize() const { return logicalSize; };
@@ -63,6 +64,9 @@ private:
     Vector2Int logicalSize;
     float aspectRatio;
     Vector2 scale;
+
+    // Settings
+    bool msaaGranted = false;
 
     // Platform Implementation (Each platform fills this struct with their necessary components)
     struct PlatformComponents;
