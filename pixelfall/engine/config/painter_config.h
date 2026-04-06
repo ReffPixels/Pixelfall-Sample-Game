@@ -17,12 +17,15 @@ namespace painter {
         // Determines how detailed circles are at different sizes. (radius / detail)
         // 1.0f means one segment for pixel in the radius
         // 0.5f means one segment for every two pixels in the radius
-        constexpr float circleSegmentsDetail{0.5f};
+        constexpr float circleSegmentsDetail {0.5f};
 
         // Minimum amount of segments in a circle (Recommended at least 3, to avoid collapsing into a line)
-        constexpr int minCircleSegments{3};
+        constexpr int minCircleSegments {3};
 
         // Maximum amount of segments in a circle (Recommended at least 64)
-        constexpr int maxCircleSegments{100};
+        constexpr int maxCircleSegments {100};
+
+        // Default tint applied to textures. For normal usecases it should always be white.
+        inline const Color textureTint {1.0f, 1.0f, 1.0f, 1.0f};
     }
 }

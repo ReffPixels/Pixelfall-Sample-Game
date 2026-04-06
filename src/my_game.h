@@ -9,4 +9,7 @@ public:
     bool onStart()  override;
     void onUpdate() override;
     void onRender() override;
+
+private:
+    Texture* pawnTexture = nullptr;
 };

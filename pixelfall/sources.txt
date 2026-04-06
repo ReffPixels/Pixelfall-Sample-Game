@@ -7,4 +7,5 @@ platform/sdl/implementation/clock.cpp
 platform/sdl/implementation/window.cpp
 platform/opengl/implementation/shader.cpp
 platform/opengl/implementation/mesh.cpp
+platform/opengl/implementation/texture.cpp
 platform/opengl/implementation/framebuffer.cpp

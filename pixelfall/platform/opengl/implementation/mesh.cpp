@@ -17,7 +17,8 @@ struct Mesh::PlatformComponents {
 // Constructor
 Mesh::Mesh(
     std::vector<float> vertices,
-    std::vector<unsigned int> indices
+    std::vector<unsigned int> indices,
+    std::vector<VertexAttribute> attributes
     ) :
     vertices(vertices),
     indices(indices),
@@ -35,10 +36,25 @@ Mesh::Mesh(
     glGenBuffers(1, &platform->EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, platform->EBO);
 
-    // Link Vertex Attributes (Tell the GPU how to interpret the vertex data we provided)
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    // Link Vertex Attributes
+    // Calculate the stride (All attribute components added together)
+    int stride{0};
+    for (auto& attr : attributes) stride += attr.components;
+
+    // Loop through every attribute and link it with the correct information
+    int offset{0};
+    for (int i = 0; i < (int)attributes.size(); i++) {
+        glVertexAttribPointer(
+            i, attributes[i].components,
+            GL_FLOAT,
+            GL_FALSE,
+            stride * sizeof(float),
+            (void*)(offset * sizeof(float))
+        );
+        glEnableVertexAttribArray(i);
+        // Record offset for next attribute
+        offset += attributes[i].components;
+    }
 
     update();
 };

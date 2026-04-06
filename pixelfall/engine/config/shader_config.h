@@ -12,9 +12,13 @@ namespace shader {
 
     namespace defaults {
 
-        // This should be separated with an ifdef in the future once that is defined in the CmakeLists
-        constexpr std::string_view geometryVertShader {"assets/shaders/opengl/geometry.vert.glsl"};
+        // Flat geometry shader (Used for geometry and primitives)
+        constexpr std::string_view geometryVertShader{"assets/shaders/opengl/geometry.vert.glsl"};
         constexpr std::string_view geometryFragShader{"assets/shaders/opengl/geometry.frag.glsl"};
+
+        // Texture/Sprite shader
+        constexpr std::string_view spriteVertShader{"assets/shaders/opengl/sprite.vert.glsl"};
+        constexpr std::string_view spriteFragShader{"assets/shaders/opengl/sprite.frag.glsl"};
 
         // Screen passes for Anti Aliasing
         constexpr std::string_view screenVertShader{"assets/shaders/opengl/screen.vert.glsl"};

@@ -8,6 +8,7 @@
 #include "pixelfall/engine/graphics/shader.h"
 #include "pixelfall/engine/graphics/color.h"
 #include "pixelfall/engine/graphics/framebuffer.h"
+#include "pixelfall/engine/graphics/texture.h"
 // Core
 #include "pixelfall/engine/core/window.h"
 // Math
@@ -17,7 +18,7 @@
 
 class Painter {
 public:
-    Painter(Shader& geometryShader, Shader& screenShader, Window& window);
+    Painter(Shader& geometryShader, Shader& spriteShader, Shader& screenShader, Window& window);
 
     // Methods
     void begin(); // Called by engine before onRender() — binds FBO and sets up projection
@@ -30,11 +31,18 @@ public:
         int segments = painter::defaults::arcSegments);
     void drawCircle(Vector2 center, float radius, Color color);
     void drawRegularPolygon(Vector2 center, float radius, Color color, int segments);
+    void drawSprite(Vector2 position, Vector2 size, Texture& texture,
+        Color tint = painter::defaults::textureTint);
 
 private:
-    Shader& shader;
+    // Shaders
+    Shader& geometryShader;
+    Shader& spriteShader;
     Shader& screenShader;
+
+    // Screen
     Window& window;
     std::unique_ptr<Framebuffer> framebuffer;
     Vector2Int framebufferSize;
+    float projectionMatrix[16]{};
 };

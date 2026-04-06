@@ -11,8 +11,17 @@
 #include "pixelfall/engine/math/tools.h"
 
 // Constructor - Also creates the frame buffer (Needed for anti aliasing)
-Painter::Painter(Shader& geometryShader, Shader& screenShader, Window& window)
-    : shader(geometryShader), screenShader(screenShader), window(window) {
+Painter::Painter(
+    Shader& geometryShader,
+    Shader& spriteShader,
+    Shader& screenShader,
+    Window& window)
+    :
+    geometryShader(geometryShader),
+    spriteShader(spriteShader),
+    screenShader(screenShader),
+    window(window) {
+
     framebufferSize = window.getPhysicalSize();
     framebuffer = std::make_unique<Framebuffer>(framebufferSize);
 }
@@ -30,6 +39,8 @@ void Painter::begin() {
         0.0f,    0.0f,    1.0f,    0.0f,  // column 2, scales Z
        -1.0f,    1.0f,    0.0f,    1.0f   // column 3, moves origin
     };
+    // Store matrix so we can reuse it in drawSprite
+    std::memcpy(projectionMatrix, ortho, sizeof(projectionMatrix));
 
     auto physSize = window.getPhysicalSize();
     if (physSize.x != framebufferSize.x || physSize.y != framebufferSize.y) {
@@ -38,8 +49,8 @@ void Painter::begin() {
     }
 
     framebuffer->bind();
-    shader.use();
-    shader.setUniformMat4("projectionMatrix", ortho);
+    geometryShader.use();
+    geometryShader.setUniformMat4("projectionMatrix", ortho);
 }
 
 // Unbinds the FBO and blits it to the screen through the FXAA shader.
@@ -58,6 +69,7 @@ void Painter::end() {
 // Draws a convex polygon with a flat color. Concave polygons are not currently supported.
 // This function is used by most geometry draw calls.
 void Painter::drawPolygon(const std::vector<Vector2>& points, Color color) {
+    geometryShader.use();
 
     std::vector<float> vertices;
     for (const Vector2& p : points) {
@@ -74,7 +86,7 @@ void Painter::drawPolygon(const std::vector<Vector2>& points, Color color) {
     }
 
     Mesh mesh(vertices, indices);
-    shader.setUniformVec4("customColor", color.r, color.g, color.b, color.a);
+    geometryShader.setUniformVec4("customColor", color.r, color.g, color.b, color.a);
     mesh.draw();
 }
 
@@ -150,4 +162,30 @@ void Painter::drawRegularPolygon(Vector2 center, float radius, Color color, int 
 
     // Draw an arc that starts at 0° and ends at 360°
     drawArc(center, radius, 0.0f, 360.0f, color, segments);
+}
+
+// Draws a mesh with a texture to display an image on the screen. Can also be tinted.
+void Painter::drawSprite(Vector2 position, Vector2 size, Texture& texture, Color tint) {
+    spriteShader.use();
+    spriteShader.setUniformMat4("projectionMatrix", projectionMatrix);
+    spriteShader.setUniformInt("customTexture", 0);
+    spriteShader.setUniformVec4("tintColor", tint.r, tint.g, tint.b, tint.a);
+
+    texture.bind();
+
+    // Positions of each corner of the texture followed by their UV coordinates
+    std::vector<float> vertices = {
+        position.x, position.y,
+        0.0f, 0.0f, 1.0f,
+        position.x + size.x, position.y,
+        0.0f, 1.0f, 1.0f,
+        position.x + size.x, position.y + size.y,
+        0.0f, 1.0f, 0.0f,
+        position.x, position.y + size.y,
+        0.0f, 0.0f, 0.0f,
+    };
+    std::vector<unsigned int> indices = {0, 1, 2, 0, 2, 3};
+
+    Mesh mesh(vertices, indices, {{3}, {2}});
+    mesh.draw();
 }

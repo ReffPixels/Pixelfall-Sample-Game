@@ -27,7 +27,7 @@ bool Engine::init() {
 // Attempts to create and start the application
 bool Engine::startApplication(std::unique_ptr<Application> application) {
     this->application = std::move(application);
-    this->application->onSetup(enginePath, *window);
+    this->application->onSetup(enginePath, *window, projectPath);
     if (!this->application->onStart()) {
         std::cout << "ERROR: Failed to create application" << std::endl;
         isRunning = false;

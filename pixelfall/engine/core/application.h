@@ -23,7 +23,7 @@ public:
     Painter& getPainter() { return *painter; };
 
     // Methods
-    void onSetup(std::filesystem::path enginePath, Window& appWindow);
+    void onSetup(std::filesystem::path enginePath, Window& appWindow, std::filesystem::path projectPath);
     virtual bool onStart() { return true; }
     virtual void onUpdate() {}
     virtual void onRender() {}
@@ -32,14 +32,23 @@ public:
     virtual ~Application() = default;
 
 protected:
+    // Metadataa
     std::string appTitle{application::defaults::appTitle.data()};
     std::string appIdentifier{application::defaults::appIdentifier.data()};
     std::string appVersion{application::defaults::appVersion.data()};
+
+    // Shaders
     std::optional<Shader> geometryShader;
     std::optional<Shader> fxaaScreenShader;
     std::optional<Shader> msaaScreenShader;
-    std::optional<Painter> painter;
+    std::optional<Shader> spriteShader;
+
+    // Engine Components
     Window* appWindow = nullptr;
+    std::optional<Painter> painter;
+
+    // Other tools
+    std::filesystem::path projectPath;
 };
 
 // Implemented by the user via PIXELFALL_APPLICATION(ApplicationClass)

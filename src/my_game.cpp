@@ -15,6 +15,8 @@ bool MyGame::onStart() {
     appVersion = "0.1";
     appIdentifier = "chess";
 
+    pawnTexture = new Texture(projectPath / "assets/image/pieces/white_pawn.png");
+
     return true;
 }
 
@@ -42,7 +44,8 @@ void MyGame::onRender() {
         (appWindow->getLogicalSize().x - boardSize.x) / 2,
         (appWindow->getLogicalSize().y - boardSize.y) / 2
     };
-    
+
+    // Draw board
     for (int row = 0; row < 8; row++) {
         for (int column = 0; column < 8; column++) {
             painter->drawRectangle(
@@ -53,4 +56,6 @@ void MyGame::onRender() {
             );
         }
     }
+
+    painter->drawSprite({200,200}, {128, 128}, *pawnTexture, Color::fromHexcode("#ff0000"));
 }
