@@ -9,3 +9,7 @@ Castling availability: If neither side has the ability to castle, this field use
 En passant target square: This is a square over which a pawn has just passed while moving two squares; it is given in algebraic notation. If there is no en passant target square, this field uses the character "-". This is recorded regardless of whether there is a pawn in position to capture en passant.[9] An updated version of the spec has since made it so the target square is recorded only if a legal en passant capture is possible, but the old version of the standard is the one most commonly used.[10][11]
 Halfmove clock: The number of halfmoves since the last capture or pawn advance, used for the fifty-move rule.[12]
 Fullmove number: The number of the full moves. It starts at 1 and is incremented after Black's move.[citation needed]
+
+Test FEN Strings:
+1r6/5pp1/R1R4p/1r1pP3/2pkQPP1/7P/1P6/2K5
+2k/5ppp/8/4p/4P/8/P4PPP/2K

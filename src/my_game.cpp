@@ -36,8 +36,8 @@ void MyGame::onRender() {
     );
 
     // Chess board
-    Vector2 squareSize{100.0f, 100.0f};
-    Vector2 boardSize{squareSize.x * 8, squareSize.y * 8};
+    Vector2 tileSize{80.0f, 80.0f};
+    Vector2 boardSize{tileSize.x * 8, tileSize.y * 8};
     Color whiteSquareColor{Color::fromHexcode("#edd6b0")};
     Color blackSquareColor{Color::fromHexcode("#b88762")};
 
@@ -51,8 +51,8 @@ void MyGame::onRender() {
     for (int rank = 0; rank < 8; rank++) {
         for (int file = 0; file < 8; file++) {
             painter->drawRectangle(
-                {boardPosition.x + (file * squareSize.x), boardPosition.y + (rank * squareSize.y)},
-                squareSize,
+                {boardPosition.x + (file * tileSize.x), boardPosition.y + (rank * tileSize.y)},
+                tileSize,
                 // If the square is odd, draw white. If it's even, draw black.
                 ((file + rank + 1) % 2 == 0) ? blackSquareColor : whiteSquareColor
             );
@@ -60,5 +60,5 @@ void MyGame::onRender() {
     }
 
     // Draw pieces
-    fenParser.drawPieces(boardPosition, squareSize, *painter, *textureCache, projectPath);
+    fenParser.drawPieces(boardPosition, tileSize, *painter, *textureCache, projectPath);
 }
