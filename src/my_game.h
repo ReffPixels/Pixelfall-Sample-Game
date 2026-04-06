@@ -3,6 +3,7 @@
 
 #pragma once
 #include "pixelfall/engine/core/application.h"
+#include "chess_piece.h"
 
 class MyGame : public Application {
 public:
@@ -12,4 +13,5 @@ public:
 
 private:
     Texture* pawnTexture = nullptr;
+    ChessPiece* myPiece = nullptr;
 };

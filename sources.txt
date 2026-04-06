@@ -1,1 +1,2 @@
 src/my_game.cpp
+src/chess_piece.cpp

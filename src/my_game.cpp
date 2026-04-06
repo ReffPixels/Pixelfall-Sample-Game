@@ -17,6 +17,8 @@ bool MyGame::onStart() {
 
     pawnTexture = new Texture(projectPath / "assets/image/pieces/white_rook.png");
 
+    myPiece = new ChessPiece{"a1", PieceType::Queen, PieceTeam::Black, projectPath};
+
     return true;
 }
 
@@ -57,5 +59,5 @@ void MyGame::onRender() {
         }
     }
 
-    painter->drawSprite(boardPosition, squareSize, *pawnTexture);
+    myPiece->draw(*painter, projectPath, boardPosition, squareSize);
 }
