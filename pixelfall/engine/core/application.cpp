@@ -27,6 +27,7 @@ void Application::onSetup(std::filesystem::path enginePath, Window& appWindow, s
         (enginePath / shader::defaults::fxaaFragShader.data())
     );
     // Use FXAA only if the driver did not grant hardware MSAA
-    Shader& activeScreenShader = appWindow.isMSAAEnabled() ? *msaaScreenShader : *fxaaScreenShader;
+    Shader& activeScreenShader = (appWindow.isMSAAEnabled() || !application::autoEnableFXAA) ? *msaaScreenShader : *fxaaScreenShader;
+        
     painter.emplace(*geometryShader, *spriteShader, activeScreenShader, appWindow);
 }
