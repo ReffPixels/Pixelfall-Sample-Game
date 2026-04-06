@@ -3,6 +3,7 @@
 #include "pixelfall/engine/core/window.h"
 // Standard Library
 #include <algorithm>
+#include <iostream>
 // SDL
 #include <SDL3/SDL.h>
 // OpenGL
@@ -47,6 +48,9 @@ bool Window::init() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    // Using MSAA (OpenGL Anti Aliasing)
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 
     // Create the window with an OpenGL Flag
     if (!(platform->window = SDL_CreateWindow(
@@ -65,9 +69,15 @@ bool Window::init() {
         return false;
     };
 
-
     // Load OpenGL functions via GLAD
     gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress);
+
+    int samples;
+    SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &samples);
+    std::cout << "MSAA samples granted: " << samples << std::endl;
+
+    // Enable OpenGL MSAA
+    glEnable(GL_MULTISAMPLE);
 
     // Define Window properties
     SDL_SetWindowMinimumSize(platform->window, minWindowSize.x, minWindowSize.y);
