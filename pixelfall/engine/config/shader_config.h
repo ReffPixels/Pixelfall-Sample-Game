@@ -1,4 +1,5 @@
 // Defines information about shaders.
+// [TO DO] This code explicitly references OpenGL shaders. Should be separated (Maybe with ifdef)
 
 #pragma once
 // Standard Library
@@ -11,7 +12,6 @@ namespace shader {
 
     namespace defaults {
 
-        // [TO DO] This code explicitly references OpenGL shaders. 
         // This should be separated with an ifdef in the future once that is defined in the CmakeLists
         constexpr std::string_view geometryVertShader {"assets/shaders/opengl/geometry.vert.glsl"};
         constexpr std::string_view geometryFragShader{"assets/shaders/opengl/geometry.frag.glsl"};

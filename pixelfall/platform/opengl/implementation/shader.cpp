@@ -50,22 +50,27 @@ void Shader::use() {
     glUseProgram(shaderID);
 }
 
-// Add Uniforms
+// Set value of a bool uniform in the shader
 void Shader::setUniformBool(const std::string& name, bool value) const {
     glUniform1i(glGetUniformLocation(shaderID, name.c_str()), (int)value);
 }
+// Set value of an int uniform in the shader
 void Shader::setUniformInt(const std::string& name, int value) const {
     glUniform1i(glGetUniformLocation(shaderID, name.c_str()), value);
 }
+// Set value of a float uniform in the shader
 void Shader::setUniformFloat(const std::string& name, float value) const {
     glUniform1f(glGetUniformLocation(shaderID, name.c_str()), value);
 }
+// Set value of a Vector 2 uniform in the shader
 void Shader::setUniformVec2(const std::string& name, float x, float y) const {
     glUniform2f(glGetUniformLocation(shaderID, name.c_str()), x, y);
 }
+// Set value of a Vector 4 uniform in the shader
 void Shader::setUniformVec4(const std::string& name, float x, float y, float z, float w) const {
     glUniform4f(glGetUniformLocation(shaderID, name.c_str()), x, y, z, w);
 }
+// Set value of a Matrix 4 float uniform in the shader
 void Shader::setUniformMat4(const std::string& name, float* matrix) const {
     glUniformMatrix4fv(glGetUniformLocation(shaderID, name.c_str()), 1, GL_FALSE, matrix);
 }

@@ -1,4 +1,4 @@
-// Implementation of framebuffer.h for OpenGL.
+// Implementation of framebuffer.h for OpenGL. [EXPERIMENTAL] [REVIEW]
 
 #include "pixelfall/engine/graphics/framebuffer.h"
 // OpenGL
@@ -11,6 +11,7 @@ struct Framebuffer::PlatformComponents {
     unsigned int quadVBO = 0;
 };
 
+// Constructor
 Framebuffer::Framebuffer(Vector2Int size) : size(size), platform(std::make_unique<PlatformComponents>()) {
 
     // Create FBO and attach a color texture
@@ -74,6 +75,7 @@ void Framebuffer::drawQuad() {
     glBindVertexArray(0);
 }
 
+// Destructor
 Framebuffer::~Framebuffer() {
     glDeleteVertexArrays(1, &platform->quadVAO);
     glDeleteBuffers(1, &platform->quadVBO);

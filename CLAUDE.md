@@ -6,15 +6,15 @@ When suggesting code changes, write the code in the chat rather than using edit 
 
 ## Project Overview
 
-**Pixelfall** is a custom 2D game engine built from scratch in C++17. It is a portfolio and learning project targeting Windows, with the long-term goal of having a full editor experience similar to Unity/Unreal. Currently in early development (version 0.0).
+**Pixelfall** is a custom 2D game engine built from scratch in C++17. Portfolio and learning project targeting Windows, with a long-term goal of a full editor experience. Currently in early development.
 
-The sample game in this repo is a simple chess game — alternating turns, click a white piece then a black piece. No AI, no multiplayer.
+The sample game is a simple chess game — alternating turns, click a white piece then a black piece. No AI, no multiplayer.
 
 **Tech Stack:**
 - Language: C++17
 - Build: CMake 4.3+
 - Rendering: OpenGL 3.3 Core Profile (via GLAD)
-- Window/Input: SDL3 (using SDL_MAIN_USE_CALLBACKS — no traditional main())
+- Window/Input: SDL3 (using `SDL_MAIN_USE_CALLBACKS` — no traditional `main()`)
 - Font: SDL3_ttf
 - External deps live in `pixelfall/external/`
 
@@ -26,72 +26,72 @@ The sample game in this repo is a simple chess game — alternating turns, click
 pixelfall/                  # Engine — built as a static library
   engine/
     core/                   # Engine, Application, Window, Clock
-    graphics/               # Painter, Shader, Mesh, Color
-    math/                   # Vector2, Vector3, Vector4 (+Int variants), constants
-    config/                 # engine_config.h, window_config.h, application_config.h, shader_config.h
+    graphics/               # Painter, Shader, Mesh, Framebuffer, Color
+    math/                   # Vector2, Vector3, Vector4 (+Int variants), numbers, tools
+    config/                 # shader_config.h, window_config.h, application_config.h, painter_config.h
   platform/
     sdl/                    # SDL3 window, event callbacks
-    opengl/                 # OpenGL shader, mesh implementations
-  assets/shaders/opengl/    # GLSL vertex and fragment shaders
+    opengl/                 # OpenGL implementations of Shader, Mesh, Framebuffer
+  assets/shaders/opengl/    # GLSL shaders (geometry.vert/frag, screen.vert, fxaa_screen.frag, msaa_screen.frag)
   external/                 # glad, SDL3, SDL3_ttf
-src/                        # User-facing game code (MyGame inherits Application)
+src/                        # Game code — MyGame inherits Application
 ```
 
 **Key classes:**
-- `Engine` — main loop orchestrator; owns Window, Clock, Application
-- `Application` — virtual base class with `onStart()`, `onUpdate()`, `onRender()` hooks
-- `MyGame` — user's game class (in `src/`)
-- `Painter` — high-level draw API (currently only `drawTriangle()`)
+- `Engine` — owns and orchestrates Window, Clock, Application; runs the main loop
+- `Application` — virtual base with `onStart()`, `onUpdate()`, `onRender()` hooks; owns the Painter and shaders
+- `Painter` — draw API; renders into a Framebuffer each frame and blits to screen with FXAA
+- `Framebuffer` — FBO + color texture + fullscreen quad; used for the FXAA post-process pass
 - `Shader` — loads/compiles GLSL from file, sets uniforms
 - `Mesh` — VAO/VBO/EBO wrapper
-- `Color` — RGBA (0.0–1.0 floats); factory methods: `fromRGBA255`, `fromHSLA`, `fromHexcode`, etc.
+- `Color` — RGBA (0.0–1.0 floats); supports construction from RGBA255, HSLA, HSVA, hex (3/4/6/8 digit)
+- `Window` — platform-agnostic window; handles presentation modes and DPI-aware sizing
 - `Clock` — deltaTime and FPS tracking
-- `Window` — platform-agnostic window with configurable presentation modes (Letterbox, Crop, Stretch, etc.)
 
-**Entry point pattern:** Games use the `PIXELFALL_APPLICATION(GameClass)` macro (defined in `application.h`) to register their game class. The engine calls `createApplication()` during init, which the macro implements.
+**Render flow each frame:**
+1. `window.clear()` — clears default framebuffer
+2. `painter.begin()` — recreates FBO if window resized, binds FBO, uploads ortho projection
+3. `application.onRender()` — user draws shapes into FBO
+4. `painter.end()` — blits FBO to screen through FXAA shader (or passthrough if MSAA granted)
+5. `window.present()` — swap buffers
 
-**Platform abstraction pattern:** Core classes (Window, Shader, Mesh) hold opaque `PlatformComponents` pointers. Implementations live in `platform/`.
+**Entry point:** Games use `PIXELFALL_APPLICATION(MyGame)` macro to register their class. Engine calls `createApplication()` which the macro implements.
 
-**CMake structure:** `pixelfall/` is a static library with its own `CMakeLists.txt`. The root `CMakeLists.txt` defines the game executable and consumes pixelfall via `add_subdirectory`. Games call `pixelfall_setup_runtime(target)` to copy engine assets and DLLs post-build. External dependencies (glad, SDL3) live in `pixelfall/external/` and are fully owned by the engine.
+**Platform abstraction:** Core classes (Window, Shader, Mesh, Framebuffer) forward-declare a private `PlatformComponents` struct in their header. The platform `.cpp` defines it with the actual API handles. This keeps platform code entirely out of engine headers.
+
+**Anti-aliasing:** On startup, `Window::init()` requests 4x MSAA from the driver. If granted (`isMSAAEnabled()`), `Application::onSetup()` passes a plain passthrough shader to `Painter`. If not granted (common), FXAA is used instead.
 
 ---
 
 ## Conventions
 
-- **Files/dirs:** camelCase
-- **Classes/Structs:** PascalCase
-- **Methods/variables:** camelCase
-- **Namespaces:** camelCase (e.g., `engine::`, `window::`)
-- Headers: `.h`, implementations: `.cpp`
-- Smart pointers (`std::unique_ptr`) preferred; game registers entry point via `PIXELFALL_APPLICATION(GameClass)` macro
-- Config constants grouped in namespaces with a nested `defaults::` namespace
+See `docs/conventions.md` for full details. Key points:
 
-See `docs/conventions.md` for full details.
+- **Naming:** files/dirs camelCase, classes PascalCase, everything else camelCase
+- **Shaders:** `name.vert.glsl` / `name.frag.glsl`
+- **Config:** constants in `namespace domain { namespace defaults { ... } }`
+- **Comments:** every function implementation has a comment on the line directly above it
+- **Includes:** grouped and labelled — own header, Standard Library, engine subsystems, platform libs
 
 ---
 
 ## Current State
 
 **Implemented:**
-- Engine init/update/shutdown loop
-- SDL3 window + OpenGL 3.3 context
-- Shader loading and uniform setters
-- Painter with `drawTriangle()`
-- Mesh (VAO/VBO/EBO)
-- Color with full RGBA/HSLA/HSVA/Hex conversion
+- Engine loop, SDL3 window, OpenGL 3.3 context
+- Painter: `drawPolygon`, `drawTriangle`, `drawQuad`, `drawRectangle`, `drawCircle`, `drawArc`, `drawRegularPolygon`
+- FXAA post-process AA (passthrough fallback when MSAA is granted by driver)
+- Alpha blending (`GL_BLEND`)
+- Color: RGBA/HSLA/HSVA/hex with full conversion, getters, and setters
 - Vector2/Vector2Int with full operator overloads
-- Clock with FPS tracking and optional frame cap
-- Configurable window presentation modes (Free, Letterbox, Crop, Stretch, Expand, ExpandHorizontal, ExpandVertical)
-- Application metadata (title, version, identifier) via virtual getters with defaults from `application_config.h`
-- `PIXELFALL_APPLICATION(GameClass)` entry point macro
-- pixelfall as a self-contained static library with its own CMakeLists and external dependencies
+- Presentation modes: Free, Letterbox, Crop, Stretch, Expand, ExpandHorizontal, ExpandVertical
+- Clock with deltaTime, FPS tracking, optional frame cap
 
 **Not yet implemented:**
-- Input handling (SDL events received but not wired to Application)
-- More Painter primitives (rect, circle, line, etc.)
+- Input handling (SDL events not wired to Application)
+- Outlined shape variants, `drawLine`, `drawLineStrip`
+- Concave polygon support (ear clipping)
 - Entity/component system
-- Asset loading system
-- Audio
-- Vector3/Vector4 operator support (currently data-only structs)
+- Asset loading, audio
+- Vector3/Vector4 operators (data-only structs currently)
 - Editor
-- `#ifdef` platform guards in `shader_config.h` (noted as TODO)

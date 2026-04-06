@@ -71,6 +71,10 @@ bool Window::init() {
     // Load OpenGL functions via GLAD
     gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress);
 
+    // Enable blending and standard transparency
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     // Enable OpenGL MSAA and check whether the driver actually granted it.
     // If no samples are is not granted, the painter will use FXAA for anti aliasing instead.
     glEnable(GL_MULTISAMPLE);
@@ -104,6 +108,7 @@ void Window::setWindowTitle(std::string windowTitle) {
         SDL_SetWindowTitle(platform->window, windowTitle.c_str());
 }
 
+// Changes the presentation mode (From the list of valid presentation modes)
 void Window::setPresentationMode(window::PresentationMode presentationMode) {
     this->presentationMode = presentationMode;
     updateLogicalPresentation();

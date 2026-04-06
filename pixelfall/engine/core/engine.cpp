@@ -24,6 +24,7 @@ bool Engine::init() {
     return true;
 }
 
+// Attempts to create and start the application
 bool Engine::startApplication(std::unique_ptr<Application> application) {
     this->application = std::move(application);
     this->application->onSetup(enginePath, *window);

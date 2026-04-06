@@ -10,6 +10,7 @@
 #include "pixelfall/engine/math/numbers.h"
 #include "pixelfall/engine/math/tools.h"
 
+// Constructor - Also creates the frame buffer (Needed for anti aliasing)
 Painter::Painter(Shader& geometryShader, Shader& screenShader, Window& window)
     : shader(geometryShader), screenShader(screenShader), window(window) {
     framebufferSize = window.getPhysicalSize();

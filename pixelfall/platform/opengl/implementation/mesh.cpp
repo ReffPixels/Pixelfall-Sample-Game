@@ -43,6 +43,8 @@ Mesh::Mesh(
     update();
 };
 
+// Calculates mesh components. 
+// Called by the constructor when instantiating the mesh, can be called again externally if needed.
 void Mesh::update() {
     // Update VBO
     glBindVertexArray(platform->VAO);
@@ -54,10 +56,12 @@ void Mesh::update() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 }
 
+// Displays the mesh on the screen by drawing each of it's triangles.
 void Mesh::draw() {
     glBindVertexArray(platform->VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
 
+// Destroyer
 Mesh::~Mesh() = default;

@@ -3,6 +3,8 @@
 #include "pixelfall/engine/core/application.h"
 #include "pixelfall/engine/config/shader_config.h"
 
+// Called by the engine before onStart, this is a private engine function that sets up all the necessary 
+// components of the application before the user defined behaviours happen (onStart, onUpdate, etc)
 void Application::onSetup(std::filesystem::path enginePath, Window& appWindow) {
     this->appWindow = &appWindow;
 

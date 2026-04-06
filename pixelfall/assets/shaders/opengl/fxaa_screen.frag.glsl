@@ -1,5 +1,9 @@
 #version 330 core
 
+// FXAA Fragment Shader [EXPERIMENTAL] [REVIEW]
+// Applies Fast Approximate Anti-Aliasing as a post-process pass.
+// Used as a fallback when hardware MSAA is not granted by the driver.
+
 out vec4 FragColor;
 in vec2 TexCoord;
 
