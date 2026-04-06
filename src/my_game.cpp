@@ -10,10 +10,10 @@ PIXELFALL_APPLICATION(MyGame);
 // Called on the first frame
 bool MyGame::onStart() {
     // Set Metadata
-    appWindow->setWindowTitle("My awesome game");
-    appTitle = "My awesome game";
+    appWindow->setWindowTitle("Chess");
+    appTitle = "Chess";
     appVersion = "0.1";
-    appIdentifier = "myAwesomeGame";
+    appIdentifier = "chess";
 
     return true;
 }
@@ -28,30 +28,29 @@ void MyGame::onRender() {
     painter->drawRectangle(
         Vector2::Zero,
         Vector2(appWindow->getLogicalSize().x, appWindow->getLogicalSize().y),
-        Color::fromHexcode("#ccc")
-        );
-    painter->drawTriangle(
-        Vector2(0, 0),
-        Vector2(1280, 0),
-        Vector2(640, 720),
-        Color::fromHexcode("#eee")
+        Color::fromHexcode("#333")
     );
-    painter->drawCircle(
-        Vector2(200, 200),
-        90.0f,
-        Color::fromHexcode("#f005")
-    );
-    painter->drawArc(
-        Vector2(400, 200),
-        90.0f,
-        0,
-        90,
-        Color::fromHexcode("#000")
-    );
-    painter->drawRegularPolygon(
-        Vector2(900, 200),
-        140.0f,
-        Color::fromHexcode("#f0f"),
-        7
-    );
+
+    // Chess board
+    Vector2 squareSize{64.0f, 64.0f};
+    Vector2 boardSize{squareSize.x * 8, squareSize.y * 8};
+    Color whiteSquareColor{Color::fromHexcode("#edd6b0")};
+    Color blackSquareColor{Color::fromHexcode("#b88762")};
+
+    // Center board
+    Vector2 boardPosition{
+        (appWindow->getLogicalSize().x - boardSize.x) / 2,
+        (appWindow->getLogicalSize().y - boardSize.y) / 2
+    };
+    
+    for (int row = 0; row < 8; row++) {
+        for (int column = 0; column < 8; column++) {
+            painter->drawRectangle(
+                {boardPosition.x + (column * squareSize.x), boardPosition.y + (row * squareSize.y)},
+                squareSize,
+                // If the square is odd, draw white. If it's even, draw black.
+                ((column + row + 1) % 2 == 0) ? blackSquareColor : whiteSquareColor
+            );
+        }
+    }
 }
