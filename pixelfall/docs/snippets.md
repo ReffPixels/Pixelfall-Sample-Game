@@ -28,4 +28,4 @@
                 ((file + rank + 1) % 2 == 0) ? blackSquareColor : whiteSquareColor
             );
         }
-    }\
+    }

@@ -29,6 +29,6 @@ struct PieceInfo {
 class ChessPiece {
 public:
     // Methods
-    void draw(PieceInfo pieceInfo, Vector2 boardPosition, Vector2 squareSize,
+    void draw(PieceInfo pieceInfo, Vector2 boardPosition, Vector2 tileSize,
         Painter& painter, TextureCache& textureCache, const std::filesystem::path& projectPath);
 };
