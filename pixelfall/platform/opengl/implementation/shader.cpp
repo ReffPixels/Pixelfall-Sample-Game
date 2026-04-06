@@ -60,6 +60,9 @@ void Shader::setUniformInt(const std::string& name, int value) const {
 void Shader::setUniformFloat(const std::string& name, float value) const {
     glUniform1f(glGetUniformLocation(shaderID, name.c_str()), value);
 }
+void Shader::setUniformVec2(const std::string& name, float x, float y) const {
+    glUniform2f(glGetUniformLocation(shaderID, name.c_str()), x, y);
+}
 void Shader::setUniformVec4(const std::string& name, float x, float y, float z, float w) const {
     glUniform4f(glGetUniformLocation(shaderID, name.c_str()), x, y, z, w);
 }

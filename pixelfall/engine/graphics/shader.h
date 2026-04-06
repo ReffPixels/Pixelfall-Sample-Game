@@ -20,6 +20,7 @@ public:
     void setUniformBool(const std::string& name, bool value) const;
     void setUniformInt(const std::string& name, int value) const;
     void setUniformFloat(const std::string& name, float value) const;
+    void setUniformVec2(const std::string& name, float x, float y) const;
     void setUniformVec4(const std::string& name, float x, float y, float z, float w) const;
     void setUniformMat4(const std::string& name, float* matrix) const;
 
