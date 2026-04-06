@@ -49,6 +49,7 @@ void ChessPiece::draw(PieceInfo pieceInfo, Vector2 boardPosition, Vector2 tileSi
         boardPosition.y + ((float)pieceInfo.position.x + (float)pieceInfo.position.y)
         * tileSize.y / 2.0f - (spriteSize.y / 2.0f + heightDisplacement * spriteSize.y),
     };
+    
     Texture& pieceTexture = textureCache.loadTexture(findImagePath(pieceInfo, projectPath).string());
 
     painter.drawSprite(

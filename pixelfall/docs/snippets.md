@@ -29,3 +29,27 @@
             );
         }
     }
+
+    
+// Draws a piece on the board isometrically
+void ChessPiece::draw(PieceInfo pieceInfo, Vector2 boardPosition, Vector2 tileSize,
+    Painter& painter, TextureCache& textureCache, const std::filesystem::path& projectPath) {
+
+    float scale{0.75f};
+    float heightDisplacement{0.25f};
+    Vector2 spriteSize{tileSize.x * scale, tileSize.y * 2 * scale};
+
+    Vector2 physicalPosition = {
+        boardPosition.x + ((float)pieceInfo.position.x - (float)pieceInfo.position.y)
+        * tileSize.x / 2.0f - spriteSize.y / 2.0f,
+        boardPosition.y + ((float)pieceInfo.position.x + (float)pieceInfo.position.y)
+        * tileSize.y / 2.0f - (spriteSize.y / 2.0f + heightDisplacement * spriteSize.y),
+    };
+    Texture& pieceTexture = textureCache.loadTexture(findImagePath(pieceInfo, projectPath).string());
+
+    painter.drawSprite(
+        physicalPosition,
+        spriteSize,
+        pieceTexture
+    );
+}

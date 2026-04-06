@@ -36,14 +36,14 @@ void MyGame::onRender() {
     );
     
     // Chess board (Isometric)
-    Vector2 tileSize{80.0f, 40.0f};  // width:height = 2:1
+    Vector2 tileSize{128.0f, 64.0f};  // width:height = 2:1
     Color whiteSquareColor{Color::fromHexcode("#edd6b0")};
     Color blackSquareColor{Color::fromHexcode("#b88762")};
 
     // Center of the whole board
     Vector2 boardPosition{
         appWindow->getLogicalSize().x / 2.0f,
-        (appWindow->getLogicalSize().y - (tileSize.y * 8)) / 2.0f
+        (appWindow->getLogicalSize().y - (tileSize.y * 8)) / 2.0f + 30.0f
     };
 
     // Draw board
