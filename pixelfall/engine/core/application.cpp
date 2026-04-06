@@ -9,5 +9,9 @@ void Application::onSetup(std::filesystem::path enginePath, Window& appWindow) {
         (enginePath / shader::defaults::defaultVertexShader.data()),
         (enginePath / shader::defaults::defaultFragmentShader.data())
     );
-    painter.emplace(*defaultShader, appWindow);
+    screenShader.emplace(
+        (enginePath / shader::defaults::screenVertexShader.data()),
+        (enginePath / shader::defaults::fxaaFragmentShader.data())
+    );
+    painter.emplace(*defaultShader, *screenShader, appWindow);
 }

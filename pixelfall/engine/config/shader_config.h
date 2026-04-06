@@ -15,5 +15,7 @@ namespace shader {
         // This should be separated with an ifdef in the future once that is defined in the CmakeLists
         constexpr std::string_view defaultVertexShader {"assets/shaders/opengl/vertex_shader.glsl"};
         constexpr std::string_view defaultFragmentShader {"assets/shaders/opengl/fragment_shader.glsl"};
+        constexpr std::string_view screenVertexShader {"assets/shaders/opengl/screen_vertex_shader.glsl"};
+        constexpr std::string_view fxaaFragmentShader {"assets/shaders/opengl/fxaa_fragment_shader.glsl"};
     }
 }

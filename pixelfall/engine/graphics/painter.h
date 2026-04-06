@@ -3,9 +3,11 @@
 #pragma once
 // Standard Library
 #include <vector>
+#include <memory>
 // Graphics
 #include "pixelfall/engine/graphics/shader.h"
 #include "pixelfall/engine/graphics/color.h"
+#include "pixelfall/engine/graphics/framebuffer.h"
 // Core
 #include "pixelfall/engine/core/window.h"
 // Math
@@ -15,11 +17,11 @@
 
 class Painter {
 public:
-    Painter(Shader& shader, Window& window)
-        : shader(shader), window(window) {}
+    Painter(Shader& geometryShader, Shader& screenShader, Window& window);
 
     // Methods
-    void begin();
+    void begin(); // Called by engine before onRender() — binds FBO and sets up projection
+    void end();   // Called by engine after onRender() — applies FXAA and blits to screen
     void drawPolygon(const std::vector<Vector2>& points, Color color);
     void drawTriangle(Vector2 a, Vector2 b, Vector2 c, Color color);
     void drawQuad(Vector2 a, Vector2 b, Vector2 c, Vector2 d, Color color);
@@ -31,5 +33,8 @@ public:
 
 private:
     Shader& shader;
+    Shader& screenShader;
     Window& window;
+    std::unique_ptr<Framebuffer> framebuffer;
+    Vector2Int framebufferSize;
 };

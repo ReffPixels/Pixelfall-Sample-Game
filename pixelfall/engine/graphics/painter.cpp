@@ -10,8 +10,14 @@
 #include "pixelfall/engine/math/numbers.h"
 #include "pixelfall/engine/math/tools.h"
 
-// Setup function that has to be called at the beginning of rendering every frame. 
-// This calculates the orthographic matrix.
+Painter::Painter(Shader& geometryShader, Shader& screenShader, Window& window)
+    : shader(geometryShader), screenShader(screenShader), window(window) {
+    framebufferSize = window.getPhysicalSize();
+    framebuffer = std::make_unique<Framebuffer>(framebufferSize);
+}
+
+// Binds the FBO and sets up the geometry shader with the orthographic projection.
+// Called by the engine before onRender().
 void Painter::begin() {
     float w = (float)window.getLogicalSize().x;
     float h = (float)window.getLogicalSize().y;
@@ -24,8 +30,28 @@ void Painter::begin() {
        -1.0f,    1.0f,    0.0f,    1.0f   // column 3, moves origin
     };
 
+    auto physSize = window.getPhysicalSize();
+    if (physSize.x != framebufferSize.x || physSize.y != framebufferSize.y) {
+        framebufferSize = physSize;
+        framebuffer = std::make_unique<Framebuffer>(framebufferSize);
+    }
+
+    framebuffer->bind();
     shader.use();
     shader.setUniformMat4("projectionMatrix", ortho);
+}
+
+// Unbinds the FBO and blits it to the screen through the FXAA shader.
+// Called by the engine after onRender().
+void Painter::end() {
+    auto physSize = window.getPhysicalSize();
+    framebuffer->unbind();
+
+    screenShader.use();
+    screenShader.setUniformInt("screenTexture", 0);
+    screenShader.setUniformVec2("rcpFrame", 1.0f / physSize.x, 1.0f / physSize.y);
+
+    framebuffer->drawQuad();
 }
 
 // Draws a convex polygon with a flat color. Concave polygons are not currently supported.

@@ -36,6 +36,7 @@ protected:
     std::string appIdentifier{application::defaults::appIdentifier.data()};
     std::string appVersion{application::defaults::appVersion.data()};
     std::optional<Shader> defaultShader;
+    std::optional<Shader> screenShader;
     std::optional<Painter> painter;
     Window* appWindow = nullptr;
 };
