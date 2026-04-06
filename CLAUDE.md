@@ -26,21 +26,23 @@ The sample game is a simple chess game — alternating turns, click a white piec
 pixelfall/                  # Engine — built as a static library
   engine/
     core/                   # Engine, Application, Window, Clock
-    graphics/               # Painter, Shader, Mesh, Framebuffer, Color
+    graphics/               # Painter, Shader, Mesh, Framebuffer, Color, Texture, TextureCache
     math/                   # Vector2, Vector3, Vector4 (+Int variants), numbers, tools
     config/                 # shader_config.h, window_config.h, application_config.h, painter_config.h
   platform/
     sdl/                    # SDL3 window, event callbacks
     opengl/                 # OpenGL implementations of Shader, Mesh, Framebuffer
-  assets/shaders/opengl/    # GLSL shaders (geometry.vert/frag, screen.vert, fxaa_screen.frag, msaa_screen.frag)
-  external/                 # glad, SDL3, SDL3_ttf
+  assets/shaders/opengl/    # GLSL shaders (geometry.vert/frag, screen.vert, fxaa_screen.frag, msaa_screen.frag, sprite.vert/frag)
+  external/                 # glad, SDL3, SDL3_ttf, stb_image (plugins/)
 src/                        # Game code — MyGame inherits Application
 ```
 
 **Key classes:**
 - `Engine` — owns and orchestrates Window, Clock, Application; runs the main loop
 - `Application` — virtual base with `onStart()`, `onUpdate()`, `onRender()` hooks; owns the Painter and shaders
-- `Painter` — draw API; renders into a Framebuffer each frame and blits to screen with FXAA
+- `Painter` — draw API; renders into a Framebuffer each frame and blits to screen with FXAA; `drawSprite` for textured quads
+- `Texture` — wraps an OpenGL texture; loaded from disk via stb_image; platform-abstracted
+- `TextureCache` — caches Textures by path to avoid reloading the same asset
 - `Framebuffer` — FBO + color texture + fullscreen quad; used for the FXAA post-process pass
 - `Shader` — loads/compiles GLSL from file, sets uniforms
 - `Mesh` — VAO/VBO/EBO wrapper
@@ -79,19 +81,28 @@ See `docs/conventions.md` for full details. Key points:
 
 **Implemented:**
 - Engine loop, SDL3 window, OpenGL 3.3 context
-- Painter: `drawPolygon`, `drawTriangle`, `drawQuad`, `drawRectangle`, `drawCircle`, `drawArc`, `drawRegularPolygon`
-- FXAA post-process AA (passthrough fallback when MSAA is granted by driver)
+- Painter: `drawPolygon`, `drawTriangle`, `drawQuad`, `drawRectangle`, `drawCircle`, `drawArc`, `drawRegularPolygon`, `drawSprite`
+- Texture loading via stb_image with TextureCache
+- FXAA post-process AA (passthrough fallback; debug toggle via `application::autoEnableFXAA`)
 - Alpha blending (`GL_BLEND`)
 - Color: RGBA/HSLA/HSVA/hex with full conversion, getters, and setters
 - Vector2/Vector2Int with full operator overloads
 - Presentation modes: Free, Letterbox, Crop, Stretch, Expand, ExpandHorizontal, ExpandVertical
 - Clock with deltaTime, FPS tracking, optional frame cap
+- Flexible Mesh vertex attributes via `VertexAttribute` struct
+- Chess sample game: FEN string parsing, board rendering, piece sprites
 
 **Not yet implemented:**
 - Input handling (SDL events not wired to Application)
 - Outlined shape variants, `drawLine`, `drawLineStrip`
 - Concave polygon support (ear clipping)
 - Entity/component system
-- Asset loading, audio
+- Audio
 - Vector3/Vector4 operators (data-only structs currently)
 - Editor
+
+---
+
+## Known Issues / To Do
+
+- **Painter creates a new Mesh (VAO/VBO/EBO) per draw call, every frame.** Should use two persistent reusable meshes (one for geometry `{{3}}`, one for sprites `{{3},{2}}`), updated via `setVertices` + `setIndices` + `update()` each call. Change `GL_STATIC_DRAW` to `GL_DYNAMIC_DRAW`. Currently causes ~96 GPU allocations/frame for a chess board, limiting FPS.

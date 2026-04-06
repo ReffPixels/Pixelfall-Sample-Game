@@ -1,11 +1,10 @@
-// Defines a chess piece object
+// Defines a chess piece object and handles drawing it on the screen.
 
 #pragma once
+// Engine
 #include "pixelfall/engine/math/vector2.h"
 #include "pixelfall/engine/graphics/painter.h"
-#include "pixelfall/engine/graphics/texture.h"
-#include "pixelfall/engine/math/vector2.h"
-#include <optional>
+#include "pixelfall/engine/graphics/texture_cache.h"
 
 enum PieceType {
     King,
@@ -21,31 +20,15 @@ enum PieceTeam {
     Black
 };
 
+struct PieceInfo {
+    PieceType type;
+    PieceTeam team;
+    Vector2Int position{0, 0};
+};
+
 class ChessPiece {
 public:
-    // Constructor
-    ChessPiece(std::string gridPosition, PieceType pieceType, PieceTeam pieceTeam, const std::filesystem::path& projectPath)
-        : gridPosition(gridPosition), pieceType(pieceType), pieceTeam(pieceTeam) {
-    }
-
-    // Getters
-    const std::string getPosition() const { return gridPosition; };
-    const PieceType getPieceType() const { return pieceType; };
-
-    // Setters
-    void setGridPosition(const std::string gridPosition) { this->gridPosition = gridPosition; };
-    void setPieceType(const PieceType pieceType) { this->pieceType = pieceType; };
-
     // Methods
-    void draw(Painter& painter, const std::filesystem::path& projectPath, Vector2 boardPosition, Vector2 squareSize);
-    std::filesystem::path findImagePath(const std::filesystem::path& projectPath);
-
-    // Destructor
-    ~ChessPiece() = default;
-private:
-    // Position is stored in chess notation (a1 to h8)
-    std::string gridPosition;
-    PieceType pieceType;
-    PieceTeam pieceTeam;
-    std::optional<Texture> texture;
+    void draw(PieceInfo pieceInfo, Vector2 boardPosition, Vector2 squareSize,
+        Painter& painter, TextureCache& textureCache, const std::filesystem::path& projectPath);
 };

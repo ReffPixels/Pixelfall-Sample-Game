@@ -7,7 +7,7 @@
 namespace application {
 
     // Settings
-    constexpr bool autoEnableFXAA(false);
+    constexpr bool autoEnableFXAA(true);
 
     namespace defaults {
         // Metadata

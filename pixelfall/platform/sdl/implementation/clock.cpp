@@ -3,6 +3,8 @@
 #include "pixelfall/engine/core/clock.h"
 // SDL
 #include <SDL3/SDL.h>
+// Standard Library
+#include <iostream>
 
 // Called when the engine is created
 bool Clock::init() {

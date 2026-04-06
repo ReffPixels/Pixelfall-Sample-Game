@@ -2,6 +2,7 @@ engine/core/engine.cpp
 engine/core/application.cpp
 engine/graphics/painter.cpp
 engine/graphics/color.cpp
+engine/graphics/texture_cache.cpp
 platform/sdl/sdl_callbacks.cpp
 platform/sdl/implementation/clock.cpp
 platform/sdl/implementation/window.cpp

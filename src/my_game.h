@@ -2,8 +2,11 @@
 // Overwrites the main functions defined in application.h (Run by the engine).
 
 #pragma once
+// Engine
 #include "pixelfall/engine/core/application.h"
-#include "chess_piece.h"
+// Chess
+#include "config/board_config.h"
+#include "fen_parser.h"
 
 class MyGame : public Application {
 public:
@@ -12,6 +15,6 @@ public:
     void onRender() override;
 
 private:
-    Texture* pawnTexture = nullptr;
-    ChessPiece* myPiece = nullptr;
+    std::string currentBoardFEN = board::defaults::defaultBoardFEN.data();
+    FenParser fenParser;
 };

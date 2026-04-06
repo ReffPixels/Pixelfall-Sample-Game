@@ -10,7 +10,7 @@ in vec2 TexCoord;
 uniform sampler2D screenTexture;
 uniform vec2 rcpFrame; // 1.0 / textureSize — one pixel step in UV space
 
-#define FXAA_SPAN_MAX   4.0
+#define FXAA_SPAN_MAX   2.0
 #define FXAA_REDUCE_MUL (1.0 / 8.0)
 #define FXAA_REDUCE_MIN (1.0 / 128.0)
 

@@ -8,7 +8,7 @@ namespace board {
 
     namespace defaults {
 
-        constexpr std::string_view defaultBoardFEN{};
+        constexpr std::string_view defaultBoardFEN{"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"};
     }
 }
 

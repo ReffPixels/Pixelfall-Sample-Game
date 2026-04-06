@@ -15,15 +15,15 @@ bool MyGame::onStart() {
     appVersion = "0.1";
     appIdentifier = "chess";
 
-    pawnTexture = new Texture(projectPath / "assets/image/pieces/white_rook.png");
-
-    myPiece = new ChessPiece{"a1", PieceType::Queen, PieceTeam::Black, projectPath};
+    // Get initial state of board
+    fenParser.getPiecesFromFEN(currentBoardFEN);
 
     return true;
 }
 
 // Called every frame
 void MyGame::onUpdate() {
+    appWindow->setWindowTitle("Chess | FPS: " + std::to_string(appClock->getFPS()));
 }
 
 // Handles draw calls
@@ -36,7 +36,7 @@ void MyGame::onRender() {
     );
 
     // Chess board
-    Vector2 squareSize{64.0f, 64.0f};
+    Vector2 squareSize{100.0f, 100.0f};
     Vector2 boardSize{squareSize.x * 8, squareSize.y * 8};
     Color whiteSquareColor{Color::fromHexcode("#edd6b0")};
     Color blackSquareColor{Color::fromHexcode("#b88762")};
@@ -48,16 +48,17 @@ void MyGame::onRender() {
     };
 
     // Draw board
-    for (int row = 0; row < 8; row++) {
-        for (int column = 0; column < 8; column++) {
+    for (int rank = 0; rank < 8; rank++) {
+        for (int file = 0; file < 8; file++) {
             painter->drawRectangle(
-                {boardPosition.x + (column * squareSize.x), boardPosition.y + (row * squareSize.y)},
+                {boardPosition.x + (file * squareSize.x), boardPosition.y + (rank * squareSize.y)},
                 squareSize,
                 // If the square is odd, draw white. If it's even, draw black.
-                ((column + row + 1) % 2 == 0) ? blackSquareColor : whiteSquareColor
+                ((file + rank + 1) % 2 == 0) ? blackSquareColor : whiteSquareColor
             );
         }
     }
 
-    myPiece->draw(*painter, projectPath, boardPosition, squareSize);
+    // Draw pieces
+    fenParser.drawPieces(boardPosition, squareSize, *painter, *textureCache, projectPath);
 }

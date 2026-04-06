@@ -1,6 +1,7 @@
 // Implementation for piece.h
 #include "chess_piece.h"
 
+// Converts a piece location from traditional notation (a1 to h8) into a vector. [FUTURE-PROOFING]
 static Vector2Int gridNotationToVector(std::string gridPosition) {
     return Vector2Int{
         gridPosition[0] - 'a', // 'a' -> 0, 'h' -> 7
@@ -8,29 +9,10 @@ static Vector2Int gridNotationToVector(std::string gridPosition) {
     };
 }
 
-void ChessPiece::draw(
-    Painter& painter, const std::filesystem::path& projectPath, Vector2 boardPosition, Vector2 squareSize) {
-
-    std::filesystem::path imagePath = findImagePath(projectPath);
-
-    Vector2 physicalPosition = {
-        boardPosition.x + ((float)gridNotationToVector(gridPosition).x * squareSize.x),
-        boardPosition.y + ((float)gridNotationToVector(gridPosition).y * squareSize.y),
-    };
-    if (!texture.has_value()) {
-        texture.emplace(findImagePath(projectPath));
-    }
-
-    painter.drawSprite(
-        physicalPosition,
-        squareSize,
-        *texture
-    );
-}
-
-std::filesystem::path ChessPiece::findImagePath(const std::filesystem::path& projectPath) {
-    if (pieceTeam == PieceTeam::White) {
-        switch (pieceType) {
+// Returns the path of a chess piece image from it's piece information (Type and team)
+static std::filesystem::path findImagePath(PieceInfo pieceInfo, const std::filesystem::path& projectPath) {
+    if (pieceInfo.team == PieceTeam::White) {
+        switch (pieceInfo.type) {
         case King: return (projectPath / "assets/image/pieces/white_king.png");
         case Queen: return (projectPath / "assets/image/pieces/white_queen.png");
         case Rook: return (projectPath / "assets/image/pieces/white_rook.png");
@@ -41,7 +23,7 @@ std::filesystem::path ChessPiece::findImagePath(const std::filesystem::path& pro
         }
     }
     else {
-        switch (pieceType) {
+        switch (pieceInfo.type) {
         case King: return (projectPath / "assets/image/pieces/black_king.png");
         case Queen: return (projectPath / "assets/image/pieces/black_queen.png");
         case Rook: return (projectPath / "assets/image/pieces/black_rook.png");
@@ -51,4 +33,21 @@ std::filesystem::path ChessPiece::findImagePath(const std::filesystem::path& pro
         default: return projectPath; // Error, invalid piece type
         }
     }
+}
+
+// Draws a piece on the board
+void ChessPiece::draw(PieceInfo pieceInfo, Vector2 boardPosition, Vector2 squareSize,
+    Painter& painter, TextureCache& textureCache, const std::filesystem::path& projectPath) {
+
+    Vector2 physicalPosition = {
+        boardPosition.x + (float)pieceInfo.position.x * squareSize.x,
+        boardPosition.y + (float)pieceInfo.position.y * squareSize.y,
+    };
+    Texture& pieceTexture = textureCache.loadTexture(findImagePath(pieceInfo, projectPath).string());
+
+    painter.drawSprite(
+        physicalPosition,
+        squareSize,
+        pieceTexture
+    );
 }
