@@ -38,11 +38,12 @@ void FenParser::getPiecesFromFEN(const std::string fenString) {
 }
 
 // Draws all the pieces in the pieces vector on the screen.
-void FenParser::drawPieces(Vector2 boardPosition, Vector2 squareSize, Painter& painter,
-    TextureCache& textureCache, std::filesystem::path& projectPath) {
+void FenParser::drawPieces(Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
+    Painter& painter, TextureCache& textureCache, const std::filesystem::path& projectPath,
+    Vector2 pieceOffset) {
     
     for (PieceInfo pieceInfo : pieces) {
         ChessPiece piece;
-        piece.draw(pieceInfo, boardPosition, squareSize, painter, textureCache, projectPath);
+        piece.draw(pieceInfo, boardPosition, tileSize, spriteSize, painter, textureCache, projectPath, pieceOffset);
     }
 };

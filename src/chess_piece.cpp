@@ -1,5 +1,6 @@
 // Implementation for piece.h
 #include "chess_piece.h"
+#include "config/board_config.h"
 
 // Converts a piece location from traditional notation (a1 to h8) into a vector. [FUTURE-PROOFING]
 static Vector2Int gridNotationToVector(std::string gridPosition) {
@@ -13,42 +14,62 @@ static Vector2Int gridNotationToVector(std::string gridPosition) {
 static std::filesystem::path findImagePath(PieceInfo pieceInfo, const std::filesystem::path& projectPath) {
     if (pieceInfo.team == PieceTeam::White) {
         switch (pieceInfo.type) {
-        case King: return (projectPath / "assets/image/pieces/white_king.png");
-        case Queen: return (projectPath / "assets/image/pieces/white_queen.png");
-        case Rook: return (projectPath / "assets/image/pieces/white_rook.png");
-        case Bishop: return (projectPath / "assets/image/pieces/white_bishop.png");
-        case Knight: return (projectPath / "assets/image/pieces/white_knight.png");
-        case Pawn: return (projectPath / "assets/image/pieces/white_pawn.png");
+        case King: return (projectPath / board::piecesPath / "white_king.png");
+        case Queen: return (projectPath / board::piecesPath / "white_queen.png");
+        case Rook: return (projectPath / board::piecesPath / "white_rook.png");
+        case Bishop: return (projectPath / board::piecesPath / "white_bishop.png");
+        case Knight: return (projectPath / board::piecesPath / "white_knight.png");
+        case Pawn: return (projectPath / board::piecesPath / "white_pawn.png");
         default: return projectPath; // Error, invalid piece type
         }
     }
     else {
         switch (pieceInfo.type) {
-        case King: return (projectPath / "assets/image/pieces/black_king.png");
-        case Queen: return (projectPath / "assets/image/pieces/black_queen.png");
-        case Rook: return (projectPath / "assets/image/pieces/black_rook.png");
-        case Bishop: return (projectPath / "assets/image/pieces/black_bishop.png");
-        case Knight: return (projectPath / "assets/image/pieces/black_knight.png");
-        case Pawn: return (projectPath / "assets/image/pieces/black_pawn.png");
+        case King: return (projectPath / board::piecesPath / "black_king.png");
+        case Queen: return (projectPath / board::piecesPath / "black_queen.png");
+        case Rook: return (projectPath / board::piecesPath / "black_rook.png");
+        case Bishop: return (projectPath / board::piecesPath / "black_bishop.png");
+        case Knight: return (projectPath / board::piecesPath / "black_knight.png");
+        case Pawn: return (projectPath / board::piecesPath / "black_pawn.png");
         default: return projectPath; // Error, invalid piece type
         }
     }
 }
 
 // Draws a piece on the board
-void ChessPiece::draw(PieceInfo pieceInfo, Vector2 boardPosition, Vector2 tileSize,
-    Painter& painter, TextureCache& textureCache, const std::filesystem::path& projectPath) {
+void ChessPiece::draw(PieceInfo pieceInfo, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
+    Painter& painter, TextureCache& textureCache, const std::filesystem::path& projectPath,
+    Vector2 pieceOffset) {
+    
+    Vector2 physicalPosition{};
+    if (board::projectionType == ThemeProjection::Isometric) {
+        physicalPosition = {
+            boardPosition.x
+            + ((float)pieceInfo.position.x - (float)pieceInfo.position.y)
+            * (tileSize.x / 2.0f)
+            - (spriteSize.x / 2.0f)
+            + pieceOffset.x,
+                
+            boardPosition.y
+            + ((float)pieceInfo.position.x + (float)pieceInfo.position.y)
+            * (tileSize.y / 2.0f)
+            - (spriteSize.y / 2.0f)
+            + pieceOffset.y,
+        };
+    }
+    else {
+        physicalPosition = {
+            boardPosition.x
+            + (float)pieceInfo.position.x
+            * tileSize.x
+            + pieceOffset.x,
 
-    float scale{0.75f};
-    float heightDisplacement{0.25f};
-    Vector2 spriteSize{tileSize.x * scale, tileSize.y * 2 * scale};
-
-    Vector2 physicalPosition = {
-        boardPosition.x + ((float)pieceInfo.position.x - (float)pieceInfo.position.y)
-        * tileSize.x / 2.0f - spriteSize.y / 2.0f,
-        boardPosition.y + ((float)pieceInfo.position.x + (float)pieceInfo.position.y)
-        * tileSize.y / 2.0f - (spriteSize.y / 2.0f + heightDisplacement * spriteSize.y),
-    };
+            boardPosition.y
+            + (float)pieceInfo.position.y
+            * tileSize.y
+            + pieceOffset.y,
+        };
+    }
     
     Texture& pieceTexture = textureCache.loadTexture(findImagePath(pieceInfo, projectPath).string());
 

@@ -14,8 +14,9 @@ class FenParser {
 public:
     // Methods
     void getPiecesFromFEN(const std::string fenString);
-    void drawPieces(Vector2 boardPosition, Vector2 squareSize, Painter& painter,
-        TextureCache& textureCache, std::filesystem::path& projectPath);
+    void drawPieces(Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
+        Painter& painter, TextureCache& textureCache, const std::filesystem::path& projectPath,
+        Vector2 pieceOffset = Vector2::Zero);
 
 private:
     std::vector<PieceInfo> pieces;
