@@ -107,7 +107,7 @@ void ChessPieces::drawPieces(std::vector<PieceInfo> pieces, Vector2 boardPositio
 
     for (int i = 0; i < (int)pieces.size(); i++) {
         // Do something special to the piece selected
-        if (isPieceSelected && i == selectedPieceIndex) {
+        if (hideSelectedPiece && i == selectedPieceIndex) {
             // Don't draw this piece
             continue;
         }

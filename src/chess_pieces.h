@@ -39,7 +39,7 @@ public:
         Painter& painter);
 
     // Setters
-    void setIsPieceSelected(bool isPieceSelected) { this->isPieceSelected = isPieceSelected; };
+    void setHideSelectedPiece(bool hideSelectedPiece) { this->hideSelectedPiece = hideSelectedPiece; };
     void setSelectedPieceIndex(int selectedPieceIndex) { this->selectedPieceIndex = selectedPieceIndex; };
 
     // Getters
@@ -47,6 +47,6 @@ public:
     static std::string getNotationFromPos(Vector2Int gridPosition);
 
 private:
-    bool isPieceSelected{false};
+    bool hideSelectedPiece{false};
     int selectedPieceIndex{-1};
 };

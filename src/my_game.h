@@ -26,6 +26,8 @@ public:
     void movePiece(PieceInfo& piece, std::string newPos);
     void nextTurn();
 private:
+    Vector2 mousePos{};
+    
     std::string currentBoardFEN = board::defaults::defaultBoardFEN.data();
     FenParser fenParser;
     ChessPieces pieces;

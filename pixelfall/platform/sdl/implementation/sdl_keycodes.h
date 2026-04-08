@@ -6,10 +6,10 @@
 static MouseButton sdlToMouseButton(Uint8 code) {
     switch (code) {
     case SDL_BUTTON_LEFT: return MouseButton::Left;
-    case SDL_BUTTON_MIDDLE: return MouseButton::Left;
-    case SDL_BUTTON_RIGHT: return MouseButton::Left;
-    case SDL_BUTTON_X1: return MouseButton::Left;
-    case SDL_BUTTON_X2: return MouseButton::Left;
+    case SDL_BUTTON_MIDDLE: return MouseButton::Middle;
+    case SDL_BUTTON_RIGHT: return MouseButton::Right;
+    case SDL_BUTTON_X1: return MouseButton::X1;
+    case SDL_BUTTON_X2: return MouseButton::X2;
     default: return MouseButton::Unknown;
     }
 }
