@@ -45,8 +45,7 @@ static std::filesystem::path findImagePath(PieceInfo pieceInfo) {
 
 // Draws a piece on the board
 void ChessPieces::draw(PieceInfo pieceInfo, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
-    Painter& painter,
-    Vector2 pieceOffset) {
+    Painter& painter, Vector2 pieceOffset) {
     
     Vector2 physicalPosition{};
     if (board::projectionType == ThemeProjection::Isometric) {
@@ -103,11 +102,15 @@ void ChessPieces::drawFree(PieceType type, PieceTeam team, Vector2 physicalPosit
 
 // Draws all the pieces in the pieces vector on the screen.
 void ChessPieces::drawPieces(std::vector<PieceInfo> pieces, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
-    Painter& painter,
-    Vector2 pieceOffset) {
+    Painter& painter, Vector2 pieceOffset) {
+
+    Vector2 adjustedPosition{
+        boardPosition.x - ((tileSize.x * 8) / 2.0f),
+        boardPosition.y - ((tileSize.y * 8) / 2.0f)
+    };
 
     for (PieceInfo pieceInfo : pieces) {
         ChessPieces piece;
-        piece.draw(pieceInfo, boardPosition, tileSize, spriteSize, painter, pieceOffset);
+        piece.draw(pieceInfo, adjustedPosition, tileSize, spriteSize, painter, pieceOffset);
     }
 };

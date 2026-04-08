@@ -6,7 +6,11 @@
 #include "pixelfall/engine/core/application.h"
 // Chess
 #include "config/board_config.h"
+#include "chess_pieces.h"
+#include "chess_board.h"
 #include "fen_parser.h"
+// Standard Library
+#include <memory>
 
 class MyGame : public Application {
 public:
@@ -20,6 +24,7 @@ private:
     FenParser fenParser;
     ChessPieces pieces;
     std::vector<PieceInfo> piecesInfo;
+    std::unique_ptr<ChessBoard> board;
     // Test
     Vector2 pieceTestPosition{};
 };

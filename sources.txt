@@ -1,3 +1,4 @@
 src/my_game.cpp
 src/chess_pieces.cpp
+src/chess_board.cpp
 src/fen_parser.cpp

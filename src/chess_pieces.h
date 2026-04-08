@@ -4,7 +4,6 @@
 // Engine
 #include "pixelfall/engine/math/vector2.h"
 #include "pixelfall/engine/graphics/painter.h"
-#include "pixelfall/engine/graphics/texture_cache.h"
 
 enum PieceType {
     King,

@@ -33,3 +33,5 @@ private:
         {'p', {PieceType::Pawn, PieceTeam::Black}}
     };
 };
+
+// [TODO] Update FEN string from pieceInfo vector
