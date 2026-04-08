@@ -11,7 +11,8 @@ enum PieceType {
     Rook,
     Bishop,
     Knight,
-    Pawn
+    Pawn,
+    None
 };
 
 enum PieceTeam {
@@ -38,6 +39,6 @@ public:
         Painter& painter);
     
     // Getters
-    Vector2Int getPosFromNotation(std::string gridPosition);
-    std::string getNotationFromPos(Vector2Int gridPosition);
+    static Vector2Int getPosFromNotation(std::string gridPosition);
+    static std::string getNotationFromPos(Vector2Int gridPosition);
 };

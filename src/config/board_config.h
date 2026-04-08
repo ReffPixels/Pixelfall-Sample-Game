@@ -6,7 +6,8 @@
 #include "chess_theme.h"
 
 namespace board {
-    
+
+    // [TODO] Fix Isometric mode
     inline ThemeProjection projectionType{Rectangular};
 
     inline std::filesystem::path piecesPath{"assets/image/themes/Cburnett/"};

@@ -1,21 +1,16 @@
 // Implementation for chess_board.h
 #include "chess_board.h"
 #include "config/board_config.h"
+#include "chess_pieces.h"
 
 void ChessBoard::draw(Painter& painter) {
-    
-    Vector2 adjustedPosition{
-        boardPosition.x - ((tileSize.x * 8) / 2.0f),
-        boardPosition.y - ((tileSize.y * 8) / 2.0f)
-    };
-
     // Draw board
     for (int rank = 0; rank < 8; rank++) {
         for (int file = 0; file < 8; file++) {
             if (projectionType == ThemeProjection::Isometric) {
                 // Center of this tile in screen space
-                float cx = adjustedPosition.x + (file - rank) * (tileSize.x / 2);
-                float cy = adjustedPosition.y + (file + rank) * (tileSize.y / 2);
+                float cx = boardPosition.x + (file - rank) * (tileSize.x / 2);
+                float cy = boardPosition.y + (file + rank) * (tileSize.y / 2);
 
                 // Four corners of the diamond
                 Vector2 top{cx,         cy - (tileSize.y / 2)};
@@ -30,11 +25,24 @@ void ChessBoard::draw(Painter& painter) {
             }
             else {
                 painter.drawRectangle(
-                    {adjustedPosition.x + (file * tileSize.x), adjustedPosition.y + (rank * tileSize.y)},
+                    {boardPosition.x + (file * tileSize.x), boardPosition.y + (rank * tileSize.y)},
                     tileSize,
                     ((file + rank + 1) % 2 == 0) ? darkSquareColor : lightSquareColor
                 );
             }
         }
     }
+}
+
+bool ChessBoard::isBoardOnHover(Vector2 mousePosition) {
+    return (mousePosition.x > boardPosition.x
+        && mousePosition.y > boardPosition.y
+        && mousePosition.x < boardPosition.x + (tileSize.x * 8)
+        && mousePosition.y < boardPosition.y + (tileSize.y * 8)
+    );
+}
+
+std::string ChessBoard::getSquareOnHover(Vector2 mousePosition) {
+    Vector2 squarePosition{(mousePosition - boardPosition) / tileSize.x};
+    return ChessPieces::getNotationFromPos({(int)squarePosition.x, (int)squarePosition.y});
 }

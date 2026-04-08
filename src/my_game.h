@@ -12,6 +12,11 @@
 // Standard Library
 #include <memory>
 
+enum InputState {
+    Normal,
+    PieceSelected,
+};
+
 class MyGame : public Application {
 public:
     bool onStart()  override;
@@ -19,12 +24,16 @@ public:
     void onRender() override;
 
     void movePiece(PieceInfo& piece, std::string newPos);
+    void nextTurn();
 private:
     std::string currentBoardFEN = board::defaults::defaultBoardFEN.data();
     FenParser fenParser;
     ChessPieces pieces;
     std::vector<PieceInfo> piecesInfo;
     std::unique_ptr<ChessBoard> board;
-    // Test
-    Vector2 pieceTestPosition{};
+
+    // Position in piecesInfo vector of the selected piece.
+    int selectedPieceInfo{};
+    InputState inputState{Normal};
+    PieceTeam playerTeam{};
 };

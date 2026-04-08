@@ -9,17 +9,21 @@
 class ChessBoard {
 public:
     // Constructor
-    ChessBoard(Vector2 boardPosition) : boardPosition(boardPosition) {}
+    ChessBoard(Vector2 boardPosition = Vector2::Zero) : boardPosition(boardPosition) {}
 
     // Getters
     const Vector2& getPosition() const { return boardPosition; };
     const Vector2& getTileSize() const { return tileSize; };
 
+    // Setters
+    void setPosition(Vector2 boardPosition) { this->boardPosition = boardPosition; };
+
     // Methods
     void draw(Painter& painter);
+    bool isBoardOnHover(Vector2 mousePosition);
     std::string getSquareOnHover(Vector2 mousePosition);
 private:
-    Vector2 boardPosition{Vector2::Zero};
+    Vector2 boardPosition;
 
     // Theme
     Vector2 tileSize{64.0f, 64.0f};  // width:height = 2:1

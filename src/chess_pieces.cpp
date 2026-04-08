@@ -1,6 +1,7 @@
 // Implementation for piece.h
 #include "chess_pieces.h"
 #include "config/board_config.h"
+#include <stdexcept>
 
 // Converts a piece location from grid notation (a1 to h8) into a vector.
 Vector2Int ChessPieces::getPosFromNotation(std::string gridPosition) {
@@ -14,7 +15,7 @@ Vector2Int ChessPieces::getPosFromNotation(std::string gridPosition) {
 std::string ChessPieces::getNotationFromPos(Vector2Int gridPosition) {
     return std::string() +
         char('a' + gridPosition.x) +
-        char('8' + gridPosition.y);
+        char('8' - gridPosition.y);
 }
 
 // Returns the path of a chess piece image from it's piece information (Type and team)
@@ -27,7 +28,7 @@ static std::filesystem::path findImagePath(PieceInfo pieceInfo) {
         case Bishop: return (board::piecesPath / "white_bishop.png");
         case Knight: return (board::piecesPath / "white_knight.png");
         case Pawn: return (board::piecesPath / "white_pawn.png");
-        default: return NULL; // Error, invalid piece type
+        default: throw std::runtime_error("Invalid piece type"); // [Error]
         }
     }
     else {
@@ -38,7 +39,7 @@ static std::filesystem::path findImagePath(PieceInfo pieceInfo) {
         case Bishop: return (board::piecesPath / "black_bishop.png");
         case Knight: return (board::piecesPath / "black_knight.png");
         case Pawn: return (board::piecesPath / "black_pawn.png");
-        default: return NULL; // Error, invalid piece type
+        default: throw std::runtime_error("Invalid piece type"); // [Error]
         }
     }
 }
@@ -104,13 +105,8 @@ void ChessPieces::drawFree(PieceType type, PieceTeam team, Vector2 physicalPosit
 void ChessPieces::drawPieces(std::vector<PieceInfo> pieces, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
     Painter& painter, Vector2 pieceOffset) {
 
-    Vector2 adjustedPosition{
-        boardPosition.x - ((tileSize.x * 8) / 2.0f),
-        boardPosition.y - ((tileSize.y * 8) / 2.0f)
-    };
-
     for (PieceInfo pieceInfo : pieces) {
         ChessPieces piece;
-        piece.draw(pieceInfo, adjustedPosition, tileSize, spriteSize, painter, pieceOffset);
+        piece.draw(pieceInfo, boardPosition, tileSize, spriteSize, painter, pieceOffset);
     }
 };
