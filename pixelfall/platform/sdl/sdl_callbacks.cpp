@@ -65,6 +65,14 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
 
 // This function runs when an SDL event is detected.
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
+
+    // Get Engine
+    Engine* engine = static_cast<Engine*>(appstate);
+
+    // Send Input Events to Engine's Input Manager
+    engine->getInputManager()->onEvent(event);
+
+    // Check if the app was quit
     if (event->type == SDL_EVENT_QUIT)
         return SDL_APP_SUCCESS;
     return SDL_APP_CONTINUE;

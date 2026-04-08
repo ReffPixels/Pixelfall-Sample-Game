@@ -7,6 +7,7 @@
 bool Engine::init() {
     window = std::make_unique<Window>();
     clock = std::make_unique<Clock>();
+    inputManager = std::make_unique<InputManager>();
 
     if (!window->init()) {
         std::cout << "ERROR: Failed to create engine window" << std::endl;
@@ -27,7 +28,7 @@ bool Engine::init() {
 // Attempts to create and start the application
 bool Engine::startApplication(std::unique_ptr<Application> application) {
     this->application = std::move(application);
-    this->application->onSetup(enginePath, *window, *clock, projectPath);
+    this->application->onSetup(*window, *clock, *inputManager, enginePath, projectPath);
     if (!this->application->onStart()) {
         std::cout << "ERROR: Failed to create application" << std::endl;
         isRunning = false;
@@ -51,6 +52,9 @@ bool Engine::update() {
     application->onRender();
     application->getPainter().end();
     window->present();
+
+    // Input
+    inputManager->onEndOfFrame();
 
     return isRunning;
 }

@@ -123,11 +123,8 @@ void Window::updateWindowData() {
     // Get current aspect ratio
     aspectRatio = (float)physicalSize.x / (float)physicalSize.y;
 
-    // Get current scale (Relative to the reference size)
-    scale = Vector2(
-        (float)physicalSize.x / referenceSize.x,
-        (float)physicalSize.y / referenceSize.y
-    );
+    // Get current scale
+    referenceScale = physicalSize / referenceSize;
 
     // Set OpenGL viewport to fill the window
     glViewport(0, 0, physicalSize.x, physicalSize.y);
@@ -150,31 +147,39 @@ void Window::updateLogicalPresentation() {
         // Coordinates (logical size) are just the window size.
         glViewport(0, 0, physicalSize.x, physicalSize.y);
         logicalSize = physicalSize;
+        viewportOffset = Vector2::Zero;
+        viewportScale = physicalSize / logicalSize;
         break;
 
     case window::PresentationMode::Letterbox: {
         // Viewport centered, scales reference size to the smallest axis of the window.
         // Coordinates (logical size) based on reference size.
-        float smallScale = std::min(scale.x, scale.y);
+        float smallScale = std::min(referenceScale.x, referenceScale.y);
         int vpW = (int)(refW * smallScale);
         int vpH = (int)(refH * smallScale);
         int vpX = (int)((winW - vpW) / 2);
         int vpY = (int)((winH - vpH) / 2);
         glViewport(vpX, vpY, vpW, vpH);
+
         logicalSize = referenceSize;
+        viewportOffset = {(float)vpX, (float)vpY};
+        viewportScale = {smallScale, smallScale};
         break;
     }
 
     case window::PresentationMode::Crop: {
         // Viewport centered, scales reference size to the biggest axis of the window.
         // Coordinates (logical size) based on reference size.
-        float bigScale = std::max(winW / refW, winH / refH);
+        float bigScale = std::max(referenceScale.x, referenceScale.y);
         int vpW = (int)(refW * bigScale);
         int vpH = (int)(refH * bigScale);
         int vpX = (int)((winW - vpW) / 2);
         int vpY = (int)((winH - vpH) / 2);
         glViewport(vpX, vpY, vpW, vpH);
+        
         logicalSize = referenceSize;
+        viewportOffset = {(float)vpX, (float)vpY};
+        viewportScale = {bigScale, bigScale};
         break;
     }
 
@@ -182,15 +187,21 @@ void Window::updateLogicalPresentation() {
         // Viewport at position (0, 0) and the full size of the window.
         // Coordinates (logical size) based on reference size.
         glViewport(0, 0, physicalSize.x, physicalSize.y);
+
         logicalSize = referenceSize;
+        viewportOffset = Vector2::Zero;
+        viewportScale = physicalSize / logicalSize;
         break;
 
     case window::PresentationMode::Expand: {
         // Viewport at position (0, 0) and the full size of the window.
         // Coordinates (logical size) are the reference size scaled to fit the screen.
-        float smallScale = std::min(scale.x, scale.y);
+        float smallScale = std::min(referenceScale.x, referenceScale.y);
         glViewport(0, 0, physicalSize.x, physicalSize.y);
+
         logicalSize = {(int)(winW / smallScale), (int)(winH / smallScale)};
+        viewportOffset = Vector2::Zero;
+        viewportScale = physicalSize / logicalSize;
         break;
     }
 
@@ -198,7 +209,10 @@ void Window::updateLogicalPresentation() {
         // Viewport at position (0, 0) and the full size of the window.
         // Coordinates (logical size) are the reference size scaled to fit the height of the screen.
         glViewport(0, 0, physicalSize.x, physicalSize.y);
-        logicalSize = {(int)(winW / scale.y), (int)(winH / scale.y)};
+
+        logicalSize = {(int)(winW / referenceScale.y), (int)(winH / referenceScale.y)};
+        viewportOffset = Vector2::Zero;
+        viewportScale = physicalSize / logicalSize;
         break;
     }
 
@@ -206,15 +220,28 @@ void Window::updateLogicalPresentation() {
         // Viewport at position (0, 0) and the full size of the window.
         // Coordinates (logical size) are the reference size scaled to fit the width of the screen.
         glViewport(0, 0, physicalSize.x, physicalSize.y);
-        logicalSize = {(int)(winW / scale.x), (int)(winH / scale.x)};
+
+        logicalSize = {(int)(winW / referenceScale.x), (int)(winH / referenceScale.x)};
+        viewportOffset = Vector2::Zero;
+        viewportScale = physicalSize / logicalSize;
         break;
     }
 
     default:
         glViewport(0, 0, physicalSize.x, physicalSize.y);
         logicalSize = physicalSize;
+        viewportOffset = Vector2::Zero;
+        viewportScale = physicalSize / logicalSize;
         break;
     }
+}
+
+// Converts a physical window pixel position to logical game coordinates
+Vector2 Window::physicalToLogical(Vector2 position) const {
+    return Vector2(
+        (position.x - viewportOffset.x) / viewportScale.x,
+        (position.y - viewportOffset.y) / viewportScale.y
+    );
 }
 
 // Destructor

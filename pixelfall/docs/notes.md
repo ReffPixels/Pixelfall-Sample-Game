@@ -1,0 +1,1 @@
+On Letterbox mouse input is detected even when hovering on black bars. Is that.. good?

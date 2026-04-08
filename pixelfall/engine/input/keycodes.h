@@ -4,7 +4,11 @@
 enum class MouseButton {
     Left,
     Middle,
-    Right
+    Right,
+    X1,
+    X2,
+    // Other
+    Unknown
 };
 
 // [To do: Add all codes]

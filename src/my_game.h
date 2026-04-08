@@ -17,4 +17,8 @@ public:
 private:
     std::string currentBoardFEN = board::defaults::defaultBoardFEN.data();
     FenParser fenParser;
+
+    // Test
+    Vector2 pieceTestPosition{};
+    ChessPiece pieceTest;
 };

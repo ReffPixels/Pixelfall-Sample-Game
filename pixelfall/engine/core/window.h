@@ -31,7 +31,9 @@ public:
     float getDprScale() const { return dprScale; };
     const Vector2Int& getLogicalSize() const { return logicalSize; };
     float getAspectRatio() const { return aspectRatio; };
-    const Vector2& getScale() const { return scale; };
+    const Vector2& getReferenceScale() const { return referenceScale; };
+    const Vector2& getViewportScale() const { return viewportScale; };
+    const Vector2& getViewportOffset() const { return viewportOffset; };
 
     // Setters
     void setWindowTitle(std::string windowTitle);
@@ -44,28 +46,40 @@ public:
     void clear();
     void present();
     void updateWindowData();
+    Vector2 physicalToLogical(Vector2 position) const;
 
     // Destroyers
     ~Window();
 
 private:
-    // Variables
+    // Title shown at the top bar of the window in windowed mode.
     std::string windowTitle;
+    // Raw size of the window in pixels
     Vector2Int physicalSize;
+    // Size used as a reference for coordinate space (Set in window config)
     Vector2Int referenceSize;
+    // Settings
     Vector2Int minWindowSize;
     float minAspectRatio;
     float maxAspectRatio;
+    // [TODO] DPR scale does not currently do anything. It should match the display's dprScale.
     float dprScale;
+    // Rules for resizing/scaling the window
     window::PresentationMode presentationMode;
+    // Colour used to clear the window - Determines colour of black bars
     Color clearColor;
 
-    // Derived Variables
-    Vector2Int logicalSize;
-    float aspectRatio;
-    Vector2 scale;
+    // Size in usable coordinates (Logical units) - Based on referenceSize, varies by presentation mode
+    Vector2Int logicalSize{};
+    float aspectRatio = 1.0f;
+    // Scale of the window based on the referenceSize (1.0 is equal, 2.0 means the window is twice as big in pixels)
+    Vector2 referenceScale {1.0f, 1.0f};
+    // Distance from the black bars (Only matters for Letterbox and Crop presentations)
+    Vector2 viewportOffset {Vector2::Zero};
+    // Scale of the viewport (Often the same as referenceScale, but not in the case of expand modes where everything is sacled by the smallest axis)
+    Vector2 viewportScale {1.0f, 1.0f};
 
-    // Settings
+    // Other Settings
     bool msaaGranted = false;
 
     // Platform Implementation (Each platform fills this struct with their necessary components)
@@ -75,3 +89,5 @@ private:
     // Methods
     void updateLogicalPresentation();
 };
+
+// [TODO] Store viewportSize? (Actual pixels visible, specifically for crop and letterbox)

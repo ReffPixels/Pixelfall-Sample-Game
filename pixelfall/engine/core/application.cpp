@@ -5,11 +5,13 @@
 
 // Called by the engine before onStart, this is a private engine function that sets up all the necessary 
 // components of the application before the user defined behaviours happen (onStart, onUpdate, etc)
-void Application::onSetup(
-    std::filesystem::path enginePath, Window& appWindow, Clock& appClock, std::filesystem::path projectPath) {
+void Application::onSetup(Window& appWindow, Clock& appClock, InputManager& appInput,
+    std::filesystem::path enginePath, std::filesystem::path projectPath) {
     // Set components
     this->appWindow = &appWindow;
     this->appClock = &appClock;
+    this->appInput = &appInput;
+    this->enginePath = enginePath;
     this->projectPath = projectPath;
     textureCache.emplace();
 

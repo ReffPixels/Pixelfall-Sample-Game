@@ -7,6 +7,7 @@
 // Engine Components
 #include "pixelfall/engine/core/window.h"
 #include "pixelfall/engine/core/clock.h"
+#include "pixelfall/engine/input/input_manager.h"
 // Application
 #include "pixelfall/engine/core/application.h"
 
@@ -16,6 +17,7 @@ public:
     Application* getApplication() { return application.get(); };
     Window* getWindow() { return window.get(); };
     Clock* getClock() { return clock.get(); };
+    InputManager* getInputManager() { return inputManager.get(); };
     std::filesystem::path getEnginePath() { return enginePath; };
     std::filesystem::path getProjectPath() { return projectPath; };
 
@@ -38,6 +40,7 @@ private:
     // Engine Components
     std::unique_ptr<Window> window;
     std::unique_ptr<Clock> clock;
+    std::unique_ptr<InputManager> inputManager;
 
     // Store paths
     std::filesystem::path projectPath;

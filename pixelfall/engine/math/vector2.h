@@ -1,4 +1,5 @@
 // Defines a basic Vector2 and Vector2Int.
+// [TODO] Update this whole mess. Use templates next time. Update other vector classes while you are at it.
 
 #pragma once
 // Standard Library
@@ -78,7 +79,7 @@ public:
     Vector2 operator+(float const &otherValue) const { return {x + otherValue, y + otherValue}; }
     Vector2 operator-(float const &otherValue) const { return {x - otherValue, y - otherValue}; }
     Vector2 operator*(float const &otherValue) const { return {x * otherValue, y * otherValue}; }
-    Vector2 operator/(float const &otherValue) const { return {x / otherValue, y / otherValue}; }
+    Vector2 operator/(float const& otherValue) const { return {x / otherValue, y / otherValue}; }
 
     // Vector2 Arithmetic Operators
     Vector2 operator+(const Vector2 &otherVector) const { return {x + otherVector.x, y + otherVector.y}; }
@@ -209,14 +210,18 @@ public:
     // Int Arithmetic Operators
     Vector2Int operator+(int const &otherValue) const { return {x + otherValue, y + otherValue}; }
     Vector2Int operator-(int const &otherValue) const { return {x - otherValue, y - otherValue}; }
-    Vector2Int operator*(int const &otherValue) const { return {x * otherValue, y * otherValue}; }
-    Vector2Int operator/(int const &otherValue) const { return {x / otherValue, y / otherValue}; }
+    Vector2Int operator*(int const& otherValue) const { return {x * otherValue, y * otherValue}; }
+    Vector2 operator/(int const& otherValue) const {    // Divisions always return float
+        return {(float)x / (float)otherValue, (float)y / (float)otherValue};
+    }
 
     // Vector2Int Arithmetic Operators
     Vector2Int operator+(const Vector2Int &otherVector) const { return {x + otherVector.x, y + otherVector.y}; }
     Vector2Int operator-(const Vector2Int &otherVector) const { return {x - otherVector.x, y - otherVector.y}; }
-    Vector2Int operator*(const Vector2Int &otherVector) const { return {x * otherVector.x, y * otherVector.y}; }
-    Vector2Int operator/(const Vector2Int &otherVector) const { return {x / otherVector.x, y / otherVector.y}; }
+    Vector2Int operator*(const Vector2Int& otherVector) const { return {x * otherVector.x, y * otherVector.y}; }
+    Vector2 operator/(const Vector2Int& otherVector) const {    // Divisions always return float
+        return {(float)x / (float)otherVector.x, (float)y / (float)otherVector.y};
+    }
 
     // Comparison Operators
     bool operator==(const Vector2Int &otherVector) const { return x == otherVector.x && y == otherVector.y; }

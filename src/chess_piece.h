@@ -32,4 +32,7 @@ public:
     void draw(PieceInfo pieceInfo, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
         Painter& painter, TextureCache& textureCache, const std::filesystem::path& projectPath,
         Vector2 pieceOffset = Vector2::Zero);
+    
+    void drawFree(PieceType type, PieceTeam team, Vector2 physicalPosition, Vector2 spriteSize,
+        Painter& painter, TextureCache& textureCache, const std::filesystem::path& projectPath);
 };

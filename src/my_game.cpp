@@ -26,6 +26,10 @@ bool MyGame::onStart() {
 // Called every frame
 void MyGame::onUpdate() {
     appWindow->setWindowTitle("Chess | FPS: " + std::to_string(appClock->getFPS()));
+
+    if (appInput->isMouseButtonPressed(MouseButton::Left)) {
+        pieceTestPosition = appWindow->physicalToLogical(appInput->getMousePhysicalPosition());
+    }
 }
 
 // Handles draw calls
@@ -86,4 +90,6 @@ void MyGame::onRender() {
 
     // Draw pieces
     fenParser.drawPieces(boardPosition, tileSize, tileSize, *painter, *textureCache, projectPath);
+
+    pieceTest.drawFree(PieceType::Knight, PieceTeam::White, pieceTestPosition, tileSize, *painter, *textureCache, projectPath);
 }

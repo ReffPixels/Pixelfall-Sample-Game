@@ -79,3 +79,17 @@ void ChessPiece::draw(PieceInfo pieceInfo, Vector2 boardPosition, Vector2 tileSi
         pieceTexture
     );
 }
+
+
+// Draws a piece floating in a giving position
+void ChessPiece::drawFree(PieceType type, PieceTeam team, Vector2 physicalPosition, Vector2 spriteSize,
+    Painter& painter, TextureCache& textureCache, const std::filesystem::path& projectPath) {
+
+    Texture& pieceTexture = textureCache.loadTexture(findImagePath({type, team, Vector2Int::Zero}, projectPath).string());
+
+    painter.drawSprite(
+        physicalPosition,
+        spriteSize,
+        pieceTexture
+    );
+}

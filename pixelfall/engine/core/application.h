@@ -9,6 +9,7 @@
 // Core
 #include "pixelfall/engine/core/window.h"
 #include "pixelfall/engine/core/clock.h"
+#include "pixelfall/engine/input/input_manager.h"
 // Graphics
 #include "pixelfall/engine/graphics/shader.h"
 #include "pixelfall/engine/graphics/painter.h"
@@ -25,8 +26,8 @@ public:
     Painter& getPainter() { return *painter; };
 
     // Methods
-    void onSetup(
-        std::filesystem::path enginePath, Window& appWindow, Clock& appClock, std::filesystem::path projectPath);
+    void onSetup(Window& appWindow, Clock& appClock, InputManager& appInput,
+        std::filesystem::path enginePath, std::filesystem::path projectPath);
     virtual bool onStart() { return true; }
     virtual void onUpdate() {}
     virtual void onRender() {}
@@ -49,10 +50,12 @@ protected:
     // Engine Components
     Window* appWindow = nullptr;
     Clock* appClock = nullptr;
+    InputManager* appInput = nullptr;
     std::optional<Painter> painter;
     std::optional<TextureCache> textureCache;
 
     // Other tools
+    std::filesystem::path enginePath;
     std::filesystem::path projectPath;
 };
 

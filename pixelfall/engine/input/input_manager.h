@@ -8,15 +8,15 @@
 // Input
 #include "pixelfall/engine/input/keycodes.h"
 
-class Input {
+class InputManager {
 public:
-    // Keyboard Getters
+    // Keyboard State
     bool isKeyDown(KeyCode key) const;
     bool isKeyUp(KeyCode key) const;
     bool isKeyPressed(KeyCode key) const;
     bool isKeyReleased(KeyCode key) const;
 
-    // Mouse Getters
+    // Mouse State
     bool isMouseButtonDown(MouseButton button) const;
     bool isMouseButtonUp(MouseButton button) const;
     bool isMouseButtonPressed(MouseButton button) const;
@@ -25,7 +25,7 @@ public:
 
     // Methods
     void onEvent(const void* platformEvent);
-    void clear();
+    void onEndOfFrame();
 private:
     // Keyboard State
     std::map<KeyCode, bool> keysDown;
@@ -33,8 +33,8 @@ private:
     std::map<KeyCode, bool> keysReleased;
 
     // Mouse state
-    Vector2 mousePhysicalPosition{Vector2::Zero};
     std::map<MouseButton, bool> mouseButtonsDown{};
     std::map<MouseButton, bool> mouseButtonsPressed{};
     std::map<MouseButton, bool> mouseButtonsReleased{};
+    Vector2 mousePhysicalPosition{Vector2::Zero};
 };
