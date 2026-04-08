@@ -105,8 +105,12 @@ void ChessPieces::drawFree(PieceType type, PieceTeam team, Vector2 physicalPosit
 void ChessPieces::drawPieces(std::vector<PieceInfo> pieces, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
     Painter& painter, Vector2 pieceOffset) {
 
-    for (PieceInfo pieceInfo : pieces) {
-        ChessPieces piece;
-        piece.draw(pieceInfo, boardPosition, tileSize, spriteSize, painter, pieceOffset);
+    for (int i = 0; i < (int)pieces.size(); i++) {
+        // Do something special to the piece selected
+        if (isPieceSelected && i == selectedPieceIndex) {
+            // Don't draw this piece
+            continue;
+        }
+        draw(pieces[i], boardPosition, tileSize, spriteSize, painter, pieceOffset);
     }
 };

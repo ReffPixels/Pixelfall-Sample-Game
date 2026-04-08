@@ -58,6 +58,7 @@ void MyGame::onUpdate() {
                 // The piece is on our team
                 if (it->team == playerTeam) {
                     selectedPieceInfo = std::distance(piecesInfo.begin(), it);
+                    pieces.setIsPieceSelected(true);
                     inputState = InputState::PieceSelected;
                 }
             }
@@ -70,6 +71,8 @@ void MyGame::onUpdate() {
                     piecesInfo.erase(it);
                     if (capturedIndex < selectedPieceInfo) selectedPieceInfo--;
                     movePiece(piecesInfo[selectedPieceInfo], board->getSquareOnHover(mousePos));
+                    selectedPieceInfo = -1; // [TODO] Detect error when attempting o move a -1 piece
+                    pieces.setIsPieceSelected(false);
                     inputState = InputState::Normal;
                     nextTurn();
                 }
@@ -79,10 +82,13 @@ void MyGame::onUpdate() {
         else {
             if (inputState == PieceSelected) {
                 movePiece(piecesInfo[selectedPieceInfo], board->getSquareOnHover(mousePos));
+                selectedPieceInfo = -1;
+                pieces.setIsPieceSelected(false);
                 inputState = InputState::Normal;
                 nextTurn();
             }
         }
+        pieces.setSelectedPieceIndex(selectedPieceInfo);
     }
 }
 

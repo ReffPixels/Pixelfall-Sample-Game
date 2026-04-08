@@ -37,8 +37,16 @@ public:
 
     void drawFree(PieceType type, PieceTeam team, Vector2 physicalPosition, Vector2 spriteSize,
         Painter& painter);
-    
+
+    // Setters
+    void setIsPieceSelected(bool isPieceSelected) { this->isPieceSelected = isPieceSelected; };
+    void setSelectedPieceIndex(int selectedPieceIndex) { this->selectedPieceIndex = selectedPieceIndex; };
+
     // Getters
     static Vector2Int getPosFromNotation(std::string gridPosition);
     static std::string getNotationFromPos(Vector2Int gridPosition);
+
+private:
+    bool isPieceSelected{false};
+    int selectedPieceIndex{-1};
 };
