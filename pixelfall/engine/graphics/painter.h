@@ -9,6 +9,7 @@
 #include "pixelfall/engine/graphics/color.h"
 #include "pixelfall/engine/graphics/framebuffer.h"
 #include "pixelfall/engine/graphics/texture.h"
+#include "pixelfall/engine/graphics/texture_cache.h"
 // Core
 #include "pixelfall/engine/core/window.h"
 // Math
@@ -18,7 +19,8 @@
 
 class Painter {
 public:
-    Painter(Shader& geometryShader, Shader& spriteShader, Shader& screenShader, Window& window);
+    Painter(Shader& geometryShader, Shader& spriteShader, Shader& screenShader,
+        Window& window, std::filesystem::path projectPath);
 
     // Methods
     void begin(); // Called by engine before onRender() — binds FBO and sets up projection
@@ -34,6 +36,8 @@ public:
     void drawSprite(Vector2 position, Vector2 size, Texture& texture,
         Color tint = painter::defaults::textureTint);
 
+    // Public Members
+    std::unique_ptr<TextureCache> textureCache;
 private:
     // Shaders
     Shader& geometryShader;

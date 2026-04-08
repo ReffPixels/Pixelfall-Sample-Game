@@ -13,7 +13,6 @@ void Application::onSetup(Window& appWindow, Clock& appClock, InputManager& appI
     this->appInput = &appInput;
     this->enginePath = enginePath;
     this->projectPath = projectPath;
-    textureCache.emplace();
 
     geometryShader.emplace(
         (enginePath / shader::defaults::geometryVertShader.data()),
@@ -34,5 +33,5 @@ void Application::onSetup(Window& appWindow, Clock& appClock, InputManager& appI
     // Use FXAA only if the driver did not grant hardware MSAA
     Shader& activeScreenShader = (appWindow.isMSAAEnabled() || !application::autoEnableFXAA) ? *msaaScreenShader : *fxaaScreenShader;
         
-    painter.emplace(*geometryShader, *spriteShader, activeScreenShader, appWindow);
+    painter.emplace(*geometryShader, *spriteShader, activeScreenShader, appWindow, projectPath);
 }

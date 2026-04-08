@@ -3,9 +3,9 @@
 #include "fen_parser.h"
 
 // Populates pieces vector with the correct placement information taken from a FEN string.
-void FenParser::getPiecesFromFEN(const std::string fenString) {
+std::vector<PieceInfo> FenParser::getPiecesFromFEN(const std::string fenString) {
     // Reset pieces container
-    pieces.clear();
+    std::vector<PieceInfo> pieces;
 
     // Store position as a simple integer (0 to 63) - Will be transformed into a Vector2{rank, file}
     int pieceRank = 0;
@@ -24,7 +24,7 @@ void FenParser::getPiecesFromFEN(const std::string fenString) {
         // End of FEN string 
         // Note: FEN strings contain extra information after the space, but we don't need it for placing pieces.
         else if (c == ' ') {
-            return;
+            break;
         }
         // Piece detected - Add it's pieceInfo to the pieces vector.
         else {
@@ -35,15 +35,5 @@ void FenParser::getPiecesFromFEN(const std::string fenString) {
             pieceFile++;
         }
     }
+    return pieces;
 }
-
-// Draws all the pieces in the pieces vector on the screen.
-void FenParser::drawPieces(Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
-    Painter& painter, TextureCache& textureCache, const std::filesystem::path& projectPath,
-    Vector2 pieceOffset) {
-    
-    for (PieceInfo pieceInfo : pieces) {
-        ChessPiece piece;
-        piece.draw(pieceInfo, boardPosition, tileSize, spriteSize, painter, textureCache, projectPath, pieceOffset);
-    }
-};

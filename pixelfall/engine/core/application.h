@@ -52,7 +52,6 @@ protected:
     Clock* appClock = nullptr;
     InputManager* appInput = nullptr;
     std::optional<Painter> painter;
-    std::optional<TextureCache> textureCache;
 
     // Other tools
     std::filesystem::path enginePath;

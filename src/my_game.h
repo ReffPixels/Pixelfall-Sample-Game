@@ -14,11 +14,12 @@ public:
     void onUpdate() override;
     void onRender() override;
 
+    void movePiece(PieceInfo& piece, std::string newPos);
 private:
     std::string currentBoardFEN = board::defaults::defaultBoardFEN.data();
     FenParser fenParser;
-
+    ChessPieces pieces;
+    std::vector<PieceInfo> piecesInfo;
     // Test
     Vector2 pieceTestPosition{};
-    ChessPiece pieceTest;
 };

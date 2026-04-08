@@ -9,7 +9,7 @@ namespace board {
     
     inline ThemeProjection projectionType{Rectangular};
 
-    inline std::string piecesPath{"assets/image/themes/Cburnett/"};
+    inline std::filesystem::path piecesPath{"assets/image/themes/Cburnett/"};
 
     namespace defaults {
 

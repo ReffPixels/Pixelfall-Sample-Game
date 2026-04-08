@@ -18,7 +18,7 @@ bool MyGame::onStart() {
     appIdentifier = "chess";
 
     // Get initial state of board
-    fenParser.getPiecesFromFEN(currentBoardFEN);
+    piecesInfo = fenParser.getPiecesFromFEN(currentBoardFEN);
 
     return true;
 }
@@ -28,7 +28,9 @@ void MyGame::onUpdate() {
     appWindow->setWindowTitle("Chess | FPS: " + std::to_string(appClock->getFPS()));
 
     if (appInput->isMouseButtonPressed(MouseButton::Left)) {
-        pieceTestPosition = appWindow->physicalToLogical(appInput->getMousePhysicalPosition());
+        //pieceTestPosition = appWindow->physicalToLogical(appInput->getMousePhysicalPosition());
+        pieceTestPosition = {4, 4};
+        movePiece(piecesInfo[5], "g4");
     }
 }
 
@@ -89,7 +91,10 @@ void MyGame::onRender() {
     }
 
     // Draw pieces
-    fenParser.drawPieces(boardPosition, tileSize, tileSize, *painter, *textureCache, projectPath);
+    pieces.drawPieces(piecesInfo, boardPosition, tileSize, tileSize, *painter);
+}
 
-    pieceTest.drawFree(PieceType::Knight, PieceTeam::White, pieceTestPosition, tileSize, *painter, *textureCache, projectPath);
+void MyGame::movePiece(PieceInfo& piece, std::string newPos) {
+    std::cout << "TEST" << std::endl;
+    piece.position = pieces.getPosFromNotation(newPos);
 }

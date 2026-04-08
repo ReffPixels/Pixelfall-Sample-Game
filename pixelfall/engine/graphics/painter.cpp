@@ -15,7 +15,8 @@ Painter::Painter(
     Shader& geometryShader,
     Shader& spriteShader,
     Shader& screenShader,
-    Window& window)
+    Window& window,
+    std::filesystem::path projectPath)
     :
     geometryShader(geometryShader),
     spriteShader(spriteShader),
@@ -24,6 +25,7 @@ Painter::Painter(
 
     framebufferSize = window.getPhysicalSize();
     framebuffer = std::make_unique<Framebuffer>(framebufferSize);
+    textureCache = std::make_unique<TextureCache>(projectPath);
 }
 
 // Binds the FBO and sets up the geometry shader with the orthographic projection.

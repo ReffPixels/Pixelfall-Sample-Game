@@ -4,7 +4,7 @@
 
 #pragma once
 // Chess
-#include "chess_piece.h"
+#include "chess_pieces.h"
 // Standard Library
 #include <string>
 #include <map>
@@ -13,14 +13,9 @@
 class FenParser {
 public:
     // Methods
-    void getPiecesFromFEN(const std::string fenString);
-    void drawPieces(Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
-        Painter& painter, TextureCache& textureCache, const std::filesystem::path& projectPath,
-        Vector2 pieceOffset = Vector2::Zero);
+    std::vector<PieceInfo> getPiecesFromFEN(const std::string fenString);
 
 private:
-    std::vector<PieceInfo> pieces;
-    
     std::map<char, PieceInfo> pieceCodes = {
         // White
         {'K', {PieceType::King, PieceTeam::White}},

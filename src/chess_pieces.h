@@ -26,13 +26,19 @@ struct PieceInfo {
     Vector2Int position{0, 0};
 };
 
-class ChessPiece {
+class ChessPieces {
 public:
     // Methods
     void draw(PieceInfo pieceInfo, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
-        Painter& painter, TextureCache& textureCache, const std::filesystem::path& projectPath,
-        Vector2 pieceOffset = Vector2::Zero);
-    
+        Painter& painter, Vector2 pieceOffset = Vector2::Zero);
+
+    void drawPieces(std::vector<PieceInfo> pieces, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
+        Painter& painter, Vector2 pieceOffset = Vector2::Zero);
+
     void drawFree(PieceType type, PieceTeam team, Vector2 physicalPosition, Vector2 spriteSize,
-        Painter& painter, TextureCache& textureCache, const std::filesystem::path& projectPath);
+        Painter& painter);
+    
+    // Getters
+    Vector2Int getPosFromNotation(std::string gridPosition);
+    std::string getNotationFromPos(Vector2Int gridPosition);
 };

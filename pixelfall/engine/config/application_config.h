@@ -7,7 +7,8 @@
 namespace application {
 
     // Settings
-    constexpr bool autoEnableFXAA(true);
+    // [TODO] - Set up a better anti aliasing pipeline and choose from an enum. Figure out what's the deal with MSAA
+    constexpr bool autoEnableFXAA(false);
 
     namespace defaults {
         // Metadata

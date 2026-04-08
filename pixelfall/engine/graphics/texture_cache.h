@@ -7,10 +7,16 @@
 
 class TextureCache {
 public:
+    // Constructor
+    TextureCache(const std::filesystem::path& projectPath)
+        : projectPath(projectPath) {
+    }
+
     // Methods
-    Texture& loadTexture(const std::string& path);
+    Texture& loadTexture(const std::filesystem::path& path);
     void clear();
 
 private:
-    std::map<std::string, Texture> cache;
+    std::filesystem::path projectPath;
+    std::map<std::filesystem::path, Texture> cache;
 };
