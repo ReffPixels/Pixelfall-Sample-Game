@@ -6,7 +6,6 @@
 #include "fen_parser.h"
 #include "chess_board.h"
 #include "chess_pieces.h"
-#include "chess_visuals.h"
 // Standard Library
 #include <memory>
 #include <array>
@@ -34,14 +33,14 @@ enum class InputState {
     PieceSelected,
 };
 
-class ChessGame {
+class ChessState {
 public:
+    // Setup
+    void setupFromFEN();
+
     // Update Methods
     void onBoardPressed(Vector2Int square);
     void onBoardReleased(Vector2Int square);
-
-    // Setup
-    void setupFromFEN();
 
     // Gameplay
     void selectPiece(Vector2Int selectedSquare);
@@ -49,13 +48,16 @@ public:
     void updateCastlingRights();
     void nextTurn();
 
-    // Components
-    FenParser fenParser;
-    ChessPieces pieces;
-    ChessBoard board;
-    ChessVisuals visuals;
+    // Getters
+    const std::array<std::array<PieceInfo, 8>, 8>& getBoardState() const { return boardState; }
+    InputState getInputState() const { return inputState; }
+    Vector2Int getSelectedPiecePosition() const { return selectedPiecePosition; }
+    Vector2Int getLastMoveOrigin() const { return lastMoveOrigin; }
+    Vector2Int getLastMoveTarget() const { return lastMoveTarget; }
 
 private:
+    FenParser fenParser;
+
     // State
     std::string currentBoardFEN = board::defaults::defaultBoardFEN.data(); // Description of the current board
     std::array<std::array<PieceInfo, 8>, 8> boardState; // 8x8 2D array of files and ranks 

@@ -3,6 +3,7 @@
 #pragma once
 // Standard Library
 #include <string_view>
+#include <filesystem>
 #include "chess_theme.h"
 
 namespace board {

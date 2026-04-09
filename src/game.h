@@ -5,7 +5,10 @@
 // Engine
 #include "pixelfall/engine/core/application.h"
 // Chess
-#include "chess_game.h"
+#include "chess_state.h"
+#include "chess_board.h"
+#include "chess_pieces.h"
+#include "chess_visuals.h"
 // Standard Library
 #include <memory>
 #include <array>
@@ -20,7 +23,11 @@ public:
 private:
     // Input
     Vector2 cursorPos{};
+    Vector2 dragAndDropPivot{Vector2::Zero};
 
-    // Chess Game
-    ChessGame game;
+    // Chess
+    ChessState game;
+    ChessBoard board;
+    ChessPieces pieces;
+    ChessVisuals visuals;
 };

@@ -1,37 +1,11 @@
+// Implementation for chess_visuals.h
+
 #include "chess_visuals.h"
-
-void ChessVisuals::draw() {
-    // Draw Board
-    board.draw(*painter);
-
-    // Draw Selected Highlight
-    highlightSelected();
-
-    // Draw Last Move
-    highlightLastMove();
-
-    // Check if user is in drag and drop mode
-    bool dragAndDrop{inputState == InputState::PieceSelected && appInput->isMouseButtonDown(MouseButton::Left)};
-    // Drag and Drop Visuals (Behind pieces)
-    pieces.setHideSelectedPiece(dragAndDrop);
-    if (dragAndDrop) highlightHoveredSquare();
-
-    // Draw pieces
-    pieces.drawPieces(boardState, board.getPosition(), board.getTileSize(),
-        board.getTileSize(), *painter, Vector2::Zero, selectedPiecePosition);
-
-    // Drag and Drop Visuals (On top of pieces)
-    if (dragAndDrop) {
-        pieceFollowCursor(
-            boardState[selectedPiecePosition.x][selectedPiecePosition.y].type,
-            boardState[selectedPiecePosition.x][selectedPiecePosition.y].team,
-            dragAndDropPivot
-        );
-    }
-}
+// Standard Library
+#include <algorithm>
 
 // Draw a highlight on the square of the selected piece
-void ChessVisuals::highlightSelected(ChessBoard& board, Vector2Int& selectedPiecePosition, Painter& painter) {
+void ChessVisuals::highlightSelected(ChessBoard& board, Vector2Int selectedPiecePosition, Painter& painter) {
     if (selectedPiecePosition != Vector2Int{-1, -1}) {
         painter.drawRectangle(
             board.getPosition()
@@ -44,8 +18,8 @@ void ChessVisuals::highlightSelected(ChessBoard& board, Vector2Int& selectedPiec
 }
 
 // Draw a highlight on the start and end squares of the last move
-void ChessVisuals::highlightLastMove(ChessBoard& board, Vector2Int& lastMoveOrigin,
-    Vector2Int& lastMoveTarget, Painter& painter) {
+void ChessVisuals::highlightLastMove(ChessBoard& board, Vector2Int lastMoveOrigin,
+    Vector2Int lastMoveTarget, Painter& painter) {
     if (lastMoveOrigin != Vector2Int{-1, -1} && lastMoveTarget != Vector2Int{-1, -1}) {
         painter.drawRectangle(
             board.getPosition()
@@ -100,7 +74,8 @@ void ChessVisuals::pieceFollowCursor(Vector2& cursorPos, ChessPieces& pieces, Ch
         positionInBoard - offset, board.getTileSize(), painter);
 }
 
-void ChessVisuals::updateDragAndDropPoint(Vector2& cursorPos, ChessBoard& board, Vector2Int& selectedPiecePosition) {
-    dragAndDropPivot = {cursorPos - (board.getPosition() +
+// Computes the pivot offset so the dragged piece stays attached at the grab point
+Vector2 ChessVisuals::computeDragPivot(Vector2& cursorPos, ChessBoard& board, Vector2Int selectedPiecePosition) {
+    return {cursorPos - (board.getPosition() +
         Vector2{(float)selectedPiecePosition.x, (float)selectedPiecePosition.y} * board.getTileSize())};
 }

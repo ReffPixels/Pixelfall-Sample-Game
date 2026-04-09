@@ -1,4 +1,6 @@
-src/my_game.cpp
+src/game.cpp
+src/chess_state.cpp
 src/chess_pieces.cpp
 src/chess_board.cpp
+src/chess_visuals.cpp
 src/fen_parser.cpp

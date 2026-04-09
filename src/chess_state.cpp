@@ -1,16 +1,16 @@
-// Implementation for chess_game.h
+// Implementation for chess_state.h
 
-#include "chess_game.h"
+#include "chess_state.h"
 // Standard Library
 #include <iostream>
 #include <algorithm>
 
-void ChessGame::setupFromFEN() {
+void ChessState::setupFromFEN() {
     boardState = fenParser.getBoardFromFEN(currentBoardFEN);
 }
 
 // Pressing allows to select a new piece or move if a piece is already selected.
-void ChessGame::onBoardPressed(Vector2Int square) {
+void ChessState::onBoardPressed(Vector2Int square) {
     PieceInfo& clicked = boardState[square.x][square.y];
     // It's a piece in the player's team
     if (clicked.type != PieceType::None && clicked.team == playerToMove)
@@ -25,21 +25,19 @@ void ChessGame::onBoardPressed(Vector2Int square) {
 }
 
 // Release only allows to move if a piece is already selected. (Drag and drop behaviour) Otherwise it does nothing.
-void ChessGame::onBoardReleased(Vector2Int square) {
+void ChessState::onBoardReleased(Vector2Int square) {
     moveSelectedPiece(square);
 }
 
 // Selects a piece in a specific square and changes the input state to selected.
-void ChessGame::selectPiece(Vector2Int selectedSquare) {
+void ChessState::selectPiece(Vector2Int selectedSquare) {
     selectedPiecePosition = selectedSquare;
     inputState = InputState::PieceSelected;
-    // Adjust drag and drop pivot point
-    visuals.updateDragAndDropPoint();
 }
 
 // Moves the selected piece to a new square and updates the board state to match. 
 // A succesful move triggers the next turn.
-void ChessGame::moveSelectedPiece(Vector2Int targetSquare) {
+void ChessState::moveSelectedPiece(Vector2Int targetSquare) {
     // A piece is not selected, don't move anything
     if (inputState != InputState::PieceSelected) return;
     // Clicked on the same square, don't move anything.
@@ -70,7 +68,7 @@ void ChessGame::moveSelectedPiece(Vector2Int targetSquare) {
 }
 
 // Swaps the current player (Local)
-void ChessGame::nextTurn() {
+void ChessState::nextTurn() {
     // Castling Rights
     updateCastlingRights();
 
@@ -91,7 +89,7 @@ void ChessGame::nextTurn() {
 }
 
 // Update Castling Rights (Must be called at the end of a move, since it uses lastMoveOrigin and lastMoveTarget)
-void ChessGame::updateCastlingRights() {
+void ChessState::updateCastlingRights() {
     // White King-side Rook
     if (wKingSideCastling &&
         ((lastMoveOrigin == Vector2Int{7, 7}) || (lastMoveTarget == Vector2Int{7, 7}))) {
