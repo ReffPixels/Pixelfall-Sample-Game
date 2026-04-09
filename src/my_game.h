@@ -24,8 +24,13 @@ public:
     void onUpdate() override;
     void onRender() override;
 
-    void movePiece(PieceInfo& piece, std::string newPos);
+    // Chess Methods
+    void onBoardPressed(Vector2Int square);
+    void onBoardReleased(Vector2Int square);
+    void selectPiece(Vector2Int square);
+    void moveSelectedPiece(Vector2Int square);
     void nextTurn();
+
 private:
     Vector2 mousePos{};
     

@@ -30,59 +30,17 @@ bool MyGame::onStart() {
 
 // Called every frame
 void MyGame::onUpdate() {
-    mousePos = appWindow->physicalToLogical(appInput->getMousePhysicalPosition());
-
-    // Center board
-    board->setPosition(
-        (appWindow->getLogicalSize() / 2) - (board->getTileSize() * 4)
-    );
-
+    // Track FPS in window title
     appWindow->setWindowTitle("Chess | FPS: " + std::to_string(appClock->getFPS()));
-
-    if (appInput->isMouseButtonPressed(MouseButton::Left)
-        || appInput->isMouseButtonReleased(MouseButton::Left)) {
-        // Console Debug
-        std::cout << board->getSquareOnHover(mousePos) << std::endl;
-
-        // Get square clicked
-        Vector2Int clickedSquare = ChessPieces::getPosFromNotation(board->getSquareOnHover(mousePos));
-
-        // Check if there's a piece in that square
-        PieceInfo& clickedPiece = boardState[clickedSquare.x][clickedSquare.y];
-        bool squareIsEmpty = (clickedPiece.type == PieceType::None);
-
-        // The Square clicked on has a piece on it
-        if (!squareIsEmpty) {
-            // The piece is on our team and there is no piece selected
-            if (inputState == Normal && clickedPiece.team == playerTeam) {
-                // Select piece
-                selectedPiecePosition = clickedSquare;
-                pieces.setSelectedPiecePosition(selectedPiecePosition);
-                inputState = InputState::PieceSelected;
-            }
-            // The piece is an enemy piece and a piece is already selected
-            else if (inputState == PieceSelected && clickedPiece.team != playerTeam) {
-                // Replace enemy piece with selected piece
-                boardState[clickedSquare.x][clickedSquare.y] = boardState[selectedPiecePosition.x][selectedPiecePosition.y];
-                // Remove selected piece
-                boardState[selectedPiecePosition.x][selectedPiecePosition.y] = {PieceType::None, PieceTeam::None};
-                selectedPiecePosition = {-1, -1};
-                inputState = InputState::Normal;
-                nextTurn();
-            }
-        }
-        // The Square clicked is an empty Square
-        else {
-            if (inputState == PieceSelected) {
-                // Replace empty square with selected piece
-                boardState[clickedSquare.x][clickedSquare.y] = boardState[selectedPiecePosition.x][selectedPiecePosition.y];
-                // Remove selected piece
-                boardState[selectedPiecePosition.x][selectedPiecePosition.y] = {PieceType::None, PieceTeam::None};
-                selectedPiecePosition = {-1, -1};
-                inputState = InputState::Normal;
-                nextTurn();
-            }
-        }
+    // Get Mouse Position
+    mousePos = appWindow->physicalToLogical(appInput->getMousePhysicalPosition());
+    // Center Board
+    board->setPosition((appWindow->getLogicalSize() / 2) - (board->getTileSize() * 4));
+    // Handle board interaction
+    if (board->isBoardOnHover(mousePos)) {
+        Vector2Int hoveredSquare = ChessPieces::getPosFromNotation(board->getSquareOnHover(mousePos));
+        if (appInput->isMouseButtonPressed(MouseButton::Left))  onBoardPressed(hoveredSquare);
+        if (appInput->isMouseButtonReleased(MouseButton::Left)) onBoardReleased(hoveredSquare);
     }
 }
 
@@ -104,7 +62,7 @@ void MyGame::onRender() {
 
     // Draw selected piece following mouse
     if (inputState == InputState::PieceSelected) {
-
+        // Only execute while holding the button down (Drag and Drop behaviour)
         if (appInput->isMouseButtonDown(MouseButton::Left)) {
             pieces.setHideSelectedPiece(true);
             pieces.drawFree(
@@ -117,6 +75,46 @@ void MyGame::onRender() {
     }
 }
 
+// Pressing allows to select a new piece or move if a piece is already selected.
+void MyGame::onBoardPressed(Vector2Int square) {
+    PieceInfo& clicked = boardState[square.x][square.y];
+    if (clicked.type != PieceType::None && clicked.team == playerTeam)
+        selectPiece(square);
+    else
+        moveSelectedPiece(square);
+}
+
+// Release only allows to move if a piece is already selected. (Drag and drop behaviour) Otherwise it does nothing.
+void MyGame::onBoardReleased(Vector2Int square) {
+    moveSelectedPiece(square);
+}
+
+// Selects a piece in a specific square and changes the input state to selected.
+void MyGame::selectPiece(Vector2Int square) {
+    selectedPiecePosition = square;
+    pieces.setSelectedPiecePosition(square);
+    inputState = InputState::PieceSelected;
+}
+
+// Moves the selected piece to a new square and updates the board state to match. 
+// A succesful move triggers the next turn.
+void MyGame::moveSelectedPiece(Vector2Int square) {
+    if (inputState != InputState::PieceSelected) return;
+    if (square == selectedPiecePosition) return; // released on same square, just a click-to-select
+
+    PieceInfo& target = boardState[square.x][square.y];
+    if (target.type != PieceType::None && target.team == playerTeam) return; // own piece, blocked
+
+    boardState[square.x][square.y] = boardState[selectedPiecePosition.x][selectedPiecePosition.y];
+    boardState[selectedPiecePosition.x][selectedPiecePosition.y] = {PieceType::None, PieceTeam::None};
+    selectedPiecePosition = {-1, -1};
+    pieces.setSelectedPiecePosition({-1, -1});
+    inputState = InputState::Normal;
+
+    nextTurn();
+}
+
+// Swaps the current player (Local)
 void MyGame::nextTurn() {
     if (playerTeam == PieceTeam::White) playerTeam = PieceTeam::Black;
     else playerTeam = PieceTeam::White;
