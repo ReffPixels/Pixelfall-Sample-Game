@@ -5,6 +5,10 @@
 #include <iostream>
 #include <algorithm>
 
+void ChessGame::setupFromFEN() {
+    boardState = fenParser.getBoardFromFEN(currentBoardFEN);
+}
+
 // Pressing allows to select a new piece or move if a piece is already selected.
 void ChessGame::onBoardPressed(Vector2Int square) {
     PieceInfo& clicked = boardState[square.x][square.y];
@@ -30,8 +34,7 @@ void ChessGame::selectPiece(Vector2Int selectedSquare) {
     selectedPiecePosition = selectedSquare;
     inputState = InputState::PieceSelected;
     // Adjust drag and drop pivot point
-    dragAndDropPivot = {cursorPos - (board.getPosition() +
-        Vector2{(float)selectedPiecePosition.x, (float)selectedPiecePosition.y} * board.getTileSize())};
+    visuals.updateDragAndDropPoint();
 }
 
 // Moves the selected piece to a new square and updates the board state to match. 
@@ -120,5 +123,3 @@ void ChessGame::updateCastlingRights() {
         bQueenSideCastling = false;
     }
 }
-
-// [TODO] Lerp animation piece when clicking instead of dragging
