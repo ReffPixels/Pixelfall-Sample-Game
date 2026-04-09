@@ -56,6 +56,17 @@ void MyGame::onRender() {
     // Draw Board
     board->draw(*painter);
 
+    // Draw Highlights
+    if (selectedPiecePosition != Vector2Int{-1, -1}) {
+        painter->drawRectangle(
+            board->getPosition()
+            + Vector2(selectedPiecePosition.x * board->getTileSize().x,
+                selectedPiecePosition.y * board->getTileSize().y),
+            board->getTileSize(),
+            Color::fromHexcode("#ffd94ec5")
+        );
+    }
+
     // Draw pieces
     pieces.drawPieces(
         boardState, board->getPosition(), board->getTileSize(), board->getTileSize(), *painter);
@@ -119,3 +130,5 @@ void MyGame::nextTurn() {
     if (playerTeam == PieceTeam::White) playerTeam = PieceTeam::Black;
     else playerTeam = PieceTeam::White;
 }
+
+// [TODO] Lerp animation piece when clicking instead of dragging
