@@ -66,7 +66,7 @@ private:
     std::string currentBoardFEN = board::defaults::defaultBoardFEN.data();
     FenParser fenParser;
     ChessPieces pieces;
-    std::unique_ptr<ChessBoard> board;
+    ChessBoard board;
 
     // Game State
     std::array<std::array<PieceInfo, 8>, 8> boardState; // 8x8 2D array of files and ranks 
@@ -80,9 +80,6 @@ private:
     int totalFullMoves{1}; // Starts at 1 due to some arcaic reason. Counts up only on black moves.
     GameOutcome gameOutcome{GameOutcome::Undecided};
 
-    // Complete history of this match. Necessary for three-fold and five-fold repetition checks
-    std::string PGN; // [TODO]
-
     // Interaction
     Vector2Int selectedPiecePosition{-1, -1};  // (-1, -1) means no square is selected.
     InputState inputState{InputState::Normal};
@@ -94,3 +91,7 @@ private:
     std::vector<PieceInfo> bCapturedPieces; // Black's graveyard (Captured black pieces)
     Vector2 dragAndDropPivot{Vector2::Zero}; // Used to attach the piece to the cursor
 };
+
+// [TODO] Some way to track 3 fold and 5 fold repetition (FEN snapshops?)
+// [TODO] Detect Game Outcomes and reset game
+// [TODO] Hover highlight should not hover origin (flash)

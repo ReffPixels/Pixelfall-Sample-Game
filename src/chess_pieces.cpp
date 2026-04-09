@@ -109,7 +109,7 @@ void ChessPieces::drawFree(PieceType type, PieceTeam team, Vector2 physicalPosit
 
 // Draws all the pieces in the pieces vector on the screen.
 void ChessPieces::drawPieces(std::array<std::array<PieceInfo, 8>, 8> boardState, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
-    Painter& painter, Vector2 pieceOffset) {
+    Painter& painter, Vector2 pieceOffset, Vector2Int selectedPiecePosition) {
     
     // Store position;
     int file = 0;

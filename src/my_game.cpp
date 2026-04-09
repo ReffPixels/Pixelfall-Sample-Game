@@ -16,9 +16,6 @@ bool MyGame::onStart() {
     appVersion = "0.1";
     appIdentifier = "chess";
 
-    // Create board
-    board = std::make_unique<ChessBoard>();
-
     // Get initial state of board
     boardState = fenParser.getBoardFromFEN(currentBoardFEN);
 
@@ -38,11 +35,11 @@ void MyGame::onUpdate() {
     cursorPos = appWindow->physicalToLogical(appInput->getMousePhysicalPosition());
 
     // Center Board
-    board->setPosition((appWindow->getLogicalSize() / 2) - (board->getTileSize() * 4));
+    board.setPosition((appWindow->getLogicalSize() / 2) - (board.getTileSize() * 4));
 
     // Handle board interaction
-    if (board->isBoardOnHover(cursorPos)) {
-        Vector2Int hoveredSquare = ChessPieces::getPosFromNotation(board->getSquareOnHover(cursorPos));
+    if (board.isBoardOnHover(cursorPos)) {
+        Vector2Int hoveredSquare = ChessPieces::getPosFromNotation(board.getSquareOnHover(cursorPos));
         if (appInput->isMouseButtonPressed(MouseButton::Left))  onBoardPressed(hoveredSquare);
         if (appInput->isMouseButtonReleased(MouseButton::Left)) onBoardReleased(hoveredSquare);
     }
@@ -58,7 +55,7 @@ void MyGame::onRender() {
     );
 
     // Draw Board
-    board->draw(*painter);
+    board.draw(*painter);
 
     // Draw Selected Highlight
     highlightSelected();
@@ -66,34 +63,37 @@ void MyGame::onRender() {
     // Draw Last Move
     highlightLastMove();
 
-    // Hide selected piece if in drag and drop mode (Must be done before the pieces are drawn to avoid flicker)
-    pieces.setHideSelectedPiece(
-        inputState == InputState::PieceSelected && appInput->isMouseButtonDown(MouseButton::Left));
+    // Check if user is in drag and drop mode
+    bool dragAndDrop{inputState == InputState::PieceSelected && appInput->isMouseButtonDown(MouseButton::Left)};
+    // Drag and Drop Visuals (Behind pieces)
+    pieces.setHideSelectedPiece(dragAndDrop);
+    if (dragAndDrop) highlightHoveredSquare();
 
     // Draw pieces
-    pieces.drawPieces(
-        boardState, board->getPosition(), board->getTileSize(), board->getTileSize(), *painter);
+    pieces.drawPieces(boardState, board.getPosition(), board.getTileSize(),
+        board.getTileSize(), *painter, Vector2::Zero, selectedPiecePosition);
 
-    // Drag and Drop Visuals
-    if (inputState == InputState::PieceSelected && appInput->isMouseButtonDown(MouseButton::Left)) {
+    // Drag and Drop Visuals (On top of pieces)
+    if (dragAndDrop) {
         pieceFollowCursor(
             boardState[selectedPiecePosition.x][selectedPiecePosition.y].type,
             boardState[selectedPiecePosition.x][selectedPiecePosition.y].team,
             dragAndDropPivot
         );
-        // Hide selected piece (Avoid duplication)
-        pieces.setHideSelectedPiece(true);
-    }
-    else {
-        pieces.setHideSelectedPiece(false);
     }
 }
 
 // Pressing allows to select a new piece or move if a piece is already selected.
 void MyGame::onBoardPressed(Vector2Int square) {
     PieceInfo& clicked = boardState[square.x][square.y];
+    // It's a piece in the player's team
     if (clicked.type != PieceType::None && clicked.team == playerToMove)
-        selectPiece(square);
+        // Clicked on the same square, deselect
+        if (square == selectedPiecePosition) {
+            selectedPiecePosition = {-1, -1};
+            inputState = InputState::Normal;
+            return;
+        } else selectPiece(square);
     else
         moveSelectedPiece(square);
 }
@@ -106,18 +106,19 @@ void MyGame::onBoardReleased(Vector2Int square) {
 // Selects a piece in a specific square and changes the input state to selected.
 void MyGame::selectPiece(Vector2Int selectedSquare) {
     selectedPiecePosition = selectedSquare;
-    pieces.setSelectedPiecePosition(selectedSquare);
     inputState = InputState::PieceSelected;
     // Adjust drag and drop pivot point
-    dragAndDropPivot = {cursorPos - (board->getPosition() +
-        Vector2{(float)selectedPiecePosition.x, (float)selectedPiecePosition.y} * board->getTileSize())};
+    dragAndDropPivot = {cursorPos - (board.getPosition() +
+        Vector2{(float)selectedPiecePosition.x, (float)selectedPiecePosition.y} * board.getTileSize())};
 }
 
 // Moves the selected piece to a new square and updates the board state to match. 
 // A succesful move triggers the next turn.
 void MyGame::moveSelectedPiece(Vector2Int targetSquare) {
+    // A piece is not selected, don't move anything
     if (inputState != InputState::PieceSelected) return;
-    if (targetSquare == selectedPiecePosition) return; // released on same square, just a click-to-select
+    // Clicked on the same square, don't move anything.
+    if (targetSquare == selectedPiecePosition) return;
 
     PieceInfo& selected = boardState[selectedPiecePosition.x][selectedPiecePosition.y];
     PieceInfo& target = boardState[targetSquare.x][targetSquare.y];
@@ -133,23 +134,21 @@ void MyGame::moveSelectedPiece(Vector2Int targetSquare) {
     selected = {PieceType::None, PieceTeam::None};
 
     // Record Move
-    lastMoveTarget = targetSquare;
     lastMoveOrigin = selectedPiecePosition;
+    lastMoveTarget = targetSquare;
 
-    // Castling Rights
-    updateCastlingRights();
-
-    // Reset Trackers
+    // Deselect Piece
     selectedPiecePosition = {-1, -1};
-    pieces.setSelectedPiecePosition({-1, -1});
     inputState = InputState::Normal;
-
 
     nextTurn();
 }
 
 // Swaps the current player (Local)
 void MyGame::nextTurn() {
+    // Castling Rights
+    updateCastlingRights();
+
     if (playerToMove == PieceTeam::White) {
         playerToMove = PieceTeam::Black;
     }
@@ -170,10 +169,10 @@ void MyGame::nextTurn() {
 void MyGame::highlightSelected() {
     if (selectedPiecePosition != Vector2Int{-1, -1}) {
         painter->drawRectangle(
-            board->getPosition()
-            + Vector2(selectedPiecePosition.x * board->getTileSize().x,
-                selectedPiecePosition.y * board->getTileSize().y),
-            board->getTileSize(),
+            board.getPosition()
+            + Vector2(selectedPiecePosition.x * board.getTileSize().x,
+                selectedPiecePosition.y * board.getTileSize().y),
+            board.getTileSize(),
             Color::fromHexcode("#ffd94e92")
         );
     }
@@ -183,17 +182,17 @@ void MyGame::highlightSelected() {
 void MyGame::highlightLastMove() {
     if (lastMoveOrigin != Vector2Int{-1, -1} && lastMoveTarget != Vector2Int{-1, -1}) {
         painter->drawRectangle(
-            board->getPosition()
-            + Vector2(lastMoveOrigin.x * board->getTileSize().x,
-                lastMoveOrigin.y * board->getTileSize().y),
-            board->getTileSize(),
+            board.getPosition()
+            + Vector2(lastMoveOrigin.x * board.getTileSize().x,
+                lastMoveOrigin.y * board.getTileSize().y),
+            board.getTileSize(),
             Color::fromHexcode("#ffd94e92")
         );
         painter->drawRectangle(
-            board->getPosition()
-            + Vector2(lastMoveTarget.x * board->getTileSize().x,
-                lastMoveTarget.y * board->getTileSize().y),
-            board->getTileSize(),
+            board.getPosition()
+            + Vector2(lastMoveTarget.x * board.getTileSize().x,
+                lastMoveTarget.y * board.getTileSize().y),
+            board.getTileSize(),
             Color::fromHexcode("#ffd94e92")
         );
     }
@@ -202,19 +201,19 @@ void MyGame::highlightLastMove() {
 // Draw a highlight on the square that the cursor is hovering
 void MyGame::highlightHoveredSquare() {
     // Snap to grid position
-    Vector2Int gridPos = ChessPieces::getPosFromNotation(board->getSquareOnHover(cursorPos));
+    Vector2Int gridPos = ChessPieces::getPosFromNotation(board.getSquareOnHover(cursorPos));
     Vector2 snappedPositionInBoard{
-        std::clamp(board->getPosition().x + (float)gridPos.x * board->getTileSize().x,
-            board->getPosition().x, board->getPosition().x + board->getTileSize().x * 7),
-        std::clamp(board->getPosition().y + gridPos.y * board->getTileSize().y,
-            board->getPosition().y, board->getPosition().y + board->getTileSize().y * 7)
+        std::clamp(board.getPosition().x + (float)gridPos.x * board.getTileSize().x,
+            board.getPosition().x, board.getPosition().x + board.getTileSize().x * 7),
+        std::clamp(board.getPosition().y + gridPos.y * board.getTileSize().y,
+            board.getPosition().y, board.getPosition().y + board.getTileSize().y * 7)
     };
 
     // Draw highlight border
     painter->drawRectangleHollow(
         snappedPositionInBoard,
-        board->getTileSize(),
-        board->getTileSize() * 0.9f,
+        board.getTileSize(),
+        board.getTileSize() * 0.9f,
         Color::fromHexcode("#ffffffbd")
     );
 }
@@ -224,47 +223,47 @@ void MyGame::pieceFollowCursor(PieceType pieceType, PieceTeam pieceTeam, Vector2
     // Clamp cursor position to inside the board
     Vector2 positionInBoard{
         std::clamp(cursorPos.x,
-            board->getPosition().x, board->getPosition().x + board->getTileSize().x * 8),
+            board.getPosition().x, board.getPosition().x + board.getTileSize().x * 8),
         std::clamp(cursorPos.y,
-            board->getPosition().y, board->getPosition().y + board->getTileSize().y * 8)
+            board.getPosition().y, board.getPosition().y + board.getTileSize().y * 8)
     };
 
     pieces.drawFree(
         pieceType, pieceTeam,
-        positionInBoard - offset, board->getTileSize(), *painter);
+        positionInBoard - offset, board.getTileSize(), *painter);
 }
 
-// Update Castling Rights
+// Update Castling Rights (Must be called at the end of a move, since it uses lastMoveOrigin and lastMoveTarget)
 void MyGame::updateCastlingRights() {
-    if (playerToMove == PieceTeam::White) {
-        // Moved King-side Rook
-        if (wKingSideCastling && selectedPiecePosition == Vector2Int{7, 7}) {
-            wKingSideCastling = false;
-        }
-        // Moved Queen-side Rook
-        if (wQueenSideCastling && selectedPiecePosition == Vector2Int{0, 7}) {
-            wQueenSideCastling = false;
-        }
-        // Moved the king
-        if ((wKingSideCastling || wQueenSideCastling) && selectedPiecePosition == Vector2Int{4, 7}) {
-            wKingSideCastling = false;
-            wQueenSideCastling = false;
-        }
+    // White King-side Rook
+    if (wKingSideCastling &&
+        ((lastMoveOrigin == Vector2Int{7, 7}) || (lastMoveTarget == Vector2Int{7, 7}))) {
+        wKingSideCastling = false;
     }
-    else if (playerToMove == PieceTeam::Black) {
-        // Moved King-side Rook
-        if (bKingSideCastling && selectedPiecePosition == Vector2Int{7, 0}) {
-            bKingSideCastling = false;
-        }
-        // Moved Queen-side Rook
-        if (bQueenSideCastling && selectedPiecePosition == Vector2Int{0, 0}) {
-            bQueenSideCastling = false;
-        }
-        // Moved the king
-        if ((bKingSideCastling || bQueenSideCastling) && selectedPiecePosition == Vector2Int{4, 0}) {
-            bKingSideCastling = false;
-            bQueenSideCastling = false;
-        }
+    // White Queen-side Rook
+    if (wQueenSideCastling &&
+        ((lastMoveOrigin == Vector2Int{0, 7}) || (lastMoveTarget == Vector2Int{0, 7}))) {
+        wQueenSideCastling = false;
+    }
+    // White King
+    if ((wKingSideCastling || wQueenSideCastling) && lastMoveOrigin == Vector2Int{4, 7}) {
+        wKingSideCastling = false;
+        wQueenSideCastling = false;
+    }
+    // Black King-side Rook
+    if (bKingSideCastling &&
+        ((lastMoveOrigin == Vector2Int{7, 0}) || (lastMoveTarget == Vector2Int{7, 0}))) {
+        bKingSideCastling = false;
+    }
+    // Black Queen-side Rook
+    if (bQueenSideCastling &&
+        ((lastMoveOrigin == Vector2Int{0, 0}) || (lastMoveTarget == Vector2Int{0, 0}))) {
+        bQueenSideCastling = false;
+    }
+    // Black King
+    if ((bKingSideCastling || bQueenSideCastling) && lastMoveOrigin == Vector2Int{4, 0}) {
+        bKingSideCastling = false;
+        bQueenSideCastling = false;
     }
 }
 
