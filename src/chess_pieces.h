@@ -4,8 +4,10 @@
 // Engine
 #include "pixelfall/engine/math/vector2.h"
 #include "pixelfall/engine/graphics/painter.h"
+// Standard Library
+#include <array>
 
-enum PieceType {
+enum class PieceType {
     King,
     Queen,
     Rook,
@@ -15,24 +17,24 @@ enum PieceType {
     None
 };
 
-enum PieceTeam {
+enum class PieceTeam {
     White,
-    Black
+    Black,
+    None
 };
 
 struct PieceInfo {
     PieceType type;
     PieceTeam team;
-    Vector2Int position{0, 0};
 };
 
 class ChessPieces {
 public:
     // Methods
-    void draw(PieceInfo pieceInfo, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
+    void draw(PieceInfo pieceInfo, Vector2Int piecePosition, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
         Painter& painter, Vector2 pieceOffset = Vector2::Zero);
 
-    void drawPieces(std::vector<PieceInfo> pieces, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
+    void drawPieces(std::array<std::array<PieceInfo, 8>, 8> pieces, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
         Painter& painter, Vector2 pieceOffset = Vector2::Zero);
 
     void drawFree(PieceType type, PieceTeam team, Vector2 physicalPosition, Vector2 spriteSize,
@@ -40,7 +42,7 @@ public:
 
     // Setters
     void setHideSelectedPiece(bool hideSelectedPiece) { this->hideSelectedPiece = hideSelectedPiece; };
-    void setSelectedPieceIndex(int selectedPieceIndex) { this->selectedPieceIndex = selectedPieceIndex; };
+    void setSelectedPiecePosition(Vector2Int selectedPiecePosition) { this->selectedPiecePosition = selectedPiecePosition; };
 
     // Getters
     static Vector2Int getPosFromNotation(std::string gridPosition);
@@ -48,5 +50,5 @@ public:
 
 private:
     bool hideSelectedPiece{false};
-    int selectedPieceIndex{-1};
+    Vector2Int selectedPiecePosition{-1, -1};  // (-1, -1) means no square is selected.
 };

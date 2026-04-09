@@ -20,7 +20,7 @@ bool MyGame::onStart() {
     board = std::make_unique<ChessBoard>();
 
     // Get initial state of board
-    piecesInfo = fenParser.getPiecesFromFEN(currentBoardFEN);
+    boardState = fenParser.getBoardFromFEN(currentBoardFEN);
 
     // White plays first
     playerTeam = PieceTeam::White;
@@ -45,45 +45,44 @@ void MyGame::onUpdate() {
         std::cout << board->getSquareOnHover(mousePos) << std::endl;
 
         // Get square clicked
-        std::string hoveredSquare = board->getSquareOnHover(mousePos);
+        Vector2Int clickedSquare = ChessPieces::getPosFromNotation(board->getSquareOnHover(mousePos));
 
         // Check if there's a piece in that square
-        auto it = std::find_if(piecesInfo.begin(), piecesInfo.end(), [&](const PieceInfo& p) {
-            return p.position == ChessPieces::getPosFromNotation(hoveredSquare);
-            });
+        PieceInfo& clickedPiece = boardState[clickedSquare.x][clickedSquare.y];
+        bool squareIsEmpty = (clickedPiece.type == PieceType::None);
 
         // The Square clicked on has a piece on it
-        if (it != piecesInfo.end()) {
-            // The piece is on our team
-            if (it->team == playerTeam) {
-                selectedPieceInfo = std::distance(piecesInfo.begin(), it);
+        if (!squareIsEmpty) {
+            // The piece is on our team and there is no piece selected
+            if (inputState == Normal && clickedPiece.team == playerTeam) {
+                // Select piece
+                selectedPiecePosition = clickedSquare;
+                pieces.setSelectedPiecePosition(selectedPiecePosition);
                 inputState = InputState::PieceSelected;
             }
-            // A piece is already selected
-            else if (inputState == PieceSelected) {
-                // The piece is NOT on our team
-                if (it->team != playerTeam) {
-                    // Capture enemy piece
-                    int capturedIndex = std::distance(piecesInfo.begin(), it);
-                    piecesInfo.erase(it);
-                    if (capturedIndex < selectedPieceInfo) selectedPieceInfo--;
-                    movePiece(piecesInfo[selectedPieceInfo], board->getSquareOnHover(mousePos));
-                    selectedPieceInfo = -1; // [TODO] Detect error when attempting o move a -1 piece
-                    inputState = InputState::Normal;
-                    nextTurn();
-                }
+            // The piece is an enemy piece and a piece is already selected
+            else if (inputState == PieceSelected && clickedPiece.team != playerTeam) {
+                // Replace enemy piece with selected piece
+                boardState[clickedSquare.x][clickedSquare.y] = boardState[selectedPiecePosition.x][selectedPiecePosition.y];
+                // Remove selected piece
+                boardState[selectedPiecePosition.x][selectedPiecePosition.y] = {PieceType::None, PieceTeam::None};
+                selectedPiecePosition = {-1, -1};
+                inputState = InputState::Normal;
+                nextTurn();
             }
         }
         // The Square clicked is an empty Square
         else {
             if (inputState == PieceSelected) {
-                movePiece(piecesInfo[selectedPieceInfo], board->getSquareOnHover(mousePos));
-                selectedPieceInfo = -1;
+                // Replace empty square with selected piece
+                boardState[clickedSquare.x][clickedSquare.y] = boardState[selectedPiecePosition.x][selectedPiecePosition.y];
+                // Remove selected piece
+                boardState[selectedPiecePosition.x][selectedPiecePosition.y] = {PieceType::None, PieceTeam::None};
+                selectedPiecePosition = {-1, -1};
                 inputState = InputState::Normal;
                 nextTurn();
             }
         }
-        pieces.setSelectedPieceIndex(selectedPieceInfo);
     }
 }
 
@@ -101,7 +100,7 @@ void MyGame::onRender() {
 
     // Draw pieces
     pieces.drawPieces(
-        piecesInfo, board->getPosition(), board->getTileSize(), board->getTileSize(), *painter);
+        boardState, board->getPosition(), board->getTileSize(), board->getTileSize(), *painter);
 
     // Draw selected piece following mouse
     if (inputState == InputState::PieceSelected) {
@@ -109,16 +108,13 @@ void MyGame::onRender() {
         if (appInput->isMouseButtonDown(MouseButton::Left)) {
             pieces.setHideSelectedPiece(true);
             pieces.drawFree(
-                piecesInfo.at(selectedPieceInfo).type, piecesInfo.at(selectedPieceInfo).team,
+                boardState[selectedPiecePosition.x][selectedPiecePosition.y].type,
+                boardState[selectedPiecePosition.x][selectedPiecePosition.y].team,
                 mousePos - (board->getTileSize() / 2), board->getTileSize(), *painter);
         } else {
             pieces.setHideSelectedPiece(false);
         }
     }
-}
-
-void MyGame::movePiece(PieceInfo& piece, std::string newPos) {
-    piece.position = pieces.getPosFromNotation(newPos);
 }
 
 void MyGame::nextTurn() {

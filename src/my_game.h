@@ -11,6 +11,7 @@
 #include "fen_parser.h"
 // Standard Library
 #include <memory>
+#include <array>
 
 enum InputState {
     Normal,
@@ -31,11 +32,18 @@ private:
     std::string currentBoardFEN = board::defaults::defaultBoardFEN.data();
     FenParser fenParser;
     ChessPieces pieces;
-    std::vector<PieceInfo> piecesInfo;
     std::unique_ptr<ChessBoard> board;
 
     // Position in piecesInfo vector of the selected piece.
-    int selectedPieceInfo{};
+    //std::vector<PieceInfo> piecesInfo;
+    //int selectedPieceInfo{-1};
+
+    // Input
     InputState inputState{Normal};
     PieceTeam playerTeam{};
+
+    // Board State
+    // 8x8 2D array of files and ranks 
+    std::array<std::array<PieceInfo, 8>, 8> boardState;
+    Vector2Int selectedPiecePosition{-1, -1};  // (-1, -1) means no square is selected.
 };

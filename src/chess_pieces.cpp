@@ -22,43 +22,46 @@ std::string ChessPieces::getNotationFromPos(Vector2Int gridPosition) {
 static std::filesystem::path findImagePath(PieceInfo pieceInfo) {
     if (pieceInfo.team == PieceTeam::White) {
         switch (pieceInfo.type) {
-        case King: return (board::piecesPath / "white_king.png");
-        case Queen: return (board::piecesPath / "white_queen.png");
-        case Rook: return (board::piecesPath / "white_rook.png");
-        case Bishop: return (board::piecesPath / "white_bishop.png");
-        case Knight: return (board::piecesPath / "white_knight.png");
-        case Pawn: return (board::piecesPath / "white_pawn.png");
+        case PieceType::King: return (board::piecesPath / "white_king.png");
+        case PieceType::Queen: return (board::piecesPath / "white_queen.png");
+        case PieceType::Rook: return (board::piecesPath / "white_rook.png");
+        case PieceType::Bishop: return (board::piecesPath / "white_bishop.png");
+        case PieceType::Knight: return (board::piecesPath / "white_knight.png");
+        case PieceType::Pawn: return (board::piecesPath / "white_pawn.png");
         default: throw std::runtime_error("Invalid piece type"); // [Error]
         }
     }
     else {
         switch (pieceInfo.type) {
-        case King: return (board::piecesPath / "black_king.png");
-        case Queen: return (board::piecesPath / "black_queen.png");
-        case Rook: return (board::piecesPath / "black_rook.png");
-        case Bishop: return (board::piecesPath / "black_bishop.png");
-        case Knight: return (board::piecesPath / "black_knight.png");
-        case Pawn: return (board::piecesPath / "black_pawn.png");
+        case PieceType::King: return (board::piecesPath / "black_king.png");
+        case PieceType::Queen: return (board::piecesPath / "black_queen.png");
+        case PieceType::Rook: return (board::piecesPath / "black_rook.png");
+        case PieceType::Bishop: return (board::piecesPath / "black_bishop.png");
+        case PieceType::Knight: return (board::piecesPath / "black_knight.png");
+        case PieceType::Pawn: return (board::piecesPath / "black_pawn.png");
         default: throw std::runtime_error("Invalid piece type"); // [Error]
         }
     }
 }
 
 // Draws a piece on the board
-void ChessPieces::draw(PieceInfo pieceInfo, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
+void ChessPieces::draw(PieceInfo pieceInfo, Vector2Int piecePosition, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
     Painter& painter, Vector2 pieceOffset) {
-    
+
+    // Check that this is a valid piece
+    if ((pieceInfo.type == PieceType::None) || (pieceInfo.team == PieceTeam::None)) return;
+
     Vector2 physicalPosition{};
     if (board::projectionType == ThemeProjection::Isometric) {
         physicalPosition = {
             boardPosition.x
-            + ((float)pieceInfo.position.x - (float)pieceInfo.position.y)
+            + ((float)piecePosition.x - (float)piecePosition.y)
             * (tileSize.x / 2.0f)
             - (spriteSize.x / 2.0f)
             + pieceOffset.x,
                 
             boardPosition.y
-            + ((float)pieceInfo.position.x + (float)pieceInfo.position.y)
+            + ((float)piecePosition.x + (float)piecePosition.y)
             * (tileSize.y / 2.0f)
             - (spriteSize.y / 2.0f)
             + pieceOffset.y,
@@ -67,12 +70,12 @@ void ChessPieces::draw(PieceInfo pieceInfo, Vector2 boardPosition, Vector2 tileS
     else {
         physicalPosition = {
             boardPosition.x
-            + (float)pieceInfo.position.x
+            + (float)piecePosition.x
             * tileSize.x
             + pieceOffset.x,
 
             boardPosition.y
-            + (float)pieceInfo.position.y
+            + (float)piecePosition.y
             * tileSize.y
             + pieceOffset.y,
         };
@@ -92,7 +95,10 @@ void ChessPieces::draw(PieceInfo pieceInfo, Vector2 boardPosition, Vector2 tileS
 void ChessPieces::drawFree(PieceType type, PieceTeam team, Vector2 physicalPosition, Vector2 spriteSize,
     Painter& painter) {
 
-    Texture& pieceTexture = painter.textureCache->loadTexture(findImagePath({type, team, Vector2Int::Zero}).string());
+    // Check that this is a valid piece
+    if ((type == PieceType::None) || (team == PieceTeam::None)) return;
+
+    Texture& pieceTexture = painter.textureCache->loadTexture(findImagePath({type, team}).string());
 
     painter.drawSprite(
         physicalPosition,
@@ -102,15 +108,21 @@ void ChessPieces::drawFree(PieceType type, PieceTeam team, Vector2 physicalPosit
 }
 
 // Draws all the pieces in the pieces vector on the screen.
-void ChessPieces::drawPieces(std::vector<PieceInfo> pieces, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
+void ChessPieces::drawPieces(std::array<std::array<PieceInfo, 8>, 8> boardState, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
     Painter& painter, Vector2 pieceOffset) {
+    
+    // Store position;
+    int file = 0;
+    int rank = 0;
 
-    for (int i = 0; i < (int)pieces.size(); i++) {
-        // Do something special to the piece selected
-        if (hideSelectedPiece && i == selectedPieceIndex) {
-            // Don't draw this piece
-            continue;
-        }
-        draw(pieces[i], boardPosition, tileSize, spriteSize, painter, pieceOffset);
-    }
+    for (int rank = 0; rank < 8; rank++)
+        for (int file = 0; file < 8; file++)
+            // Check if there's a piece in the square
+            if (boardState[file][rank].type != PieceType::None) {
+                if (hideSelectedPiece && Vector2Int{file, rank} == selectedPiecePosition) {
+                    // Don't draw this piece
+                    continue;
+                }
+                draw(boardState[file][rank], {file, rank}, boardPosition, tileSize, spriteSize, painter, pieceOffset);
+            }
 };

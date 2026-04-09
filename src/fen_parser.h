@@ -8,12 +8,12 @@
 // Standard Library
 #include <string>
 #include <map>
-#include <vector>
+#include <array>
 
 class FenParser {
 public:
     // Methods
-    std::vector<PieceInfo> getPiecesFromFEN(const std::string fenString);
+    std::array<std::array<PieceInfo, 8>, 8> getBoardFromFEN(const std::string fenString);
 
 private:
     std::map<char, PieceInfo> pieceCodes = {
@@ -34,4 +34,4 @@ private:
     };
 };
 
-// [TODO] Update FEN string from pieceInfo vector
+// [TODO] Opposite getter, Update FEN string based on array

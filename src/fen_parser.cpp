@@ -2,38 +2,42 @@
 
 #include "fen_parser.h"
 
-// Populates pieces vector with the correct placement information taken from a FEN string.
-std::vector<PieceInfo> FenParser::getPiecesFromFEN(const std::string fenString) {
-    // Reset pieces container
-    std::vector<PieceInfo> pieces;
+std::array<std::array<PieceInfo, 8>, 8> FenParser::getBoardFromFEN(const std::string fenString) {
+    // Create board state
+    std::array<std::array<PieceInfo, 8>, 8> boardState{};
 
-    // Store position as a simple integer (0 to 63) - Will be transformed into a Vector2{rank, file}
-    int pieceRank = 0;
-    int pieceFile = 0;
+    // Reset all squares to None
+    for (auto& rank : boardState)
+        for (auto& cell : rank)
+            cell = {PieceType::None, PieceTeam::None};
+
+
+    // Store position;
+    int rank = 0;
+    int file = 0;
 
     for (char c : fenString) {
         // Digit detected - Skip squares
         if (std::isdigit(c)) {
-            pieceFile += (c - '0');
+            file += (c - '0');
         }
         // Next-rank symbol detected - Skip to next rank (And reset file to 0)
         else if (c == '/') {
-            pieceRank++;
-            pieceFile = 0;
+            rank++;
+            file = 0;
         }
         // End of FEN string 
         // Note: FEN strings contain extra information after the space, but we don't need it for placing pieces.
         else if (c == ' ') {
             break;
         }
-        // Piece detected - Add it's pieceInfo to the pieces vector.
+        // Piece detected - Add it's pieceInfo to the board array.
         else {
             PieceInfo pieceInfo = pieceCodes[c];
-            pieceInfo.position = {pieceFile, pieceRank};
-            pieces.push_back(pieceInfo);
+            boardState[file][rank] = pieceInfo;
             // Move to next square
-            pieceFile++;
+            file++;
         }
     }
-    return pieces;
+    return boardState;
 }
