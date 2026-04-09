@@ -51,4 +51,6 @@ private:
     // 8x8 2D array of files and ranks 
     std::array<std::array<PieceInfo, 8>, 8> boardState;
     Vector2Int selectedPiecePosition{-1, -1};  // (-1, -1) means no square is selected.
+    Vector2Int lastMoveOrigin{-1, -1};
+    Vector2Int lastMoveTarget{-1, -1};
 };

@@ -191,3 +191,17 @@ void Painter::drawSprite(Vector2 position, Vector2 size, Texture& texture, Color
     Mesh mesh(vertices, indices, {{3}, {2}});
     mesh.draw();
 }
+
+// Draws a rectangular border by composing 4 rectangles. innerSize is clamped to always be smaller than size.
+void Painter::drawRectangleHollow(Vector2 position, Vector2 size, Vector2 innerSize, Color color) {
+    innerSize.x = std::clamp(innerSize.x, 0.0f, size.x);
+    innerSize.y = std::clamp(innerSize.y, 0.0f, size.y);
+
+    float borderX = (size.x - innerSize.x) / 2.0f;
+    float borderY = (size.y - innerSize.y) / 2.0f;
+
+    drawRectangle(position, {size.x,  borderY}, color); // top
+    drawRectangle({position.x, position.y + size.y - borderY}, {size.x,  borderY}, color); // bottom
+    drawRectangle({position.x, position.y + borderY}, {borderX, innerSize.y}, color); // left
+    drawRectangle({position.x + size.x - borderX, position.y + borderY}, {borderX, innerSize.y}, color); // right
+}

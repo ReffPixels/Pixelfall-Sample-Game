@@ -35,6 +35,7 @@ public:
     void drawRegularPolygon(Vector2 center, float radius, Color color, int segments);
     void drawSprite(Vector2 position, Vector2 size, Texture& texture,
         Color tint = painter::defaults::textureTint);
+    void drawRectangleHollow(Vector2 position, Vector2 size, Vector2 innerSize, Color color);
 
     // Public Members
     std::unique_ptr<TextureCache> textureCache;

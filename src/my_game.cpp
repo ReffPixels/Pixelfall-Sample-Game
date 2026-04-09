@@ -56,14 +56,32 @@ void MyGame::onRender() {
     // Draw Board
     board->draw(*painter);
 
-    // Draw Highlights
+    // Draw Selected Highlight
     if (selectedPiecePosition != Vector2Int{-1, -1}) {
         painter->drawRectangle(
             board->getPosition()
             + Vector2(selectedPiecePosition.x * board->getTileSize().x,
                 selectedPiecePosition.y * board->getTileSize().y),
             board->getTileSize(),
-            Color::fromHexcode("#ffd94ec5")
+            Color::fromHexcode("#ffd94e92")
+        );
+    }
+
+    // Draw Last Move
+    if (lastMoveOrigin != Vector2Int{-1, -1} && lastMoveTarget != Vector2Int{-1, -1}) {
+        painter->drawRectangle(
+            board->getPosition()
+            + Vector2(lastMoveOrigin.x * board->getTileSize().x,
+                lastMoveOrigin.y * board->getTileSize().y),
+            board->getTileSize(),
+            Color::fromHexcode("#ffd94e92")
+        );
+        painter->drawRectangle(
+            board->getPosition()
+            + Vector2(lastMoveTarget.x * board->getTileSize().x,
+                lastMoveTarget.y * board->getTileSize().y),
+            board->getTileSize(),
+            Color::fromHexcode("#ffd94e92")
         );
     }
 
@@ -93,10 +111,11 @@ void MyGame::onRender() {
             };
 
             // Drag and drop highlight
-            painter->drawRectangle(
+            painter->drawRectangleHollow(
                 snappedPositionInBoard,
                 board->getTileSize(),
-                Color::fromHexcode("#ffffff81")
+                board->getTileSize() * 0.9f,
+                Color::fromHexcode("#ffffffbd")
             );
 
             pieces.setHideSelectedPiece(true);
@@ -141,8 +160,15 @@ void MyGame::moveSelectedPiece(Vector2Int square) {
     PieceInfo& target = boardState[square.x][square.y];
     if (target.type != PieceType::None && target.team == playerTeam) return; // own piece, blocked
 
+    // Move Piece
     boardState[square.x][square.y] = boardState[selectedPiecePosition.x][selectedPiecePosition.y];
     boardState[selectedPiecePosition.x][selectedPiecePosition.y] = {PieceType::None, PieceTeam::None};
+
+    // Record Move
+    lastMoveTarget = square;
+    lastMoveOrigin = selectedPiecePosition;
+
+    // Reset Trackers
     selectedPiecePosition = {-1, -1};
     pieces.setSelectedPiecePosition({-1, -1});
     inputState = InputState::Normal;
