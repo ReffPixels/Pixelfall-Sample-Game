@@ -4,7 +4,7 @@
 
 #pragma once
 // Chess
-#include "chess_pieces.h"
+#include "game_objects/chess_pieces.h"
 // Standard Library
 #include <string>
 #include <map>

@@ -1,15 +1,15 @@
 // Defines the loop of this specific application.
 
-#include "game.h"
+#include "chess.h"
 // Standard Library
 #include <iostream>
 #include <algorithm>
 
 // Create Game
-PIXELFALL_APPLICATION(MyGame);
+PIXELFALL_APPLICATION(Chess);
 
 // Called on the first frame
-bool MyGame::onStart() {
+bool Chess::onStart() {
     // Set Metadata
     appWindow->setWindowTitle("Chess");
     appTitle = "Chess";
@@ -17,13 +17,13 @@ bool MyGame::onStart() {
     appIdentifier = "chess";
 
     // Get initial state of board
-    game.setupFromFEN();
+    state.setupFromFEN();
 
     return true;
 }
 
 // Called every frame
-void MyGame::onUpdate() {
+void Chess::onUpdate() {
 
     // Track FPS in window title
     appWindow->setWindowTitle("Chess | FPS: " + std::to_string(appClock->getFPS()));
@@ -38,17 +38,17 @@ void MyGame::onUpdate() {
     if (board.isBoardOnHover(cursorPos)) {
         Vector2Int hoveredSquare = ChessPieces::getPosFromNotation(board.getSquareOnHover(cursorPos));
         if (appInput->isMouseButtonPressed(MouseButton::Left)) {
-            game.onBoardPressed(hoveredSquare);
+            state.onBoardPressed(hoveredSquare);
             // Capture drag pivot at the moment of selection
-            if (game.getInputState() == InputState::PieceSelected)
-                dragAndDropPivot = visuals.computeDragPivot(cursorPos, board, game.getSelectedPiecePosition());
+            if (state.getInputState() == InputState::PieceSelected)
+                dragAndDropPivot = visuals.computeDragPivot(cursorPos, board, state.getSelectedPiecePosition());
         }
-        if (appInput->isMouseButtonReleased(MouseButton::Left)) game.onBoardReleased(hoveredSquare);
+        if (appInput->isMouseButtonReleased(MouseButton::Left)) state.onBoardReleased(hoveredSquare);
     }
 }
 
 // Called at the end of each frame (Handles rendering)
-void MyGame::onRender() {
+void Chess::onRender() {
     // Draw Background
     painter->drawRectangle(
         Vector2::Zero,
@@ -60,23 +60,23 @@ void MyGame::onRender() {
     board.draw(*painter);
 
     // Draw Highlights
-    Vector2Int selPos = game.getSelectedPiecePosition();
-    Vector2Int lastOrigin = game.getLastMoveOrigin();
-    Vector2Int lastTarget = game.getLastMoveTarget();
+    Vector2Int selPos = state.getSelectedPiecePosition();
+    Vector2Int lastOrigin = state.getLastMoveOrigin();
+    Vector2Int lastTarget = state.getLastMoveTarget();
     visuals.highlightLastMove(board, lastOrigin, lastTarget, *painter);
     visuals.highlightSelected(board, selPos, *painter);
 
-    bool dragAndDrop = game.getInputState() == InputState::PieceSelected
+    bool dragAndDrop = state.getInputState() == InputState::PieceSelected
         && appInput->isMouseButtonDown(MouseButton::Left);
 
     // Draw Pieces (hide selected piece during drag to avoid duplication)
     pieces.setHideSelectedPiece(dragAndDrop);
-    pieces.drawPieces(game.getBoardState(), board.getPosition(), board.getTileSize(),
+    pieces.drawPieces(state.getBoardState(), board.getPosition(), board.getTileSize(),
         board.getTileSize(), *painter, Vector2::Zero, selPos);
 
     // Drag and Drop Visuals (piece following cursor)
     if (dragAndDrop) {
         visuals.pieceFollowCursor(cursorPos, pieces, board,
-            game.getBoardState()[selPos.x][selPos.y], *painter, dragAndDropPivot);
+            state.getBoardState()[selPos.x][selPos.y], *painter, dragAndDropPivot);
     }
 }

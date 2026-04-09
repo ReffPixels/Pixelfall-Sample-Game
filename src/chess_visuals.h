@@ -2,8 +2,8 @@
 
 #pragma once
 // Chess
-#include "chess_board.h"
-#include "chess_pieces.h"
+#include "game_objects/chess_board.h"
+#include "game_objects/chess_pieces.h"
 
 class ChessVisuals {
 public:

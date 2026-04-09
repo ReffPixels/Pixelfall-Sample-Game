@@ -1,10 +1,10 @@
-// Implementation for chess_board.h
-#include "chess_board.h"
+// Implementation for game_objects/chess_board.h
+#include "game_objects/chess_board.h"
 #include "config/board_config.h"
-#include "chess_pieces.h"
+#include "game_objects/chess_pieces.h"
 
+// Draw board (Depending on projection type)
 void ChessBoard::draw(Painter& painter) {
-    // Draw board
     for (int rank = 0; rank < 8; rank++) {
         for (int file = 0; file < 8; file++) {
             if (projectionType == ThemeProjection::Isometric) {
@@ -34,6 +34,7 @@ void ChessBoard::draw(Painter& painter) {
     }
 }
 
+// Check if the cursor is on top of the board
 bool ChessBoard::isBoardOnHover(Vector2 mousePosition) {
     return (mousePosition.x > boardPosition.x
         && mousePosition.y > boardPosition.y
@@ -42,6 +43,7 @@ bool ChessBoard::isBoardOnHover(Vector2 mousePosition) {
     );
 }
 
+// Get the specific square under the cursor
 std::string ChessBoard::getSquareOnHover(Vector2 mousePosition) {
     Vector2 squarePosition{(mousePosition - boardPosition) / tileSize.x};
     return ChessPieces::getNotationFromPos({(int)squarePosition.x, (int)squarePosition.y});

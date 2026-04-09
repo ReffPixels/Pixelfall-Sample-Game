@@ -6,15 +6,15 @@
 #include "pixelfall/engine/core/application.h"
 // Chess
 #include "chess_state.h"
-#include "chess_board.h"
-#include "chess_pieces.h"
+#include "game_objects/chess_board.h"
+#include "game_objects/chess_pieces.h"
 #include "chess_visuals.h"
 // Standard Library
 #include <memory>
 #include <array>
 #include <vector>
 
-class MyGame : public Application {
+class Chess : public Application {
 public:
     bool onStart()  override;
     void onUpdate() override;
@@ -26,7 +26,7 @@ private:
     Vector2 dragAndDropPivot{Vector2::Zero};
 
     // Chess
-    ChessState game;
+    ChessState state;
     ChessBoard board;
     ChessPieces pieces;
     ChessVisuals visuals;

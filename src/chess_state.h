@@ -4,8 +4,8 @@
 // Chess
 #include "config/board_config.h"
 #include "fen_parser.h"
-#include "chess_board.h"
-#include "chess_pieces.h"
+#include "game_objects/chess_board.h"
+#include "game_objects/chess_pieces.h"
 // Standard Library
 #include <memory>
 #include <array>

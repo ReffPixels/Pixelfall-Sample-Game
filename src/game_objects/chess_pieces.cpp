@@ -1,5 +1,5 @@
 // Implementation for piece.h
-#include "chess_pieces.h"
+#include "game_objects/chess_pieces.h"
 #include "config/board_config.h"
 #include <stdexcept>
 
