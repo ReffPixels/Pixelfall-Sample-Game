@@ -4,7 +4,7 @@
 // Engine
 #include "pixelfall/engine/math/vector2.h"
 #include "pixelfall/engine/graphics/painter.h"
-#include "chess_theme.h"
+#include "config/chess_theme.h"
 
 class ChessBoard {
 public:

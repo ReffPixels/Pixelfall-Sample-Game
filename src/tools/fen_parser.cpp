@@ -1,6 +1,6 @@
-// Implementation for fen_parser.h
+// Implementation for tools/fen_parser.h
 
-#include "fen_parser.h"
+#include "tools/fen_parser.h"
 
 std::array<std::array<PieceInfo, 8>, 8> FenParser::getBoardFromFEN(const std::string fenString) {
     // Create board state
