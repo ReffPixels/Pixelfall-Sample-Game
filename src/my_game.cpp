@@ -75,12 +75,37 @@ void MyGame::onRender() {
     if (inputState == InputState::PieceSelected) {
         // Only execute while holding the button down (Drag and Drop behaviour)
         if (appInput->isMouseButtonDown(MouseButton::Left)) {
+            // Clamp mouse position to inside the board
+            Vector2 positionInBoard{
+                std::clamp(mousePos.x,
+                    board->getPosition().x, board->getPosition().x + board->getTileSize().x * 8),
+                std::clamp(mousePos.y,
+                    board->getPosition().y, board->getPosition().y + board->getTileSize().y * 8)
+            };
+
+            // Snap to grid position
+            Vector2Int gridPos = ChessPieces::getPosFromNotation(board->getSquareOnHover(mousePos));
+            Vector2 snappedPositionInBoard{
+                std::clamp(board->getPosition().x + (float)gridPos.x * board->getTileSize().x,
+                    board->getPosition().x, board->getPosition().x + board->getTileSize().x * 7),
+                std::clamp(board->getPosition().y + gridPos.y * board->getTileSize().y,
+                    board->getPosition().y, board->getPosition().y + board->getTileSize().y * 7)
+            };
+
+            // Drag and drop highlight
+            painter->drawRectangle(
+                snappedPositionInBoard,
+                board->getTileSize(),
+                Color::fromHexcode("#ffffff81")
+            );
+
             pieces.setHideSelectedPiece(true);
             pieces.drawFree(
                 boardState[selectedPiecePosition.x][selectedPiecePosition.y].type,
                 boardState[selectedPiecePosition.x][selectedPiecePosition.y].team,
-                mousePos - (board->getTileSize() / 2), board->getTileSize(), *painter);
-        } else {
+                positionInBoard - (board->getTileSize() / 2), board->getTileSize(), *painter);
+        }
+        else {
             pieces.setHideSelectedPiece(false);
         }
     }
