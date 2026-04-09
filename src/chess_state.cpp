@@ -1,6 +1,7 @@
 // Implementation for chess_state.h
 
 #include "chess_state.h"
+#include "chess_moves.h"
 // Standard Library
 #include <iostream>
 #include <algorithm>
@@ -15,8 +16,8 @@ void ChessState::onBoardPressed(Vector2Int square) {
     // It's a piece in the player's team
     if (clicked.type != PieceType::None && clicked.team == playerToMove)
         // Clicked on the same square, deselect
-        if (square == selectedPiecePosition) {
-            selectedPiecePosition = {-1, -1};
+        if (square == selectedPosition) {
+            selectedPosition = {-1, -1};
             inputState = InputState::Normal;
             return;
         } else selectPiece(square);
@@ -31,8 +32,12 @@ void ChessState::onBoardReleased(Vector2Int square) {
 
 // Selects a piece in a specific square and changes the input state to selected.
 void ChessState::selectPiece(Vector2Int selectedSquare) {
-    selectedPiecePosition = selectedSquare;
+    selectedPosition = selectedSquare;
     inputState = InputState::PieceSelected;
+    if (boardState[selectedPosition.x][selectedPosition.y].type == PieceType::Rook) {
+        validMoves = ChessMoves::GenerateRookMoves(
+            selectedPosition, boardState[selectedPosition.x][selectedPosition.y].team, boardState);
+    }
 }
 
 // Moves the selected piece to a new square and updates the board state to match. 
@@ -41,9 +46,9 @@ void ChessState::moveSelectedPiece(Vector2Int targetSquare) {
     // A piece is not selected, don't move anything
     if (inputState != InputState::PieceSelected) return;
     // Clicked on the same square, don't move anything.
-    if (targetSquare == selectedPiecePosition) return;
+    if (targetSquare == selectedPosition) return;
 
-    PieceInfo& selected = boardState[selectedPiecePosition.x][selectedPiecePosition.y];
+    PieceInfo& selected = boardState[selectedPosition.x][selectedPosition.y];
     PieceInfo& target = boardState[targetSquare.x][targetSquare.y];
 
     // There's a piece in the target square!
@@ -57,11 +62,11 @@ void ChessState::moveSelectedPiece(Vector2Int targetSquare) {
     selected = {PieceType::None, PieceTeam::None};
 
     // Record Move
-    lastMoveOrigin = selectedPiecePosition;
+    lastMoveOrigin = selectedPosition;
     lastMoveTarget = targetSquare;
 
     // Deselect Piece
-    selectedPiecePosition = {-1, -1};
+    selectedPosition = {-1, -1};
     inputState = InputState::Normal;
 
     nextTurn();

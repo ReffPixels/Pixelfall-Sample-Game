@@ -41,7 +41,7 @@ void Chess::onUpdate() {
             state.onBoardPressed(hoveredSquare);
             // Capture drag pivot at the moment of selection
             if (state.getInputState() == InputState::PieceSelected)
-                dragAndDropPivot = visuals.computeDragPivot(cursorPos, board, state.getSelectedPiecePosition());
+                dragAndDropPivot = visuals.computeDragPivot(cursorPos, board, state.getSelectedPosition());
         }
         if (appInput->isMouseButtonReleased(MouseButton::Left)) state.onBoardReleased(hoveredSquare);
     }
@@ -60,11 +60,15 @@ void Chess::onRender() {
     board.draw(*painter);
 
     // Draw Highlights
-    Vector2Int selPos = state.getSelectedPiecePosition();
+    Vector2Int selPos = state.getSelectedPosition();
     Vector2Int lastOrigin = state.getLastMoveOrigin();
     Vector2Int lastTarget = state.getLastMoveTarget();
     visuals.highlightLastMove(board, lastOrigin, lastTarget, *painter);
-    visuals.highlightSelected(board, selPos, *painter);
+
+    if (state.getInputState() == InputState::PieceSelected) {
+        visuals.highlightSelected(board, selPos, *painter);
+        visuals.highlightValidMoves(state.getValidMoves(), board, *painter);
+    }
 
     bool dragAndDrop = state.getInputState() == InputState::PieceSelected
         && appInput->isMouseButtonDown(MouseButton::Left);

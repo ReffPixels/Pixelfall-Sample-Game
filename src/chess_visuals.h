@@ -4,15 +4,22 @@
 // Chess
 #include "game_objects/chess_board.h"
 #include "game_objects/chess_pieces.h"
+#include "chess_moves.h"
 
 class ChessVisuals {
 public:
-    // Methods
-    void highlightSelected(ChessBoard& board, Vector2Int selectedPiecePosition, Painter& painter);
+    // Square Highlights
+    void highlightSelected(ChessBoard& board, Vector2Int selectedPosition, Painter& painter);
     void highlightLastMove(ChessBoard& board, Vector2Int lastMoveOrigin,
         Vector2Int lastMoveTarget, Painter& painter);
     void highlightHoveredSquare(Vector2& cursorPos, ChessBoard& board, Painter& painter);
+
+    // Valid Moves
+    void highlightValidMoves(std::array<std::array<MoveType, 8>, 8> validMoves,
+        ChessBoard& board, Painter& painter);
+
+    // Cursor
     void pieceFollowCursor(Vector2& cursorPos, ChessPieces& pieces, ChessBoard& board,
         PieceInfo pieceInfo, Painter& painter, Vector2 offset = Vector2::Zero);
-    Vector2 computeDragPivot(Vector2& cursorPos, ChessBoard& board, Vector2Int selectedPiecePosition);
+    Vector2 computeDragPivot(Vector2& cursorPos, ChessBoard& board, Vector2Int selectedPosition);
 };

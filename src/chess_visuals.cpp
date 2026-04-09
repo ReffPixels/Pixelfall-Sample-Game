@@ -5,12 +5,12 @@
 #include <algorithm>
 
 // Draw a highlight on the square of the selected piece
-void ChessVisuals::highlightSelected(ChessBoard& board, Vector2Int selectedPiecePosition, Painter& painter) {
-    if (selectedPiecePosition != Vector2Int{-1, -1}) {
+void ChessVisuals::highlightSelected(ChessBoard& board, Vector2Int selectedPosition, Painter& painter) {
+    if (selectedPosition != Vector2Int{-1, -1}) {
         painter.drawRectangle(
             board.getPosition()
-            + Vector2(selectedPiecePosition.x * board.getTileSize().x,
-                selectedPiecePosition.y * board.getTileSize().y),
+            + Vector2(selectedPosition.x * board.getTileSize().x,
+                selectedPosition.y * board.getTileSize().y),
             board.getTileSize(),
             Color::fromHexcode("#ffd94e92")
         );
@@ -58,6 +58,29 @@ void ChessVisuals::highlightHoveredSquare(Vector2& cursorPos, ChessBoard& board,
     );
 }
 
+// Draw a circle at every valid move spot
+void ChessVisuals::highlightValidMoves(std::array<std::array<MoveType, 8>, 8> validMoves, ChessBoard& board, Painter& painter) {
+    for (int rank = 0; rank < 8; rank++)
+        for (int file = 0; file < 8; file++)
+            if (validMoves[file][rank] == MoveType::Move)
+                painter.drawRegularPolygon(
+                    Vector2(board.getPosition().x + (float)file * board.getTileSize().x + board.getTileSize().x / 2,
+                        board.getPosition().y + (float)rank * board.getTileSize().y + board.getTileSize().y / 2),
+                    board.getTileSize().x * 0.15f,
+                    Color::fromHexcode("#6e422d55"),
+                    20
+                );
+            else if (validMoves[file][rank] == MoveType::Capture) {
+                painter.drawRegularPolygon(
+                    Vector2(board.getPosition().x + (float)file * board.getTileSize().x + board.getTileSize().x / 2,
+                        board.getPosition().y + (float)rank * board.getTileSize().y + board.getTileSize().y / 2),
+                    board.getTileSize().x * 0.9f,
+                    Color::fromHexcode("#c5131355"),
+                    20
+                );
+            }
+}
+
 // Attach a piece visual to the cursor
 void ChessVisuals::pieceFollowCursor(Vector2& cursorPos, ChessPieces& pieces, ChessBoard& board,
     PieceInfo pieceInfo, Painter& painter, Vector2 offset) {
@@ -75,7 +98,7 @@ void ChessVisuals::pieceFollowCursor(Vector2& cursorPos, ChessPieces& pieces, Ch
 }
 
 // Computes the pivot offset so the dragged piece stays attached at the grab point
-Vector2 ChessVisuals::computeDragPivot(Vector2& cursorPos, ChessBoard& board, Vector2Int selectedPiecePosition) {
+Vector2 ChessVisuals::computeDragPivot(Vector2& cursorPos, ChessBoard& board, Vector2Int selectedPosition) {
     return {cursorPos - (board.getPosition() +
-        Vector2{(float)selectedPiecePosition.x, (float)selectedPiecePosition.y} * board.getTileSize())};
+        Vector2{(float)selectedPosition.x, (float)selectedPosition.y} * board.getTileSize())};
 }

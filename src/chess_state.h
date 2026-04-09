@@ -33,6 +33,13 @@ enum class InputState {
     PieceSelected,
 };
 
+struct Move {
+    Vector2Int origin;
+    Vector2Int target;
+};
+
+enum class MoveType { None, Move, Capture };
+
 class ChessState {
 public:
     // Setup
@@ -51,9 +58,10 @@ public:
     // Getters
     const std::array<std::array<PieceInfo, 8>, 8>& getBoardState() const { return boardState; }
     InputState getInputState() const { return inputState; }
-    Vector2Int getSelectedPiecePosition() const { return selectedPiecePosition; }
+    Vector2Int getSelectedPosition() const { return selectedPosition; }
     Vector2Int getLastMoveOrigin() const { return lastMoveOrigin; }
     Vector2Int getLastMoveTarget() const { return lastMoveTarget; }
+    const std::array<std::array<MoveType, 8>, 8>& getValidMoves() const { return validMoves; }
 
 private:
     FenParser fenParser;
@@ -81,7 +89,10 @@ private:
 
     // Interaction
     InputState inputState{InputState::Normal};
-    Vector2Int selectedPiecePosition{-1, -1};  // (-1, -1) means no square is selected.
+    Vector2Int selectedPosition{-1, -1};  // (-1, -1) means no square is selected.
+
+    // Valid Moves
+    std::array<std::array<MoveType, 8>, 8> validMoves;
 };
 
 // [TODO] Some way to track 3 fold and 5 fold repetition (FEN snapshops?)
