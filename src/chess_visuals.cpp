@@ -39,9 +39,12 @@ void ChessVisuals::highlightLastMove(ChessBoard& board, Vector2Int lastMoveOrigi
 }
 
 // Draw a highlight on the square that the cursor is hovering
-void ChessVisuals::highlightHoveredSquare(Vector2& cursorPos, ChessBoard& board, Painter& painter) {
+void ChessVisuals::highlightHoveredSquare(Vector2& cursorPos, ChessBoard& board,
+    Painter& painter, Vector2Int selectedPosition) {
     // Snap to grid position
     Vector2Int gridPos = ChessPieces::getPosFromNotation(board.getSquareOnHover(cursorPos));
+    if (gridPos == selectedPosition) return; // Don't draw highlight over origin square
+
     Vector2 snappedPositionInBoard{
         std::clamp(board.getPosition().x + (float)gridPos.x * board.getTileSize().x,
             board.getPosition().x, board.getPosition().x + board.getTileSize().x * 7),
@@ -63,20 +66,19 @@ void ChessVisuals::highlightValidMoves(std::array<std::array<MoveType, 8>, 8> va
     for (int rank = 0; rank < 8; rank++)
         for (int file = 0; file < 8; file++)
             if (validMoves[file][rank] == MoveType::Move)
-                painter.drawRegularPolygon(
+                painter.drawCircle(
                     Vector2(board.getPosition().x + (float)file * board.getTileSize().x + board.getTileSize().x / 2,
                         board.getPosition().y + (float)rank * board.getTileSize().y + board.getTileSize().y / 2),
                     board.getTileSize().x * 0.15f,
-                    Color::fromHexcode("#6e422d55"),
-                    20
+                    Color::fromHexcode("#6e422d55")
                 );
             else if (validMoves[file][rank] == MoveType::Capture) {
-                painter.drawRegularPolygon(
+                painter.drawCircleHollow(
                     Vector2(board.getPosition().x + (float)file * board.getTileSize().x + board.getTileSize().x / 2,
                         board.getPosition().y + (float)rank * board.getTileSize().y + board.getTileSize().y / 2),
-                    board.getTileSize().x * 0.9f,
-                    Color::fromHexcode("#c5131355"),
-                    20
+                    board.getTileSize().x * 0.45f,
+                    board.getTileSize().x * 0.3f,
+                    Color::fromHexcode("#c5131355")
                 );
             }
 }

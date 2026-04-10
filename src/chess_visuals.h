@@ -12,7 +12,8 @@ public:
     void highlightSelected(ChessBoard& board, Vector2Int selectedPosition, Painter& painter);
     void highlightLastMove(ChessBoard& board, Vector2Int lastMoveOrigin,
         Vector2Int lastMoveTarget, Painter& painter);
-    void highlightHoveredSquare(Vector2& cursorPos, ChessBoard& board, Painter& painter);
+    void highlightHoveredSquare(Vector2& cursorPos, ChessBoard& board,
+        Painter& painter, Vector2Int selectedPosition);
 
     // Valid Moves
     void highlightValidMoves(std::array<std::array<MoveType, 8>, 8> validMoves,

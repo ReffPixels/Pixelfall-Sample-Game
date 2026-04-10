@@ -19,6 +19,7 @@ void ChessState::onBoardPressed(Vector2Int square) {
         if (square == selectedPosition) {
             selectedPosition = {-1, -1};
             inputState = InputState::Normal;
+            ChessMoves::clearMoves(validMoves);
             return;
         } else selectPiece(square);
     else
@@ -34,9 +35,28 @@ void ChessState::onBoardReleased(Vector2Int square) {
 void ChessState::selectPiece(Vector2Int selectedSquare) {
     selectedPosition = selectedSquare;
     inputState = InputState::PieceSelected;
-    if (boardState[selectedPosition.x][selectedPosition.y].type == PieceType::Rook) {
-        validMoves = ChessMoves::GenerateRookMoves(
+    switch (boardState[selectedPosition.x][selectedPosition.y].type) {
+    case PieceType::King:
+        validMoves = ChessMoves::generateKingMoves(
             selectedPosition, boardState[selectedPosition.x][selectedPosition.y].team, boardState);
+        break;
+    case PieceType::Queen:
+        validMoves = ChessMoves::generateQueenMoves(
+            selectedPosition, boardState[selectedPosition.x][selectedPosition.y].team, boardState);
+        break;
+    case PieceType::Rook:
+        validMoves = ChessMoves::generateRookMoves(
+            selectedPosition, boardState[selectedPosition.x][selectedPosition.y].team, boardState);
+        break;
+    case PieceType::Bishop:
+        validMoves = ChessMoves::generateBishopMoves(
+            selectedPosition, boardState[selectedPosition.x][selectedPosition.y].team, boardState);
+        break;
+    case PieceType::Knight:
+        validMoves = ChessMoves::generateKnightMoves(
+            selectedPosition, boardState[selectedPosition.x][selectedPosition.y].team, boardState);
+        break;
+    default: ChessMoves::clearMoves(validMoves);
     }
 }
 

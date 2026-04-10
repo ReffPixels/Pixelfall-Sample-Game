@@ -205,3 +205,28 @@ void Painter::drawRectangleHollow(Vector2 position, Vector2 size, Vector2 innerS
     drawRectangle({position.x, position.y + borderY}, {borderX, innerSize.y}, color); // left
     drawRectangle({position.x + size.x - borderX, position.y + borderY}, {borderX, innerSize.y}, color); // right
 }
+
+// Draws a circle made out of triangular segments (Uses more segments at bigger radius)
+void Painter::drawCircleHollow(Vector2 center, float radius, float innerRadius, Color color) {
+    innerRadius = std::clamp(innerRadius, 0.0f, radius);
+
+    int segments = std::clamp(
+        (int)(radius * painter::defaults::circleSegmentsDetail),
+        painter::defaults::minCircleSegments,
+        painter::defaults::maxCircleSegments
+    );
+
+    float step = math::conversions::degreesToRadians(360.0f) / (float)segments;
+
+    for (int i = 0; i < segments; i++) {
+        float a0 = step * i;
+        float a1 = step * (i + 1);
+
+        Vector2 outerA(center.x + radius * cosf(a0), center.y - radius * sinf(a0));
+        Vector2 outerB(center.x + radius * cosf(a1), center.y - radius * sinf(a1));
+        Vector2 innerA(center.x + innerRadius * cosf(a0), center.y - innerRadius * sinf(a0));
+        Vector2 innerB(center.x + innerRadius * cosf(a1), center.y - innerRadius * sinf(a1));
+
+        drawQuad(outerA, outerB, innerB, innerA, color);
+    }
+}

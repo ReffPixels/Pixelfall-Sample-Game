@@ -72,13 +72,15 @@ void Chess::onRender() {
 
     bool dragAndDrop = state.getInputState() == InputState::PieceSelected
         && appInput->isMouseButtonDown(MouseButton::Left);
+    // Draw Drag and Drop Highlight (Under pieces)
+    if (dragAndDrop) visuals.highlightHoveredSquare(cursorPos, board, *painter, selPos);
 
     // Draw Pieces (hide selected piece during drag to avoid duplication)
     pieces.setHideSelectedPiece(dragAndDrop);
     pieces.drawPieces(state.getBoardState(), board.getPosition(), board.getTileSize(),
         board.getTileSize(), *painter, Vector2::Zero, selPos);
 
-    // Drag and Drop Visuals (piece following cursor)
+    // Drag and Drop Visuals (piece following cursor, over pieces)
     if (dragAndDrop) {
         visuals.pieceFollowCursor(cursorPos, pieces, board,
             state.getBoardState()[selPos.x][selPos.y], *painter, dragAndDropPivot);

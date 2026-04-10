@@ -36,6 +36,7 @@ public:
     void drawSprite(Vector2 position, Vector2 size, Texture& texture,
         Color tint = painter::defaults::textureTint);
     void drawRectangleHollow(Vector2 position, Vector2 size, Vector2 innerSize, Color color);
+    void drawCircleHollow(Vector2 center, float radius, float innerRadius, Color color);
 
     // Public Members
     std::unique_ptr<TextureCache> textureCache;
