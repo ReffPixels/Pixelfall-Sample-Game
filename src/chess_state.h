@@ -11,21 +11,21 @@
 #include <array>
 #include <vector>
 
-enum class GameOutcome { // [TODO] Victory detection
-    Playing,
-    WhiteVictoryCheckmate,
-    BlackVictoryCheckmate,
-    WhiteVictoryResignation,
-    BlackVictoryResignation,
-    WhiteVictoryTimeout,
-    BlackVictoryTimeout,
-    DrawStalemate,
-    DrawInsufficientMaterial,
-    Draw50Move,
-    Draw75Move,
-    Draw3FoldRepetition,
-    Draw5FoldRepetition,
-    DrawAgreement,
+enum class GameOutcome {
+    Playing,                    // Done
+    WhiteVictoryCheckmate,      // Done
+    BlackVictoryCheckmate,      // Done
+    WhiteVictoryResignation,    // [TODO] Button system
+    BlackVictoryResignation,    // [TODO] Button system
+    WhiteVictoryTimeout,        // [TODO] Clock
+    BlackVictoryTimeout,        // [TODO] Clock
+    DrawStalemate,              // Done
+    DrawInsufficientMaterial,   // [TODO] Insufficient Material Detection
+    Draw50Move,                 // [TODO] Button system (50 Move is not automatic)
+    Draw75Move,                 // [TODO] 
+    Draw3FoldRepetition,        // [TODO] Fen snapshots?
+    Draw5FoldRepetition,        // [TODO] Fen snapshots?
+    DrawAgreement,              // [TODO] Button system
 };
 
 enum class InputState { Normal, PieceSelected, };
@@ -108,7 +108,10 @@ private:
     void findGameOutcome();
 };
 
-// [TODO] Some way to track 3 fold and 5 fold repetition (FEN snapshops?)
-// [TODO] Detect Game Outcomes and reset game
-// [TODO] Hover highlight should not hover origin (flash)
 // [TODO] Lerp animation piece when clicking instead of dragging
+
+// Insufficient Material Rules:
+// king versus king
+// king and bishop versus king
+// king and knight versus king
+// king and bishop versus king and bishop with the bishops on the same color.

@@ -65,8 +65,8 @@ void ChessState::movePiece(Vector2Int origin, Vector2Int target, MoveType moveTy
     // Reset enPassant availability
     enPassantTargetSquare = {-1, -1};
 
-    // Update move rule counter
-    if (targetPiece.type != PieceType::None) moveRuleCounter = 0;
+    // Reset move rule counter if this was a capture or a pawn move
+    if (targetPiece.type != PieceType::None || selected.type == PieceType::Pawn) moveRuleCounter = 0;
     else moveRuleCounter++;
 
     // Move piece
@@ -252,9 +252,19 @@ PieceTeam ChessState::getOpponent() {
 void ChessState::endGame() {
     std::cout << "-------------------------------" << std::endl;
     switch (gameOutcome) {
-    case GameOutcome::WhiteVictoryCheckmate: std::cout << "WHITE VICTORY (CHECKMATE)" << std::endl;
-    case GameOutcome::BlackVictoryCheckmate: std::cout << "BLACK VICTORY (CHECKMATE)" << std::endl;
-    case GameOutcome::DrawStalemate: std::cout << "DRAW (STALEMATE)" << std::endl;
+    case GameOutcome::WhiteVictoryCheckmate: std::cout << "WHITE VICTORY (CHECKMATE)" << std::endl; break;
+    case GameOutcome::BlackVictoryCheckmate: std::cout << "BLACK VICTORY (CHECKMATE)" << std::endl; break;
+    case GameOutcome::WhiteVictoryResignation: std::cout << "WHITE VICTORY (RESIGNATION)" << std::endl; break;
+    case GameOutcome::BlackVictoryResignation: std::cout << "BLACK VICTORY (RESIGNATION)" << std::endl; break;
+    case GameOutcome::WhiteVictoryTimeout: std::cout << "WHITE VICTORY (TIMEOUT)" << std::endl; break;
+    case GameOutcome::BlackVictoryTimeout: std::cout << "BLACK VICTORY (TIMEOUT)" << std::endl; break;
+    case GameOutcome::DrawStalemate: std::cout << "DRAW (STALEMATE)" << std::endl; break;
+    case GameOutcome::DrawInsufficientMaterial: std::cout << "DRAW (INSUFFICIENT MATERIAL)" << std::endl; break;
+    case GameOutcome::Draw50Move: std::cout << "DRAW (50 MOVE RULE)" << std::endl; break;
+    case GameOutcome::Draw75Move: std::cout << "DRAW (75 MOVE RULE)" << std::endl; break;
+    case GameOutcome::Draw3FoldRepetition: std::cout << "DRAW (3 FOLD REPETITION)" << std::endl; break;
+    case GameOutcome::Draw5FoldRepetition: std::cout << "DRAW (5 FOLD REPETITION)" << std::endl; break;
+    case GameOutcome::DrawAgreement: std::cout << "DRAW (AGREEMENT)" << std::endl; break;
     }
 }
 
@@ -307,6 +317,13 @@ bool ChessState::hasLegalMoves(PieceTeam team) const {
 
 // Checks for checkmate and stalemate after each move.
 void ChessState::findGameOutcome() {
+    // 75 Move Rule (Automatic Draw)
+    if (moveRuleCounter == 4) {
+        gameOutcome = GameOutcome::Draw75Move;
+        endGame();
+        return;
+    }
+
     // There are still legal moves, continue the game.
     if (hasLegalMoves(playerToMove)) return;
 
