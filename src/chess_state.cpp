@@ -133,7 +133,8 @@ void ChessState::nextTurn() {
     std::cout << "Castling Rights KQkq: " << castlingRights.whiteKingSide << castlingRights.whiteQueenSide
         << castlingRights.blackKingSide << castlingRights.blackQueenSide << std::endl;
 
-    if (gameOutcome != GameOutcome::Playing) endGame();
+    // Check if the game should end
+    findGameOutcome();
 }
 
 // Update Castling Rights (Must be called at the end of a move, since it uses lastMoveOrigin and lastMoveTarget)
@@ -267,4 +268,57 @@ void ChessState::resetGame() {
     lastMoveOrigin = {-1, -1};
     lastMoveTarget = {-1, -1};
     setupFromFEN();
+}
+
+// Returns true if the given team's king is currently being attacked.
+bool ChessState::isKingInCheck(PieceTeam team) const {
+    // Find the king's position
+    Vector2Int kingPos{-1, -1};
+    for (int rank = 0; rank < 8; rank++)
+        for (int file = 0; file < 8; file++)
+            if (boardState[file][rank].type == PieceType::King && boardState[file][rank].team == team)
+                kingPos = {file, rank};
+
+    // Get squares attacked by the opponent (ignoreKing = false, we want accurate attacks)
+    auto attacked = getAttackedSquares(false, team, boardState, castlingRights);
+    return attacked[kingPos.x][kingPos.y];
+}
+
+// Returns true if the given team has at least one legal move available.
+bool ChessState::hasLegalMoves(PieceTeam team) const {
+    for (int rank = 0; rank < 8; rank++) {
+        for (int file = 0; file < 8; file++) {
+            if (boardState[file][rank].team != team) continue;
+
+            PieceInfo piece = boardState[file][rank];
+            Vector2Int pos{file, rank};
+
+            auto moves = ChessMoves::generateMovesForPiece(piece, pos, boardState, castlingRights, enPassantTargetSquare);
+            ChessMoves::findLegalMovesForPiece(moves, piece, pos, boardState, castlingRights, enPassantTargetSquare);
+
+            for (int r = 0; r < 8; r++)
+                for (int f = 0; f < 8; f++)
+                    if (moves[f][r] != MoveType::None)
+                        return true;
+        }
+    }
+    return false;
+}
+
+// Checks for checkmate and stalemate after each move.
+void ChessState::findGameOutcome() {
+    // There are still legal moves, continue the game.
+    if (hasLegalMoves(playerToMove)) return;
+
+    // Is it checkmate?
+    if (isKingInCheck(playerToMove)) {
+        gameOutcome = (playerToMove == PieceTeam::White)
+            ? GameOutcome::BlackVictoryCheckmate
+            : GameOutcome::WhiteVictoryCheckmate;
+    }
+    else {
+        gameOutcome = GameOutcome::DrawStalemate;
+    }
+
+    endGame();
 }
