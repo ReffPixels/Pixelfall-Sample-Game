@@ -68,7 +68,8 @@ void ChessVisuals::highlightValidMoves(std::array<std::array<MoveType, 8>, 8> va
             // It's a normal move or it's castling
             if (validMoves[file][rank] == MoveType::Move
                 || validMoves[file][rank] == MoveType::CastlingKingSide
-                || validMoves[file][rank] == MoveType::CastlingQueenSide)
+                || validMoves[file][rank] == MoveType::CastlingQueenSide
+                || validMoves[file][rank] == MoveType::Promotion)
 
                 painter.drawCircle(
                     Vector2(board.getPosition().x + (float)file * board.getTileSize().x + board.getTileSize().x / 2,
@@ -77,7 +78,9 @@ void ChessVisuals::highlightValidMoves(std::array<std::array<MoveType, 8>, 8> va
                     Color::fromHexcode("#6e422d55")
                 );
             // It's a capture
-            else if ((validMoves[file][rank] == MoveType::Capture) || (validMoves[file][rank] == MoveType::EnPassant)) {
+            else if ((validMoves[file][rank] == MoveType::Capture)
+                || (validMoves[file][rank] == MoveType::EnPassant)
+                || (validMoves[file][rank] == MoveType::CapturePromotion)) {
                 painter.drawCircleHollow(
                     Vector2(board.getPosition().x + (float)file * board.getTileSize().x + board.getTileSize().x / 2,
                         board.getPosition().y + (float)rank * board.getTileSize().y + board.getTileSize().y / 2),

@@ -100,7 +100,13 @@ std::array<std::array<MoveType, 8>, 8> ChessMoves::generatePawnMoves(
             break;
 
         if (boardState[targetSquare.x][targetSquare.y].type == PieceType::None) {
-            moves[targetSquare.x][targetSquare.y] = MoveType::Move;
+            // Check if it's a promotion
+            if (targetSquare.y == 0 || targetSquare.y == 7) {
+                moves[targetSquare.x][targetSquare.y] = MoveType::Promotion;
+            }
+            else {
+                moves[targetSquare.x][targetSquare.y] = MoveType::Move;
+            }
         }
         else {
             break; // Pawns are blocked by any piece in a target movement square.
@@ -116,7 +122,13 @@ std::array<std::array<MoveType, 8>, 8> ChessMoves::generatePawnMoves(
         // There is a piece in this square
         if (boardState[targetSquare.x][targetSquare.y].type != PieceType::None) {
             if (boardState[targetSquare.x][targetSquare.y].team != pieceTeam)
-                moves[targetSquare.x][targetSquare.y] = MoveType::Capture;
+                // Check if it's a promotion
+                if (targetSquare.y == 0 || targetSquare.y == 7) {
+                    moves[targetSquare.x][targetSquare.y] = MoveType::CapturePromotion;
+                }
+                else {
+                    moves[targetSquare.x][targetSquare.y] = MoveType::Capture;
+                }
             continue;
         }
         // Empty square (Could it be en passant?)

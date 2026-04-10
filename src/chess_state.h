@@ -30,7 +30,7 @@ enum class GameOutcome { // [TODO] Victory detection
 
 enum class InputState { Normal, PieceSelected, };
 
-enum class MoveType { None, Move, Capture, EnPassant, CastlingKingSide, CastlingQueenSide };
+enum class MoveType { None, Move, Capture, EnPassant, CastlingKingSide, CastlingQueenSide, Promotion, CapturePromotion };
 
 struct Move { Vector2Int origin; Vector2Int target; };
 

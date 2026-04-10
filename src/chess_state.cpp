@@ -105,6 +105,10 @@ void ChessState::movePiece(Vector2Int origin, Vector2Int target, MoveType moveTy
     if (moveType == MoveType::EnPassant)
         boardState[target.x][origin.y] = {PieceType::None, PieceTeam::None};
 
+    // Was it a promotion?
+    if (moveType == MoveType::Promotion || moveType == MoveType::CapturePromotion)
+        targetPiece.type = PieceType::Queen; // Temporary, eventually implement ui to select piece
+
     // Was it castling? Move the rook to its new position
     if (selected.team == PieceTeam::White) {
         if (moveType == MoveType::CastlingKingSide) {
