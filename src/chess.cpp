@@ -34,16 +34,24 @@ void Chess::onUpdate() {
     // Center Board
     board.setPosition((appWindow->getLogicalSize() / 2) - (board.getTileSize() * 4));
 
-    // Handle board interaction (Stop interaction if the game has ended)
-    if (board.isBoardOnHover(cursorPos) && state.getGameOutcome() == GameOutcome::Playing) {
-        Vector2Int hoveredSquare = ChessPieces::getPosFromNotation(board.getSquareOnHover(cursorPos));
-        if (appInput->isMouseButtonPressed(MouseButton::Left)) {
-            state.onBoardPressed(hoveredSquare);
-            // Capture drag pivot at the moment of selection
-            if (state.getInputState() == InputState::PieceSelected)
-                dragAndDropPivot = visuals.computeDragPivot(cursorPos, board, state.getselPiecePosition());
+    // Handle board interaction
+    if (state.getGameOutcome() == GameOutcome::Playing) {
+        if (board.isBoardOnHover(cursorPos)) {
+            Vector2Int hoveredSquare = ChessPieces::getPosFromNotation(board.getSquareOnHover(cursorPos));
+            if (appInput->isMouseButtonPressed(MouseButton::Left)) {
+                state.onBoardPressed(hoveredSquare);
+                // Capture drag pivot at the moment of selection
+                if (state.getInputState() == InputState::PieceSelected)
+                    dragAndDropPivot = visuals.computeDragPivot(cursorPos, board, state.getselPiecePosition());
+            }
+            if (appInput->isMouseButtonReleased(MouseButton::Left)) state.onBoardReleased(hoveredSquare);
         }
-        if (appInput->isMouseButtonReleased(MouseButton::Left)) state.onBoardReleased(hoveredSquare);
+    }
+    else {
+        // Game has ended, only action is reset
+        if (appInput->isMouseButtonPressed(MouseButton::Left)) {
+            state.resetGame();
+        }
     }
 }
 
@@ -53,7 +61,7 @@ void Chess::onRender() {
     Color backgroundColor{
         state.getGameOutcome() == GameOutcome::Playing ?
         Color::fromHexcode("#212121") : Color::fromHexcode("#33ff00")};
-
+    
     painter->drawRectangle(
         Vector2::Zero,
         Vector2(appWindow->getLogicalSize().x, appWindow->getLogicalSize().y),

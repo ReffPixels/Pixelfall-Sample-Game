@@ -60,6 +60,7 @@ public:
         const std::array<std::array<PieceInfo, 8>, 8>& boardState, const CastlingRights& castlingRights);
     void nextTurn();
     void endGame();
+    void resetGame();
 
     // Getters
     const std::array<std::array<PieceInfo, 8>, 8>& getBoardState() const { return boardState; }

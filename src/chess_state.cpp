@@ -132,6 +132,8 @@ void ChessState::nextTurn() {
     std::cout << "Full Moves: " << totalFullMoves << std::endl;
     std::cout << "Castling Rights KQkq: " << castlingRights.whiteKingSide << castlingRights.whiteQueenSide
         << castlingRights.blackKingSide << castlingRights.blackQueenSide << std::endl;
+
+    if (gameOutcome != GameOutcome::Playing) endGame();
 }
 
 // Update Castling Rights (Must be called at the end of a move, since it uses lastMoveOrigin and lastMoveTarget)
@@ -253,4 +255,16 @@ void ChessState::endGame() {
     case GameOutcome::BlackVictoryCheckmate: std::cout << "BLACK VICTORY (CHECKMATE)" << std::endl;
     case GameOutcome::DrawStalemate: std::cout << "DRAW (STALEMATE)" << std::endl;
     }
+}
+
+void ChessState::resetGame() {
+    gameOutcome = GameOutcome::Playing;
+    playerToMove = PieceTeam::White;
+    castlingRights = {true, true, true, true};
+    enPassantTargetSquare = {-1, -1};
+    moveRuleCounter = 0;
+    totalFullMoves = 1;
+    lastMoveOrigin = {-1, -1};
+    lastMoveTarget = {-1, -1};
+    setupFromFEN();
 }
