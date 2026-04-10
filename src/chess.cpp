@@ -16,6 +16,9 @@ bool Chess::onStart() {
     appVersion = "0.1";
     appIdentifier = "chess";
 
+    // Window Settings
+    appWindow->setWReferenceSize({720, 720});
+
     // Get initial state of board
     state.setupFromFEN();
 

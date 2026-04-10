@@ -22,7 +22,7 @@ enum class GameOutcome {
     DrawStalemate,              // Done
     DrawInsufficientMaterial,   // [TODO] Insufficient Material Detection
     Draw50Move,                 // [TODO] Button system (50 Move is not automatic)
-    Draw75Move,                 // [TODO] 
+    Draw75Move,                 // Done
     Draw3FoldRepetition,        // [TODO] Fen snapshots?
     Draw5FoldRepetition,        // [TODO] Fen snapshots?
     DrawAgreement,              // [TODO] Button system

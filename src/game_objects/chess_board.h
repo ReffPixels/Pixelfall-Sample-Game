@@ -26,7 +26,7 @@ private:
     Vector2 boardPosition;
 
     // Theme
-    Vector2 tileSize{64.0f, 64.0f};  // width:height = 2:1
+    Vector2 tileSize{80.0f, 80.0f};  // width:height = 2:1
     Color lightSquareColor{Color::fromHexcode("#edd6b0")};
     Color darkSquareColor{Color::fromHexcode("#b88762")};
     ThemeProjection projectionType = ThemeProjection::Rectangular;
