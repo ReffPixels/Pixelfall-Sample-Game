@@ -318,7 +318,7 @@ bool ChessState::hasLegalMoves(PieceTeam team) const {
 // Checks for checkmate and stalemate after each move.
 void ChessState::findGameOutcome() {
     // 75 Move Rule (Automatic Draw)
-    if (moveRuleCounter == 4) {
+    if (moveRuleCounter == 75) {
         gameOutcome = GameOutcome::Draw75Move;
         endGame();
         return;
