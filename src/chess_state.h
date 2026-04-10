@@ -28,17 +28,18 @@ enum class GameOutcome { // [TODO] Victory detection
     DrawAgreement,
 };
 
-enum class InputState {
-    Normal,
-    PieceSelected,
-};
+enum class InputState { Normal, PieceSelected, };
 
-struct Move {
-    Vector2Int origin;
-    Vector2Int target;
-};
+enum class MoveType { None, Move, Capture, EnPassant, CastlingKingSide, CastlingQueenSide };
 
-enum class MoveType { None, Move, Capture, EnPassant };
+struct Move { Vector2Int origin; Vector2Int target; };
+
+struct CastlingRights {
+    bool whiteKingSide;
+    bool whiteQueenSide;
+    bool blackKingSide;
+    bool blackQueenSide;
+};
 
 class ChessState {
 public:
@@ -72,10 +73,7 @@ private:
     std::string currentBoardFEN = board::defaults::defaultBoardFEN.data(); // Description of the current board
     std::array<std::array<PieceInfo, 8>, 8> boardState; // 8x8 2D array of files and ranks 
     PieceTeam playerToMove{PieceTeam::White}; // White plays first
-    bool wKingSideCastling{true};
-    bool wQueenSideCastling{true};
-    bool bKingSideCastling{true};
-    bool bQueenSideCastling{true};
+    CastlingRights castlingRights{ true, true, true, true }; // Tracker for who's lost their castling rights.
     Vector2Int enPassantTargetSquare{-1, -1}; // [TODO]
     int moveRuleCounter{0}; // Used for 50 fold and 75 fold repetition. Counts on every pawn move or capture.
     int totalFullMoves{1}; // Starts at 1 due to some arcaic reason. Counts up only on black moves.

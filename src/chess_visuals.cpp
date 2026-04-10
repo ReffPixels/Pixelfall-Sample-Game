@@ -65,13 +65,18 @@ void ChessVisuals::highlightHoveredSquare(Vector2& cursorPos, ChessBoard& board,
 void ChessVisuals::highlightValidMoves(std::array<std::array<MoveType, 8>, 8> validMoves, ChessBoard& board, Painter& painter) {
     for (int rank = 0; rank < 8; rank++)
         for (int file = 0; file < 8; file++)
-            if (validMoves[file][rank] == MoveType::Move)
+            // It's a normal move or it's castling
+            if (validMoves[file][rank] == MoveType::Move
+                || validMoves[file][rank] == MoveType::CastlingKingSide
+                || validMoves[file][rank] == MoveType::CastlingQueenSide)
+
                 painter.drawCircle(
                     Vector2(board.getPosition().x + (float)file * board.getTileSize().x + board.getTileSize().x / 2,
                         board.getPosition().y + (float)rank * board.getTileSize().y + board.getTileSize().y / 2),
                     board.getTileSize().x * 0.15f,
                     Color::fromHexcode("#6e422d55")
                 );
+            // It's a capture
             else if ((validMoves[file][rank] == MoveType::Capture) || (validMoves[file][rank] == MoveType::EnPassant)) {
                 painter.drawCircleHollow(
                     Vector2(board.getPosition().x + (float)file * board.getTileSize().x + board.getTileSize().x / 2,

@@ -36,7 +36,7 @@ void ChessState::selectPiece(Vector2Int selectedSquare) {
     PieceTeam team = boardState[selectedPosition.x][selectedPosition.y].team;
     switch (boardState[selectedPosition.x][selectedPosition.y].type) {
     case PieceType::King:
-        validMoves = ChessMoves::generateKingMoves(selectedPosition, team, boardState);
+        validMoves = ChessMoves::generateKingMoves(selectedPosition, team, boardState, castlingRights);
         break;
     case PieceType::Queen:
         validMoves = ChessMoves::generateQueenMoves(selectedPosition, team, boardState);
@@ -105,6 +105,28 @@ void ChessState::movePiece(Vector2Int origin, Vector2Int target, MoveType moveTy
     if (moveType == MoveType::EnPassant)
         boardState[target.x][origin.y] = {PieceType::None, PieceTeam::None};
 
+    // Was it castling? Move the rook to its new position
+    if (selected.team == PieceTeam::White) {
+        if (moveType == MoveType::CastlingKingSide) {
+            boardState[7][7] = {PieceType::None, PieceTeam::None};
+            boardState[5][7] = {PieceType::Rook, PieceTeam::White};
+        }
+        else if (moveType == MoveType::CastlingQueenSide) {
+            boardState[0][7] = {PieceType::None, PieceTeam::None};
+            boardState[3][7] = {PieceType::Rook, PieceTeam::White};
+        }
+    }
+    else if (selected.team == PieceTeam::Black) {
+        if (moveType == MoveType::CastlingKingSide) {
+            boardState[7][0] = {PieceType::None, PieceTeam::None};
+            boardState[5][0] = {PieceType::Rook, PieceTeam::Black};
+        }
+        else if (moveType == MoveType::CastlingQueenSide) {
+            boardState[0][0] = {PieceType::None, PieceTeam::None};
+            boardState[3][0] = {PieceType::Rook, PieceTeam::Black};
+        }
+    }
+
     // Remove piece from its previous position
     selected = {PieceType::None, PieceTeam::None};
 }
@@ -127,41 +149,41 @@ void ChessState::nextTurn() {
     std::cout << "Player to Move: " << static_cast<int>(playerToMove) << std::endl;
     std::cout << "Half Moves: " << moveRuleCounter << std::endl;
     std::cout << "Full Moves: " << totalFullMoves << std::endl;
-    std::cout << "Castling Rights KQkq: " << wKingSideCastling << wQueenSideCastling
-        << bKingSideCastling << bQueenSideCastling << std::endl;
+    std::cout << "Castling Rights KQkq: " << castlingRights.whiteKingSide << castlingRights.whiteQueenSide
+        << castlingRights.blackKingSide << castlingRights.blackQueenSide << std::endl;
 }
 
 // Update Castling Rights (Must be called at the end of a move, since it uses lastMoveOrigin and lastMoveTarget)
 void ChessState::updateCastlingRights() {
     // White King-side Rook
-    if (wKingSideCastling &&
+    if (castlingRights.whiteKingSide &&
         ((lastMoveOrigin == Vector2Int{7, 7}) || (lastMoveTarget == Vector2Int{7, 7}))) {
-        wKingSideCastling = false;
+        castlingRights.whiteKingSide = false;
     }
     // White Queen-side Rook
-    if (wQueenSideCastling &&
+    if (castlingRights.whiteQueenSide &&
         ((lastMoveOrigin == Vector2Int{0, 7}) || (lastMoveTarget == Vector2Int{0, 7}))) {
-        wQueenSideCastling = false;
+        castlingRights.whiteQueenSide = false;
     }
     // White King
-    if ((wKingSideCastling || wQueenSideCastling) && lastMoveOrigin == Vector2Int{4, 7}) {
-        wKingSideCastling = false;
-        wQueenSideCastling = false;
+    if ((castlingRights.whiteKingSide || castlingRights.whiteQueenSide) && lastMoveOrigin == Vector2Int{4, 7}) {
+        castlingRights.whiteKingSide = false;
+        castlingRights.whiteQueenSide = false;
     }
     // Black King-side Rook
-    if (bKingSideCastling &&
+    if (castlingRights.blackKingSide &&
         ((lastMoveOrigin == Vector2Int{7, 0}) || (lastMoveTarget == Vector2Int{7, 0}))) {
-        bKingSideCastling = false;
+        castlingRights.blackKingSide = false;
     }
     // Black Queen-side Rook
-    if (bQueenSideCastling &&
+    if (castlingRights.blackQueenSide &&
         ((lastMoveOrigin == Vector2Int{0, 0}) || (lastMoveTarget == Vector2Int{0, 0}))) {
-        bQueenSideCastling = false;
+        castlingRights.blackQueenSide = false;
     }
     // Black King
-    if ((bKingSideCastling || bQueenSideCastling) && lastMoveOrigin == Vector2Int{4, 0}) {
-        bKingSideCastling = false;
-        bQueenSideCastling = false;
+    if ((castlingRights.blackKingSide || castlingRights.blackQueenSide) && lastMoveOrigin == Vector2Int{4, 0}) {
+        castlingRights.blackKingSide = false;
+        castlingRights.blackQueenSide = false;
     }
 }
 

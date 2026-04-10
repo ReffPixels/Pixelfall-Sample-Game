@@ -2,11 +2,44 @@
 #include "chess_moves.h"
 
 std::array<std::array<MoveType, 8>, 8> ChessMoves::generateKingMoves(
-    Vector2Int moveOrigin, PieceTeam pieceTeam, std::array<std::array<PieceInfo, 8>, 8> boardState) {
-    
-    return generateMoves(moveOrigin, pieceTeam, boardState, {
-        Vector2Int::Up, Vector2Int::Right, Vector2Int::Down, Vector2Int::Left,
-        Vector2Int::UpRight, Vector2Int::DownRight, Vector2Int::DownLeft, Vector2Int::UpLeft}, 1);
+    Vector2Int moveOrigin, PieceTeam pieceTeam, std::array<std::array<PieceInfo, 8>, 8> boardState,
+    CastlingRights& castlingRights) {
+
+    // Normal Moves
+    std::array<std::array<MoveType, 8>, 8> kingMoves =
+        generateMoves(moveOrigin, pieceTeam, boardState, {
+            Vector2Int::Up, Vector2Int::Right, Vector2Int::Down, Vector2Int::Left,
+            Vector2Int::UpRight, Vector2Int::DownRight, Vector2Int::DownLeft, Vector2Int::UpLeft}, 1);
+
+    // White Castling Moves
+    if (pieceTeam == PieceTeam::White) {
+        if (castlingRights.whiteKingSide) {
+            if (boardState[5][7].type == PieceType::None
+                && boardState[6][7].type == PieceType::None)
+                kingMoves[6][7] = MoveType::CastlingKingSide;
+        }
+        if (castlingRights.whiteQueenSide) {
+            if (boardState[1][7].type == PieceType::None
+                && boardState[2][7].type == PieceType::None
+                && boardState[3][7].type == PieceType::None)
+                kingMoves[2][7] = MoveType::CastlingQueenSide;
+        }
+    }
+    // Black Castling Moves
+    else {
+        if (castlingRights.blackKingSide) {
+            if (boardState[5][0].type == PieceType::None
+                && boardState[6][0].type == PieceType::None)
+                kingMoves[6][0] = MoveType::CastlingKingSide;
+        }
+        if (castlingRights.blackQueenSide) {
+            if (boardState[1][0].type == PieceType::None
+                && boardState[2][0].type == PieceType::None
+                && boardState[3][0].type == PieceType::None)
+                kingMoves[2][0] = MoveType::CastlingQueenSide;
+        }
+    }
+    return kingMoves;
 }
 
 std::array<std::array<MoveType, 8>, 8> ChessMoves::generateQueenMoves(
