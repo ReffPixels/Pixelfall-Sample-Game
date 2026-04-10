@@ -3,7 +3,7 @@
 
 void ChessMoves::findLegalMovesForPiece(std::array<std::array<MoveType, 8>, 8>& moves,
     PieceInfo piece, Vector2Int position, const std::array<std::array<PieceInfo, 8>, 8>& boardState,
-    CastlingRights& castlingRights, Vector2Int enPassantTargetSquare) {
+    const CastlingRights& castlingRights, Vector2Int enPassantTargetSquare) {
 
     // Iterate through every pseudo legal move
     for (int r = 0; r < 8; r++) {
@@ -62,7 +62,7 @@ void ChessMoves::findLegalMovesForPiece(std::array<std::array<MoveType, 8>, 8>& 
 // Dispatch move generation to the correct function based on piece type
 std::array<std::array<MoveType, 8>, 8> ChessMoves::generateMovesForPiece(
     PieceInfo piece, Vector2Int position, const std::array<std::array<PieceInfo, 8>, 8>& boardState,
-    CastlingRights& castlingRights, Vector2Int enPassantTargetSquare) {
+    const CastlingRights& castlingRights, Vector2Int enPassantTargetSquare) {
 
     switch (piece.type) {
     case PieceType::King:
@@ -87,7 +87,7 @@ std::array<std::array<MoveType, 8>, 8> ChessMoves::generateMovesForPiece(
 
 std::array<std::array<MoveType, 8>, 8> ChessMoves::generateKingMoves(
     Vector2Int moveOrigin, PieceTeam pieceTeam, const std::array<std::array<PieceInfo, 8>, 8>& boardState,
-    CastlingRights& castlingRights) {
+    const CastlingRights& castlingRights) {
 
     // Normal Moves
     std::array<std::array<MoveType, 8>, 8> kingMoves =

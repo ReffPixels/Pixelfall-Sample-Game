@@ -9,11 +9,11 @@ public:
     // Piece Movement
     static void findLegalMovesForPiece(std::array<std::array<MoveType, 8>, 8>& moves,
         PieceInfo piece, Vector2Int position, const std::array<std::array<PieceInfo, 8>, 8>& boardState,
-        CastlingRights& castlingRights, Vector2Int enPassantTargetSquare = Vector2Int(-1, -1));
-    
+        const CastlingRights& castlingRights, Vector2Int enPassantTargetSquare = Vector2Int(-1, -1));
+
     static std::array<std::array<MoveType, 8>, 8> generateMovesForPiece(
         PieceInfo piece, Vector2Int position, const std::array<std::array<PieceInfo, 8>, 8>& boardState,
-        CastlingRights& castlingRights, Vector2Int enPassantTargetSquare = Vector2Int(-1, -1));
+        const CastlingRights& castlingRights, Vector2Int enPassantTargetSquare = Vector2Int(-1, -1));
 
     static std::array<std::array<MoveType, 8>, 8> ChessMoves::generateMoves(
         Vector2Int moveOrigin, PieceTeam pieceTeam,
@@ -22,7 +22,7 @@ public:
 
     static std::array<std::array<MoveType, 8>, 8> generateKingMoves(
         Vector2Int moveOrigin, PieceTeam pieceTeam, const std::array<std::array<PieceInfo, 8>, 8>& boardState,
-        CastlingRights& castlingRights);
+        const CastlingRights& castlingRights);
     
     static std::array<std::array<MoveType, 8>, 8> generateQueenMoves(
         Vector2Int moveOrigin, PieceTeam pieceTeam, const std::array<std::array<PieceInfo, 8>, 8>& boardState);

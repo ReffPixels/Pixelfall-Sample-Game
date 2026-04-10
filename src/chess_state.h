@@ -57,7 +57,7 @@ public:
     void movePiece(Vector2Int origin, Vector2Int target, MoveType moveType);
     void updateCastlingRights();
     static std::array<std::array<bool, 8>, 8> getAttackedSquares(bool ignoreKing, PieceTeam playerTeam,
-        const std::array<std::array<PieceInfo, 8>, 8>& boardState, CastlingRights& castlingRights);
+        const std::array<std::array<PieceInfo, 8>, 8>& boardState, const CastlingRights& castlingRights);
     void nextTurn();
 
     // Getters
@@ -67,6 +67,8 @@ public:
     Vector2Int getLastMoveOrigin() const { return lastMoveOrigin; }
     Vector2Int getLastMoveTarget() const { return lastMoveTarget; }
     const std::array<std::array<MoveType, 8>, 8>& getValidMoves() const { return validMoves; }
+    PieceTeam getPlayerToMove() const { return playerToMove; }
+    const CastlingRights& getCastlingRights() const { return castlingRights; }
 
 private:
     FenParser fenParser;

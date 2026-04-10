@@ -59,6 +59,11 @@ void Chess::onRender() {
     // Draw Board
     board.draw(*painter);
 
+    // Draw Attacked Squares (Debug)
+    visuals.highlightAttackedSquares(
+        ChessState::getAttackedSquares(false, state.getPlayerToMove(), state.getBoardState(), state.getCastlingRights()),
+        board, *painter);
+
     // Draw Highlights
     Vector2Int selPos = state.getselPiecePosition();
     Vector2Int lastOrigin = state.getLastMoveOrigin();

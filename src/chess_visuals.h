@@ -19,6 +19,10 @@ public:
     void highlightValidMoves(std::array<std::array<MoveType, 8>, 8> validMoves,
         ChessBoard& board, Painter& painter);
 
+    // Debug
+    void highlightAttackedSquares(std::array<std::array<bool, 8>, 8> attackedSquares,
+        ChessBoard& board, Painter& painter);
+
     // Cursor
     void pieceFollowCursor(Vector2& cursorPos, ChessPieces& pieces, ChessBoard& board,
         PieceInfo pieceInfo, Painter& painter, Vector2 offset = Vector2::Zero);

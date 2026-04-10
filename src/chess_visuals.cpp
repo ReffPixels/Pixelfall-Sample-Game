@@ -91,6 +91,20 @@ void ChessVisuals::highlightValidMoves(std::array<std::array<MoveType, 8>, 8> va
             }
 }
 
+// Draw a red highlight on every square attacked by the opponent
+void ChessVisuals::highlightAttackedSquares(std::array<std::array<bool, 8>, 8> attackedSquares,
+    ChessBoard& board, Painter& painter) {
+    for (int rank = 0; rank < 8; rank++)
+        for (int file = 0; file < 8; file++)
+            if (attackedSquares[file][rank])
+                painter.drawRectangle(
+                    board.getPosition()
+                    + Vector2(file * board.getTileSize().x, rank * board.getTileSize().y),
+                    board.getTileSize(),
+                    Color::fromHexcode("#ff000040")
+                );
+}
+
 // Attach a piece visual to the cursor
 void ChessVisuals::pieceFollowCursor(Vector2& cursorPos, ChessPieces& pieces, ChessBoard& board,
     PieceInfo pieceInfo, Painter& painter, Vector2 offset) {

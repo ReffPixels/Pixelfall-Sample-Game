@@ -179,7 +179,7 @@ void ChessState::deselectPiece() {
 // If ignoreKing is set to true, the attacked squares of sliding pieces will ignore the king.
 // This is necessary for finding safe king squares since the king cannot retreat to the squares it was blocking. (X-ray)
 std::array<std::array<bool, 8>, 8> ChessState::getAttackedSquares(bool ignoreKing, PieceTeam playerTeam,
-    const std::array<std::array<PieceInfo, 8>, 8>& boardState, CastlingRights& castlingRights) {
+    const std::array<std::array<PieceInfo, 8>, 8>& boardState, const CastlingRights& castlingRights) {
     // Store attacked squares
     std::array<std::array<bool, 8>, 8> attackedSquares;
 
