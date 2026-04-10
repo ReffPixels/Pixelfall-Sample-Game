@@ -59,10 +59,14 @@ void Chess::onRender() {
     // Draw Board
     board.draw(*painter);
 
-    // Draw Attacked Squares (Debug)
-    visuals.highlightAttackedSquares(
-        ChessState::getAttackedSquares(false, state.getPlayerToMove(), state.getBoardState(), state.getCastlingRights()),
-        board, *painter);
+    // Draw Attacked Squares (Player)
+    if (appInput->isKeyDown(KeyCode::Q)) visuals.highlightAttackedSquares(ChessState::getAttackedSquares(
+        false, state.getPlayerToMove(), state.getBoardState(), state.getCastlingRights()), board, *painter);
+
+    // Draw Attacked Squares (Opponent)
+    if (appInput->isKeyDown(KeyCode::E)) visuals.highlightAttackedSquares(ChessState::getAttackedSquares(
+        false, state.getOpponent(), state.getBoardState(), state.getCastlingRights()), board, *painter,
+        Color::fromHexcode("#0000ff88"));
 
     // Draw Highlights
     Vector2Int selPos = state.getselPiecePosition();

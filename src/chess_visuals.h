@@ -21,7 +21,7 @@ public:
 
     // Debug
     void highlightAttackedSquares(std::array<std::array<bool, 8>, 8> attackedSquares,
-        ChessBoard& board, Painter& painter);
+        ChessBoard& board, Painter& painter, Color color = Color::fromHexcode("#ff000088"));
 
     // Cursor
     void pieceFollowCursor(Vector2& cursorPos, ChessPieces& pieces, ChessBoard& board,

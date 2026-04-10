@@ -68,6 +68,7 @@ public:
     Vector2Int getLastMoveTarget() const { return lastMoveTarget; }
     const std::array<std::array<MoveType, 8>, 8>& getValidMoves() const { return validMoves; }
     PieceTeam getPlayerToMove() const { return playerToMove; }
+    PieceTeam getOpponent();
     const CastlingRights& getCastlingRights() const { return castlingRights; }
 
 private:

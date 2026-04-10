@@ -239,3 +239,9 @@ std::array<std::array<bool, 8>, 8> ChessState::getAttackedSquares(bool ignoreKin
 
     return attackedSquares;
 }
+
+PieceTeam ChessState::getOpponent() {
+    if (playerToMove == PieceTeam::White) return PieceTeam::Black;
+    if (playerToMove == PieceTeam::Black) return PieceTeam::White;
+    if (playerToMove == PieceTeam::None) return PieceTeam::None;
+}
