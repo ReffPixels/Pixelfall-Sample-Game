@@ -17,9 +17,7 @@ void ChessState::onBoardPressed(Vector2Int square) {
     if (clicked.type != PieceType::None && clicked.team == playerToMove)
         // Clicked on the same square, deselect
         if (square == selectedPosition) {
-            selectedPosition = {-1, -1};
-            inputState = InputState::Normal;
-            ChessMoves::clearMoves(validMoves);
+            deselectPiece();
             return;
         } else selectPiece(square);
     else
@@ -68,54 +66,49 @@ void ChessState::selectPiece(Vector2Int selectedSquare) {
 // Moves the selected piece to a new square and updates the board state to match. 
 // A succesful move triggers the next turn.
 void ChessState::moveSelectedPiece(Vector2Int targetSquare) {
-    // A piece is not selected, don't move anything
+    MoveType moveType = validMoves[targetSquare.x][targetSquare.y];
+
     if (inputState != InputState::PieceSelected) return;
-    // Clicked on the same square, don't move anything.
     if (targetSquare == selectedPosition) return;
-    // targetSquare is not a valid move (Deselect)
-    if (validMoves[targetSquare.x][targetSquare.y] == MoveType::None) {
-        selectedPosition = {-1, -1};
-        inputState = InputState::Normal;
-        ChessMoves::clearMoves(validMoves);
+    if (moveType == MoveType::None) {
+        deselectPiece();
         return;
     }
 
-    PieceInfo& selected = boardState[selectedPosition.x][selectedPosition.y];
-    PieceInfo& target = boardState[targetSquare.x][targetSquare.y];
+    movePiece(selectedPosition, targetSquare, moveType);
+    deselectPiece();
+    nextTurn();
+}
+
+// Moves a piece from an origin square to a target square and applies rules based on the type of move.
+void ChessState::movePiece(Vector2Int origin, Vector2Int target, MoveType moveType) {
+    PieceInfo& selected = boardState[origin.x][origin.y];
+    PieceInfo& targetPiece = boardState[target.x][target.y];
 
     // Reset enPassant availability
     enPassantTargetSquare = {-1, -1};
 
-    // There's a piece in the target square!
-    if (target.type != PieceType::None) 
-        if (target.team == playerToMove) return; // It's an an ally piece (Invalid move)   
-        else moveRuleCounter = 0; // It's a capture (Reset 50 move rule)
+    // Update move rule counter
+    if (targetPiece.type != PieceType::None) moveRuleCounter = 0;
     else moveRuleCounter++;
 
-    // Move Piece
-    target = selected;
+    // Move piece
+    targetPiece = selected;
+    lastMoveOrigin = origin;
+    lastMoveTarget = target;
 
-    // Record Move
-    lastMoveOrigin = selectedPosition;
-    lastMoveTarget = targetSquare;
+    // Was it a double pawn push? Record en passant square.
+    if (selected.type == PieceType::Pawn && abs(target.y - origin.y) == 2)
+        enPassantTargetSquare = {target.x, (origin.y + target.y) / 2};
 
-    // Record En Passant availability
-    if (selected.type == PieceType::Pawn && abs(lastMoveTarget.y - lastMoveOrigin.y) == 2)
-        enPassantTargetSquare = {targetSquare.x, (lastMoveOrigin.y + lastMoveTarget.y) / 2};
-
-    // Was it en passant capture? Remove the captured pawn.
-    if (validMoves[targetSquare.x][targetSquare.y] == MoveType::EnPassant)
-        boardState[targetSquare.x][selectedPosition.y] = {PieceType::None, PieceTeam::None};
+    // Was it en passant? Remove the captured pawn.
+    if (moveType == MoveType::EnPassant)
+        boardState[target.x][origin.y] = {PieceType::None, PieceTeam::None};
 
     // Remove piece from its previous position
     selected = {PieceType::None, PieceTeam::None};
-    
-    // Deselect Piece
-    selectedPosition = {-1, -1};
-    inputState = InputState::Normal;
-
-    nextTurn();
 }
+
 
 // Swaps the current player (Local)
 void ChessState::nextTurn() {
@@ -170,4 +163,11 @@ void ChessState::updateCastlingRights() {
         bKingSideCastling = false;
         bQueenSideCastling = false;
     }
+}
+
+// Reset selected piece trackers
+void ChessState::deselectPiece() {
+    selectedPosition = {-1, -1};
+    inputState = InputState::Normal;
+    ChessMoves::clearMoves(validMoves);
 }

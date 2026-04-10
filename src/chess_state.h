@@ -51,7 +51,9 @@ public:
 
     // Gameplay
     void selectPiece(Vector2Int selectedSquare);
+    void deselectPiece();
     void moveSelectedPiece(Vector2Int targetSquare);
+    void movePiece(Vector2Int origin, Vector2Int target, MoveType moveType);
     void updateCastlingRights();
     void nextTurn();
 
