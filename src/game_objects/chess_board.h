@@ -6,6 +6,11 @@
 #include "pixelfall/engine/graphics/painter.h"
 #include "config/chess_theme.h"
 
+enum class BoardDirection {
+    BlackOnTop,
+    WhiteOnTop
+};
+
 class ChessBoard {
 public:
     // Constructor
@@ -14,6 +19,7 @@ public:
     // Getters
     const Vector2& getPosition() const { return boardPosition; };
     const Vector2& getTileSize() const { return tileSize; };
+    const BoardDirection& getBoardDirection() const { return boardDirection; };
 
     // Setters
     void setPosition(Vector2 boardPosition) { this->boardPosition = boardPosition; };
@@ -23,7 +29,9 @@ public:
     bool isBoardOnHover(Vector2 mousePosition);
     std::string getSquareOnHover(Vector2 mousePosition);
 private:
-    Vector2 boardPosition;
+    // Board Settings
+    Vector2 boardPosition{Vector2::Zero};
+    BoardDirection boardDirection{BoardDirection::BlackOnTop};
 
     // Theme
     Vector2 tileSize{80.0f, 80.0f};  // width:height = 2:1

@@ -40,3 +40,6 @@ build/
 # Exceptions
 !external/**/*.dll
 !external/**/*.lib
+
+# Local Files Folder
+local/

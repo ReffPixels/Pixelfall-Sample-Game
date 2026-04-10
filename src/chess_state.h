@@ -12,20 +12,21 @@
 #include <vector>
 
 enum class GameOutcome {
-    Playing,                    // Done
-    WhiteVictoryCheckmate,      // Done
-    BlackVictoryCheckmate,      // Done
-    WhiteVictoryResignation,    // [TODO] Button system
-    BlackVictoryResignation,    // [TODO] Button system
-    WhiteVictoryTimeout,        // [TODO] Clock
-    BlackVictoryTimeout,        // [TODO] Clock
-    DrawStalemate,              // Done
-    DrawInsufficientMaterial,   // [TODO] Insufficient Material Detection
-    Draw50Move,                 // [TODO] Button system (50 Move is not automatic)
-    Draw75Move,                 // Done
-    Draw3FoldRepetition,        // [TODO] Fen snapshots?
-    Draw5FoldRepetition,        // [TODO] Fen snapshots?
-    DrawAgreement,              // [TODO] Button system
+    Playing,                            // The game is currently in progress
+    WhiteVictoryCheckmate,              // There are no legal moves for black and the king is under check
+    BlackVictoryCheckmate,              // There are no legal moves for white and the king is under check
+    WhiteVictoryResignation,            // [TODO] Button system
+    BlackVictoryResignation,            // [TODO] Button system
+    WhiteVictoryTimeout,                // [TODO] Clock
+    BlackVictoryTimeout,                // [TODO] Clock
+    DrawTimeoutVsInsufficientMaterial,  // [TODO] Clock
+    DrawStalemate,                      // There are no legal moves for the player but their king is not under check
+    DrawInsufficientMaterial,           // [TODO] Insufficient Material Detection
+    Draw50Move,                         // [TODO] Button system (50 Move is not automatic)
+    Draw75Move,                         // 75 Half moves have passed since the last capture or pawn move.
+    Draw3FoldRepetition,                // [TODO] Fen snapshots?
+    Draw5FoldRepetition,                // [TODO] Fen snapshots?
+    DrawAgreement,                      // [TODO] Button system
 };
 
 enum class InputState { Normal, PieceSelected, };
@@ -60,7 +61,7 @@ public:
         const std::array<std::array<PieceInfo, 8>, 8>& boardState, const CastlingRights& castlingRights);
     void nextTurn();
     void endGame();
-    void resetGame();
+    void resetGame(PieceTeam startingPlayer = PieceTeam::White);
 
     // Getters
     const std::array<std::array<PieceInfo, 8>, 8>& getBoardState() const { return boardState; }

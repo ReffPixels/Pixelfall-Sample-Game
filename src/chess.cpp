@@ -4,6 +4,7 @@
 // Standard Library
 #include <iostream>
 #include <algorithm>
+#include <random> // For selecting a player
 
 // Create Game
 PIXELFALL_APPLICATION(Chess);
@@ -19,8 +20,16 @@ bool Chess::onStart() {
     // Window Settings
     appWindow->setWReferenceSize({720, 720});
 
-    // Get initial state of board
-    state.setupFromFEN();
+    // Randomly choose who plays first
+    // Generate random sequence with Mersenne Twister Algorithm. 
+    // Eventually we'll want an engine random header that handles this instead.
+    std::mt19937 rng(std::random_device{}());
+    // Bernoulli Distribution 
+    // This returns a bool (True or False) at a given chance (50 % in this case) by using a random sequence item.
+    std::bernoulli_distribution coinFlip(0.5);
+
+    // Set initial state of board (Randomly picks first player)
+    state.resetGame((coinFlip(rng)) ? PieceTeam::White : PieceTeam::Black);
 
     return true;
 }

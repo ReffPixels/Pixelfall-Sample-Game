@@ -268,9 +268,12 @@ void ChessState::endGame() {
     }
 }
 
-void ChessState::resetGame() {
+void ChessState::resetGame(PieceTeam startingPlayer) {
+    // Defaults to white moving first
+    playerToMove = startingPlayer;
+    
+    // Reset board state and trackers
     gameOutcome = GameOutcome::Playing;
-    playerToMove = PieceTeam::White;
     castlingRights = {true, true, true, true};
     enPassantTargetSquare = {-1, -1};
     moveRuleCounter = 0;
