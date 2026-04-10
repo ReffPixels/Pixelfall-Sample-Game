@@ -72,7 +72,7 @@ void ChessVisuals::highlightValidMoves(std::array<std::array<MoveType, 8>, 8> va
                     board.getTileSize().x * 0.15f,
                     Color::fromHexcode("#6e422d55")
                 );
-            else if (validMoves[file][rank] == MoveType::Capture) {
+            else if ((validMoves[file][rank] == MoveType::Capture) || (validMoves[file][rank] == MoveType::EnPassant)) {
                 painter.drawCircleHollow(
                     Vector2(board.getPosition().x + (float)file * board.getTileSize().x + board.getTileSize().x / 2,
                         board.getPosition().y + (float)rank * board.getTileSize().y + board.getTileSize().y / 2),

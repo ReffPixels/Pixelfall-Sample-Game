@@ -40,7 +40,7 @@ std::array<std::array<MoveType, 8>, 8> ChessMoves::generateKnightMoves(
 
 std::array<std::array<MoveType, 8>, 8> ChessMoves::generatePawnMoves(
     Vector2Int moveOrigin, PieceTeam pieceTeam, std::array<std::array<PieceInfo, 8>, 8> boardState,
-    bool isFirstMove, int enPassant) {
+    Vector2Int enPassantTargetSquare, bool isFirstMove) {
     
     std::array<std::array<MoveType, 8>, 8> moves;
     clearMoves(moves);
@@ -80,11 +80,15 @@ std::array<std::array<MoveType, 8>, 8> ChessMoves::generatePawnMoves(
         if (targetSquare.x < 0 || targetSquare.x > 7 || targetSquare.y < 0 || targetSquare.y > 7)
             continue;
 
+        // There is a piece in this square
         if (boardState[targetSquare.x][targetSquare.y].type != PieceType::None) {
             if (boardState[targetSquare.x][targetSquare.y].team != pieceTeam)
                 moves[targetSquare.x][targetSquare.y] = MoveType::Capture;
             continue;
         }
+        // Empty square (Could it be en passant?)
+        if (targetSquare == enPassantTargetSquare)
+            moves[targetSquare.x][targetSquare.y] = MoveType::EnPassant;
     }
 
     return moves;

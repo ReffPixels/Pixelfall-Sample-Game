@@ -38,7 +38,7 @@ struct Move {
     Vector2Int target;
 };
 
-enum class MoveType { None, Move, Capture };
+enum class MoveType { None, Move, Capture, EnPassant };
 
 class ChessState {
 public:

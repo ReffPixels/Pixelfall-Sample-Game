@@ -58,7 +58,7 @@ void ChessState::selectPiece(Vector2Int selectedSquare) {
         else isFirstMove = (selectedPosition.y == 1);
 
         validMoves = ChessMoves::generatePawnMoves(
-            selectedPosition, team, boardState, isFirstMove, isFirstMove);
+            selectedPosition, team, boardState, enPassantTargetSquare, isFirstMove);
         break;
     }
     default: ChessMoves::clearMoves(validMoves);
@@ -83,6 +83,9 @@ void ChessState::moveSelectedPiece(Vector2Int targetSquare) {
     PieceInfo& selected = boardState[selectedPosition.x][selectedPosition.y];
     PieceInfo& target = boardState[targetSquare.x][targetSquare.y];
 
+    // Reset enPassant availability
+    enPassantTargetSquare = {-1, -1};
+
     // There's a piece in the target square!
     if (target.type != PieceType::None) 
         if (target.team == playerToMove) return; // It's an an ally piece (Invalid move)   
@@ -91,12 +94,22 @@ void ChessState::moveSelectedPiece(Vector2Int targetSquare) {
 
     // Move Piece
     target = selected;
-    selected = {PieceType::None, PieceTeam::None};
 
     // Record Move
     lastMoveOrigin = selectedPosition;
     lastMoveTarget = targetSquare;
 
+    // Record En Passant availability
+    if (selected.type == PieceType::Pawn && abs(lastMoveTarget.y - lastMoveOrigin.y) == 2)
+        enPassantTargetSquare = {targetSquare.x, (lastMoveOrigin.y + lastMoveTarget.y) / 2};
+
+    // Was it en passant capture? Remove the captured pawn.
+    if (validMoves[targetSquare.x][targetSquare.y] == MoveType::EnPassant)
+        boardState[targetSquare.x][selectedPosition.y] = {PieceType::None, PieceTeam::None};
+
+    // Remove piece from its previous position
+    selected = {PieceType::None, PieceTeam::None};
+    
     // Deselect Piece
     selectedPosition = {-1, -1};
     inputState = InputState::Normal;

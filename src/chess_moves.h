@@ -19,7 +19,7 @@ public:
         Vector2Int moveOrigin, PieceTeam pieceTeam, std::array<std::array<PieceInfo, 8>, 8> boardState);
     static std::array<std::array<MoveType, 8>, 8> generatePawnMoves(
         Vector2Int moveOrigin, PieceTeam pieceTeam, std::array<std::array<PieceInfo, 8>, 8> boardState,
-        bool isFirstMove = false, int enPassant = 0);
+        Vector2Int enPassantTargetSquare, bool isFirstMove = false);
 
     // Helpers
     static std::array<std::array<MoveType, 8>, 8> ChessMoves::generateMoves(
