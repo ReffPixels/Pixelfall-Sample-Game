@@ -35,27 +35,32 @@ void ChessState::onBoardReleased(Vector2Int square) {
 void ChessState::selectPiece(Vector2Int selectedSquare) {
     selectedPosition = selectedSquare;
     inputState = InputState::PieceSelected;
+    PieceTeam team = boardState[selectedPosition.x][selectedPosition.y].team;
     switch (boardState[selectedPosition.x][selectedPosition.y].type) {
     case PieceType::King:
-        validMoves = ChessMoves::generateKingMoves(
-            selectedPosition, boardState[selectedPosition.x][selectedPosition.y].team, boardState);
+        validMoves = ChessMoves::generateKingMoves(selectedPosition, team, boardState);
         break;
     case PieceType::Queen:
-        validMoves = ChessMoves::generateQueenMoves(
-            selectedPosition, boardState[selectedPosition.x][selectedPosition.y].team, boardState);
+        validMoves = ChessMoves::generateQueenMoves(selectedPosition, team, boardState);
         break;
     case PieceType::Rook:
-        validMoves = ChessMoves::generateRookMoves(
-            selectedPosition, boardState[selectedPosition.x][selectedPosition.y].team, boardState);
+        validMoves = ChessMoves::generateRookMoves(selectedPosition, team, boardState);
         break;
     case PieceType::Bishop:
-        validMoves = ChessMoves::generateBishopMoves(
-            selectedPosition, boardState[selectedPosition.x][selectedPosition.y].team, boardState);
+        validMoves = ChessMoves::generateBishopMoves(selectedPosition, team, boardState);
         break;
     case PieceType::Knight:
-        validMoves = ChessMoves::generateKnightMoves(
-            selectedPosition, boardState[selectedPosition.x][selectedPosition.y].team, boardState);
+        validMoves = ChessMoves::generateKnightMoves(selectedPosition, team, boardState);
         break;
+    case PieceType::Pawn: {
+        bool isFirstMove{};
+        if (team == PieceTeam::White) isFirstMove = (selectedPosition.y == 6);
+        else isFirstMove = (selectedPosition.y == 1);
+
+        validMoves = ChessMoves::generatePawnMoves(
+            selectedPosition, team, boardState, isFirstMove, isFirstMove);
+        break;
+    }
     default: ChessMoves::clearMoves(validMoves);
     }
 }
@@ -67,6 +72,13 @@ void ChessState::moveSelectedPiece(Vector2Int targetSquare) {
     if (inputState != InputState::PieceSelected) return;
     // Clicked on the same square, don't move anything.
     if (targetSquare == selectedPosition) return;
+    // targetSquare is not a valid move (Deselect)
+    if (validMoves[targetSquare.x][targetSquare.y] == MoveType::None) {
+        selectedPosition = {-1, -1};
+        inputState = InputState::Normal;
+        ChessMoves::clearMoves(validMoves);
+        return;
+    }
 
     PieceInfo& selected = boardState[selectedPosition.x][selectedPosition.y];
     PieceInfo& target = boardState[targetSquare.x][targetSquare.y];

@@ -18,8 +18,13 @@ public:
     static std::array<std::array<MoveType, 8>, 8> generateKnightMoves(
         Vector2Int moveOrigin, PieceTeam pieceTeam, std::array<std::array<PieceInfo, 8>, 8> boardState);
     static std::array<std::array<MoveType, 8>, 8> generatePawnMoves(
-        Vector2Int moveOrigin, PieceTeam pieceTeam, std::array<std::array<PieceInfo, 8>, 8> boardState);
-    
+        Vector2Int moveOrigin, PieceTeam pieceTeam, std::array<std::array<PieceInfo, 8>, 8> boardState,
+        bool isFirstMove = false, int enPassant = 0);
+
     // Helpers
+    static std::array<std::array<MoveType, 8>, 8> ChessMoves::generateMoves(
+        Vector2Int moveOrigin, PieceTeam pieceTeam,
+        std::array<std::array<PieceInfo, 8>, 8> boardState,
+        std::vector<Vector2Int> directions, int maxSteps);
     static void clearMoves(std::array<std::array<MoveType, 8>, 8>& moves);
 };
