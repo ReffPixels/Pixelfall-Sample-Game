@@ -243,5 +243,14 @@ std::array<std::array<bool, 8>, 8> ChessState::getAttackedSquares(bool ignoreKin
 PieceTeam ChessState::getOpponent() {
     if (playerToMove == PieceTeam::White) return PieceTeam::Black;
     if (playerToMove == PieceTeam::Black) return PieceTeam::White;
-    if (playerToMove == PieceTeam::None) return PieceTeam::None;
+    return PieceTeam::None;
+}
+
+void ChessState::endGame() {
+    std::cout << "-------------------------------" << std::endl;
+    switch (gameOutcome) {
+    case GameOutcome::WhiteVictoryCheckmate: std::cout << "WHITE VICTORY (CHECKMATE)" << std::endl;
+    case GameOutcome::BlackVictoryCheckmate: std::cout << "BLACK VICTORY (CHECKMATE)" << std::endl;
+    case GameOutcome::DrawStalemate: std::cout << "DRAW (STALEMATE)" << std::endl;
+    }
 }

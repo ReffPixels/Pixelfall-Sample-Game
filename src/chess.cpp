@@ -34,8 +34,8 @@ void Chess::onUpdate() {
     // Center Board
     board.setPosition((appWindow->getLogicalSize() / 2) - (board.getTileSize() * 4));
 
-    // Handle board interaction
-    if (board.isBoardOnHover(cursorPos)) {
+    // Handle board interaction (Stop interaction if the game has ended)
+    if (board.isBoardOnHover(cursorPos) && state.getGameOutcome() == GameOutcome::Playing) {
         Vector2Int hoveredSquare = ChessPieces::getPosFromNotation(board.getSquareOnHover(cursorPos));
         if (appInput->isMouseButtonPressed(MouseButton::Left)) {
             state.onBoardPressed(hoveredSquare);
@@ -50,10 +50,14 @@ void Chess::onUpdate() {
 // Called at the end of each frame (Handles rendering)
 void Chess::onRender() {
     // Draw Background
+    Color backgroundColor{
+        state.getGameOutcome() == GameOutcome::Playing ?
+        Color::fromHexcode("#212121") : Color::fromHexcode("#33ff00")};
+
     painter->drawRectangle(
         Vector2::Zero,
         Vector2(appWindow->getLogicalSize().x, appWindow->getLogicalSize().y),
-        Color::fromHexcode("#212121")
+        backgroundColor
     );
 
     // Draw Board

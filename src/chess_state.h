@@ -12,7 +12,7 @@
 #include <vector>
 
 enum class GameOutcome { // [TODO] Victory detection
-    Undecided,
+    Playing,
     WhiteVictoryCheckmate,
     BlackVictoryCheckmate,
     WhiteVictoryResignation,
@@ -59,6 +59,7 @@ public:
     static std::array<std::array<bool, 8>, 8> getAttackedSquares(bool ignoreKing, PieceTeam playerTeam,
         const std::array<std::array<PieceInfo, 8>, 8>& boardState, const CastlingRights& castlingRights);
     void nextTurn();
+    void endGame();
 
     // Getters
     const std::array<std::array<PieceInfo, 8>, 8>& getBoardState() const { return boardState; }
@@ -70,11 +71,12 @@ public:
     PieceTeam getPlayerToMove() const { return playerToMove; }
     PieceTeam getOpponent();
     const CastlingRights& getCastlingRights() const { return castlingRights; }
+    const GameOutcome& getGameOutcome() const { return gameOutcome; };
 
 private:
     FenParser fenParser;
 
-    // State
+    // State (FEN)
     std::string currentBoardFEN = board::defaults::defaultBoardFEN.data(); // Description of the current board
     std::array<std::array<PieceInfo, 8>, 8> boardState; // 8x8 2D array of files and ranks 
     PieceTeam playerToMove{PieceTeam::White}; // White plays first
@@ -82,7 +84,6 @@ private:
     Vector2Int enPassantTargetSquare{-1, -1}; // [TODO]
     int moveRuleCounter{0}; // Used for 50 fold and 75 fold repetition. Counts on every pawn move or capture.
     int totalFullMoves{1}; // Starts at 1 due to some arcaic reason. Counts up only on black moves.
-    GameOutcome gameOutcome{GameOutcome::Undecided};
 
     // Last Move
     Vector2Int lastMoveOrigin{-1, -1};
@@ -98,6 +99,12 @@ private:
 
     // Moves
     std::array<std::array<MoveType, 8>, 8> validMoves;
+
+    // Game Outcome
+    GameOutcome gameOutcome{GameOutcome::Playing};
+    bool isKingInCheck(PieceTeam team) const;
+    bool hasLegalMoves(PieceTeam team) const;
+    void findGameOutcome();
 };
 
 // [TODO] Some way to track 3 fold and 5 fold repetition (FEN snapshops?)
