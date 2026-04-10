@@ -16,7 +16,7 @@ void ChessState::onBoardPressed(Vector2Int square) {
     // It's a piece in the player's team
     if (clicked.type != PieceType::None && clicked.team == playerToMove)
         // Clicked on the same square, deselect
-        if (square == selectedPosition) {
+        if (square == selPiecePosition) {
             deselectPiece();
             return;
         } else selectPiece(square);
@@ -31,36 +31,13 @@ void ChessState::onBoardReleased(Vector2Int square) {
 
 // Selects a piece in a specific square and changes the input state to selected.
 void ChessState::selectPiece(Vector2Int selectedSquare) {
-    selectedPosition = selectedSquare;
+    selPiecePosition = selectedSquare;
+    PieceInfo& selPieceInfo = boardState[selPiecePosition.x][selPiecePosition.y];
     inputState = InputState::PieceSelected;
-    PieceTeam team = boardState[selectedPosition.x][selectedPosition.y].team;
-    switch (boardState[selectedPosition.x][selectedPosition.y].type) {
-    case PieceType::King:
-        validMoves = ChessMoves::generateKingMoves(selectedPosition, team, boardState, castlingRights);
-        break;
-    case PieceType::Queen:
-        validMoves = ChessMoves::generateQueenMoves(selectedPosition, team, boardState);
-        break;
-    case PieceType::Rook:
-        validMoves = ChessMoves::generateRookMoves(selectedPosition, team, boardState);
-        break;
-    case PieceType::Bishop:
-        validMoves = ChessMoves::generateBishopMoves(selectedPosition, team, boardState);
-        break;
-    case PieceType::Knight:
-        validMoves = ChessMoves::generateKnightMoves(selectedPosition, team, boardState);
-        break;
-    case PieceType::Pawn: {
-        bool isFirstMove{};
-        if (team == PieceTeam::White) isFirstMove = (selectedPosition.y == 6);
-        else isFirstMove = (selectedPosition.y == 1);
-
-        validMoves = ChessMoves::generatePawnMoves(
-            selectedPosition, team, boardState, enPassantTargetSquare, isFirstMove);
-        break;
-    }
-    default: ChessMoves::clearMoves(validMoves);
-    }
+    validMoves = ChessMoves::generateMovesForPiece(
+        selPieceInfo, selPiecePosition, boardState, castlingRights, enPassantTargetSquare);
+    ChessMoves::findLegalMovesForPiece(
+        validMoves, selPieceInfo, selPiecePosition, boardState, castlingRights, enPassantTargetSquare);
 }
 
 // Moves the selected piece to a new square and updates the board state to match. 
@@ -69,13 +46,13 @@ void ChessState::moveSelectedPiece(Vector2Int targetSquare) {
     MoveType moveType = validMoves[targetSquare.x][targetSquare.y];
 
     if (inputState != InputState::PieceSelected) return;
-    if (targetSquare == selectedPosition) return;
+    if (targetSquare == selPiecePosition) return;
     if (moveType == MoveType::None) {
         deselectPiece();
         return;
     }
 
-    movePiece(selectedPosition, targetSquare, moveType);
+    movePiece(selPiecePosition, targetSquare, moveType);
     deselectPiece();
     nextTurn();
 }
@@ -193,7 +170,72 @@ void ChessState::updateCastlingRights() {
 
 // Reset selected piece trackers
 void ChessState::deselectPiece() {
-    selectedPosition = {-1, -1};
+    selPiecePosition = {-1, -1};
     inputState = InputState::Normal;
     ChessMoves::clearMoves(validMoves);
+}
+
+// Find all of the squares attacked by the oponent. 
+// If ignoreKing is set to true, the attacked squares of sliding pieces will ignore the king.
+// This is necessary for finding safe king squares since the king cannot retreat to the squares it was blocking. (X-ray)
+std::array<std::array<bool, 8>, 8> ChessState::getAttackedSquares(bool ignoreKing, PieceTeam playerTeam,
+    const std::array<std::array<PieceInfo, 8>, 8>& boardState, CastlingRights& castlingRights) {
+    // Store attacked squares
+    std::array<std::array<bool, 8>, 8> attackedSquares;
+
+    // Set attacked squares to none
+    for (auto& rank : attackedSquares)
+        for (auto& square : rank)
+            square = false;
+
+    // Store an adjusted board state (In case we are ignoring the king)
+    std::array<std::array<PieceInfo, 8>, 8> adjustedBoardState = boardState;
+    if (ignoreKing) {
+        for (int r = 0; r < 8; r++)
+            for (int f = 0; f < 8; f++)
+                if (boardState[f][r].team == playerTeam && boardState[f][r].type == PieceType::King)
+                    adjustedBoardState[f][r] = {PieceType::None, PieceTeam::None};
+    }
+
+    // Find every enemy piece
+    for (int rank = 0; rank < 8; rank++) {
+        for (int file = 0; file < 8; file++) {
+            PieceInfo& cell = adjustedBoardState[file][rank];
+            // This cell is empty, do nothing
+            if (cell.type == PieceType::None || cell.team == playerTeam)
+                continue; 
+
+            // This cell is a pawn. Pawns attack diagonally so they require special treatment
+            // We don't need an exception for en passant since it doesn't change the attack shape (Diagonal)
+            if (cell.type == PieceType::Pawn) {
+                int direction = (cell.team == PieceTeam::White) ? -1 : 1;
+                int attackRank = rank + direction;
+                if (attackRank >= 0 && attackRank < 8) {
+                    if (file - 1 >= 0) attackedSquares[file - 1][attackRank] = true;
+                    if (file + 1 < 8)  attackedSquares[file + 1][attackRank] = true;
+                }
+                continue;
+            }
+
+            // This cell is a piece other than a pawn, we can use move generation to find its attack squares
+            std::array<std::array<MoveType, 8>, 8> moves =
+                ChessMoves::generateMovesForPiece(cell, Vector2Int(file, rank), adjustedBoardState, castlingRights);
+
+            // Only add valid attack moves to the attacked squares (Not Empty or Castling)
+            // We don't need to account for promotion since forward pawn moves don't attack anyway.
+            for (int r = 0; r < 8; r++) {
+                for (int f = 0; f < 8; f++) {
+                    MoveType m = moves[f][r];
+                    if (m == MoveType::None
+                        || m == MoveType::CastlingKingSide
+                        || m == MoveType::CastlingQueenSide)
+                        continue;
+
+                    attackedSquares[f][r] = true;
+                }
+            }
+        }
+    }
+
+    return attackedSquares;
 }

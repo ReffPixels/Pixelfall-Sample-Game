@@ -56,12 +56,14 @@ public:
     void moveSelectedPiece(Vector2Int targetSquare);
     void movePiece(Vector2Int origin, Vector2Int target, MoveType moveType);
     void updateCastlingRights();
+    static std::array<std::array<bool, 8>, 8> getAttackedSquares(bool ignoreKing, PieceTeam playerTeam,
+        const std::array<std::array<PieceInfo, 8>, 8>& boardState, CastlingRights& castlingRights);
     void nextTurn();
 
     // Getters
     const std::array<std::array<PieceInfo, 8>, 8>& getBoardState() const { return boardState; }
     InputState getInputState() const { return inputState; }
-    Vector2Int getSelectedPosition() const { return selectedPosition; }
+    Vector2Int getselPiecePosition() const { return selPiecePosition; }
     Vector2Int getLastMoveOrigin() const { return lastMoveOrigin; }
     Vector2Int getLastMoveTarget() const { return lastMoveTarget; }
     const std::array<std::array<MoveType, 8>, 8>& getValidMoves() const { return validMoves; }
@@ -89,9 +91,9 @@ private:
 
     // Interaction
     InputState inputState{InputState::Normal};
-    Vector2Int selectedPosition{-1, -1};  // (-1, -1) means no square is selected.
+    Vector2Int selPiecePosition{-1, -1};  // (-1, -1) means no square is selected.
 
-    // Valid Moves
+    // Moves
     std::array<std::array<MoveType, 8>, 8> validMoves;
 };
 

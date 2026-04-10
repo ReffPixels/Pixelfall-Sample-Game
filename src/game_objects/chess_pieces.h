@@ -35,7 +35,7 @@ public:
         Painter& painter, Vector2 pieceOffset = Vector2::Zero);
 
     void drawPieces(std::array<std::array<PieceInfo, 8>, 8> pieces, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
-        Painter& painter, Vector2 pieceOffset = Vector2::Zero, Vector2Int selectedPosition = {-1, -1});
+        Painter& painter, Vector2 pieceOffset = Vector2::Zero, Vector2Int selPiecePosition = {-1, -1});
 
     void drawFree(PieceType type, PieceTeam team, Vector2 physicalPosition, Vector2 spriteSize,
         Painter& painter);

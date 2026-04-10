@@ -5,12 +5,12 @@
 #include <algorithm>
 
 // Draw a highlight on the square of the selected piece
-void ChessVisuals::highlightSelected(ChessBoard& board, Vector2Int selectedPosition, Painter& painter) {
-    if (selectedPosition != Vector2Int{-1, -1}) {
+void ChessVisuals::highlightSelected(ChessBoard& board, Vector2Int selPiecePosition, Painter& painter) {
+    if (selPiecePosition != Vector2Int{-1, -1}) {
         painter.drawRectangle(
             board.getPosition()
-            + Vector2(selectedPosition.x * board.getTileSize().x,
-                selectedPosition.y * board.getTileSize().y),
+            + Vector2(selPiecePosition.x * board.getTileSize().x,
+                selPiecePosition.y * board.getTileSize().y),
             board.getTileSize(),
             Color::fromHexcode("#ffd94e92")
         );
@@ -40,10 +40,10 @@ void ChessVisuals::highlightLastMove(ChessBoard& board, Vector2Int lastMoveOrigi
 
 // Draw a highlight on the square that the cursor is hovering
 void ChessVisuals::highlightHoveredSquare(Vector2& cursorPos, ChessBoard& board,
-    Painter& painter, Vector2Int selectedPosition) {
+    Painter& painter, Vector2Int selPiecePosition) {
     // Snap to grid position
     Vector2Int gridPos = ChessPieces::getPosFromNotation(board.getSquareOnHover(cursorPos));
-    if (gridPos == selectedPosition) return; // Don't draw highlight over origin square
+    if (gridPos == selPiecePosition) return; // Don't draw highlight over origin square
 
     Vector2 snappedPositionInBoard{
         std::clamp(board.getPosition().x + (float)gridPos.x * board.getTileSize().x,
@@ -108,7 +108,7 @@ void ChessVisuals::pieceFollowCursor(Vector2& cursorPos, ChessPieces& pieces, Ch
 }
 
 // Computes the pivot offset so the dragged piece stays attached at the grab point
-Vector2 ChessVisuals::computeDragPivot(Vector2& cursorPos, ChessBoard& board, Vector2Int selectedPosition) {
+Vector2 ChessVisuals::computeDragPivot(Vector2& cursorPos, ChessBoard& board, Vector2Int selPiecePosition) {
     return {cursorPos - (board.getPosition() +
-        Vector2{(float)selectedPosition.x, (float)selectedPosition.y} * board.getTileSize())};
+        Vector2{(float)selPiecePosition.x, (float)selPiecePosition.y} * board.getTileSize())};
 }

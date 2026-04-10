@@ -9,11 +9,11 @@
 class ChessVisuals {
 public:
     // Square Highlights
-    void highlightSelected(ChessBoard& board, Vector2Int selectedPosition, Painter& painter);
+    void highlightSelected(ChessBoard& board, Vector2Int selPiecePosition, Painter& painter);
     void highlightLastMove(ChessBoard& board, Vector2Int lastMoveOrigin,
         Vector2Int lastMoveTarget, Painter& painter);
     void highlightHoveredSquare(Vector2& cursorPos, ChessBoard& board,
-        Painter& painter, Vector2Int selectedPosition);
+        Painter& painter, Vector2Int selPiecePosition);
 
     // Valid Moves
     void highlightValidMoves(std::array<std::array<MoveType, 8>, 8> validMoves,
@@ -22,5 +22,5 @@ public:
     // Cursor
     void pieceFollowCursor(Vector2& cursorPos, ChessPieces& pieces, ChessBoard& board,
         PieceInfo pieceInfo, Painter& painter, Vector2 offset = Vector2::Zero);
-    Vector2 computeDragPivot(Vector2& cursorPos, ChessBoard& board, Vector2Int selectedPosition);
+    Vector2 computeDragPivot(Vector2& cursorPos, ChessBoard& board, Vector2Int selPiecePosition);
 };
