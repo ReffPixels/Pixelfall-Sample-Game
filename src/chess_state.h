@@ -15,18 +15,18 @@ enum class GameOutcome {
     Playing,                            // The game is currently in progress
     WhiteVictoryCheckmate,              // There are no legal moves for black and the king is under check
     BlackVictoryCheckmate,              // There are no legal moves for white and the king is under check
-    WhiteVictoryResignation,            // [TODO] Button system
-    BlackVictoryResignation,            // [TODO] Button system
-    WhiteVictoryTimeout,                // [TODO] Clock
-    BlackVictoryTimeout,                // [TODO] Clock
-    DrawTimeoutVsInsufficientMaterial,  // [TODO] Clock
+    WhiteVictoryResignation,            // [TODO LONG TERM] Button system
+    BlackVictoryResignation,            // [TODO LONG TERM] Button system
+    WhiteVictoryTimeout,                // [TODO LONG TERM] Clock
+    BlackVictoryTimeout,                // [TODO LONG TERM] Clock
+    DrawTimeoutVsInsufficientMaterial,  // [TODO LONG TERM] Clock
     DrawStalemate,                      // There are no legal moves for the player but their king is not under check
-    DrawInsufficientMaterial,           // [TODO] Insufficient Material Detection
-    Draw50Move,                         // [TODO] Button system (50 Move is not automatic)
+    DrawInsufficientMaterial,           // Checkmate is impossible (The pieces left on the board are insufficient)
+    Draw50Move,                         // [TODO LONG TERM] Button system (50 Move is not automatic)
     Draw75Move,                         // 75 Half moves have passed since the last capture or pawn move.
-    Draw3FoldRepetition,                // [TODO] Fen snapshots?
-    Draw5FoldRepetition,                // [TODO] Fen snapshots?
-    DrawAgreement,                      // [TODO] Button system
+    Draw3FoldRepetition,                // [TODO LONG TERM] Fen snapshots
+    Draw5FoldRepetition,                // [TODO LONG TERM] Fen snapshots
+    DrawAgreement,                      // [TODO LONG TERM] Button system
 };
 
 enum class InputState { Normal, PieceSelected, };
