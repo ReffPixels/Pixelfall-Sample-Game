@@ -117,11 +117,9 @@ void ChessState::nextTurn() {
 
     // Swap player
     playerToMove = (playerToMove == PieceTeam::White ? PieceTeam::Black : PieceTeam::White);
-
     // Count full moves
     if (playerToMove == PieceTeam::Black) totalFullMoves++;
-        playerToMove = PieceTeam::White;
-        
+
     deselectPiece();
     updateCastlingRights();
     updatePieceList();
@@ -260,9 +258,9 @@ void ChessState::endGame() {
     }
 }
 
-void ChessState::resetGame(PieceTeam startingPlayer) {
-    // Defaults to white moving first
-    playerToMove = startingPlayer;
+void ChessState::resetGame() {
+    // White always goes first, even if we are playing from black's perspective
+    playerToMove = PieceTeam::White;
     
     // Reset board state and trackers
     gameOutcome = GameOutcome::Playing;
@@ -397,10 +395,6 @@ bool ChessState::hasInsufficientMaterial() {
         }
     }
     return false;
-}
-
-static Vector2Int findPiece() {
-
 }
 
 void ChessState::printStatistics() {

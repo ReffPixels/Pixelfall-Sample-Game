@@ -117,16 +117,16 @@ void Chess::onRender() {
 }
 
 void Chess::startNewGame() {
-    // Randomly choose who plays first using Bernoulli Distribution 
+    // Randomly choose the player team using Bernoulli Distribution 
      // This returns a bool (True or False) at a given chance (50 % in this case) by using our random sequence (rng)
     std::bernoulli_distribution coinFlip(0.5);
-    PieceTeam firstPlayer = (coinFlip(rng)) ? PieceTeam::White : PieceTeam::Black;
+    PieceTeam playerTeam = (coinFlip(rng)) ? PieceTeam::White : PieceTeam::Black;
 
     // Set initial state of board.
-    state.resetGame(firstPlayer);
+    state.resetGame();
 
     // We need to flip the board and pieces here since state does not handle board visuals.
-    if (firstPlayer == PieceTeam::White) {
+    if (playerTeam == PieceTeam::White) {
         board.setBoardDirection(BoardDirection::BlackOnTop);
         pieces.setFlippedPieces(false);
     }
