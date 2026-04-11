@@ -13,6 +13,7 @@
 #include <memory>
 #include <array>
 #include <vector>
+#include <random>
 
 class Chess : public Application {
 public:
@@ -25,9 +26,15 @@ private:
     Vector2 cursorPos{};
     Vector2 dragAndDropPivot{Vector2::Zero};
 
+    // Generate reusable random sequence with Mersenne Twister Algorithm.
+    // [TODO] This should be provided by the Engine.
+    std::mt19937 rng{std::random_device{}()};
+
     // Chess
     ChessState state;
     ChessBoard board;
     ChessPieces pieces;
     ChessVisuals visuals;
+
+    void startNewGame();
 };

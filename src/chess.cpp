@@ -4,7 +4,6 @@
 // Standard Library
 #include <iostream>
 #include <algorithm>
-#include <random> // For selecting a player
 
 // Create Game
 PIXELFALL_APPLICATION(Chess);
@@ -20,29 +19,8 @@ bool Chess::onStart() {
     // Window Settings
     appWindow->setWReferenceSize({720, 720});
 
-    // Generate reusable random sequence with Mersenne Twister Algorithm. 
-    // Eventually we'll want an engine random header that handles this instead.
-    std::mt19937 rng(std::random_device{}());
-
-    // Randomly choose who plays first using Bernoulli Distribution 
-    // This returns a bool (True or False) at a given chance (50 % in this case) by using our random sequence (rng)
-    std::bernoulli_distribution coinFlip(0.5);
-    PieceTeam firstPlayer = (coinFlip(rng)) ? PieceTeam::White : PieceTeam::Black;
-
-    // Set initial state of board.
-    state.resetGame(firstPlayer);
-
-    // We need to flip the board here since state does not handle board visuals.
-    if (firstPlayer == PieceTeam::White) {
-        board.setBoardDirection(BoardDirection::BlackOnTop);
-        pieces.setFlippedPieces(false);
-    }
-    else {
-        board.setBoardDirection(BoardDirection::WhiteOnTop);
-        pieces.setFlippedPieces(true);
-    }
-
-    // The pieces need to be drawn based on the newly assigned board direction
+    // Start new chess game
+    startNewGame();
 
     return true;
 }
@@ -73,9 +51,9 @@ void Chess::onUpdate() {
         }
     }
     else {
-        // Game has ended, only action is reset
+        // Game has ended, only action is to reset the game
         if (appInput->isMouseButtonPressed(MouseButton::Left)) {
-            state.resetGame();
+            startNewGame();
         }
     }
 }
@@ -130,5 +108,25 @@ void Chess::onRender() {
     if (dragAndDrop) {
         visuals.pieceFollowCursor(cursorPos, pieces, board,
             state.getBoardState()[selPos.x][selPos.y], *painter, dragAndDropPivot);
+    }
+}
+
+void Chess::startNewGame() {
+    // Randomly choose who plays first using Bernoulli Distribution 
+     // This returns a bool (True or False) at a given chance (50 % in this case) by using our random sequence (rng)
+    std::bernoulli_distribution coinFlip(0.5);
+    PieceTeam firstPlayer = (coinFlip(rng)) ? PieceTeam::White : PieceTeam::Black;
+
+    // Set initial state of board.
+    state.resetGame(firstPlayer);
+
+    // We need to flip the board and pieces here since state does not handle board visuals.
+    if (firstPlayer == PieceTeam::White) {
+        board.setBoardDirection(BoardDirection::BlackOnTop);
+        pieces.setFlippedPieces(false);
+    }
+    else {
+        board.setBoardDirection(BoardDirection::WhiteOnTop);
+        pieces.setFlippedPieces(true);
     }
 }
