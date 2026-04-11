@@ -271,6 +271,8 @@ void ChessState::resetGame() {
     lastMoveOrigin = {-1, -1};
     lastMoveTarget = {-1, -1};
     setupFromFEN();
+
+    printStatistics();
 }
 
 // Returns true if the given team's king is currently being attacked.
@@ -398,10 +400,10 @@ bool ChessState::hasInsufficientMaterial() {
 }
 
 void ChessState::printStatistics() {
-    std::cout << "-------------------------------" << std::endl;
-    std::cout << "Player to Move: " << static_cast<int>(playerToMove) << std::endl;
-    std::cout << "Half Moves: " << moveRuleCounter << std::endl;
-    std::cout << "Full Moves: " << totalFullMoves << std::endl;
+    std::cout << "-------------------------------" << '\n';
+    std::cout << "Player to Move: " << static_cast<int>(playerToMove) << '\n';
+    std::cout << "Half Moves: " << moveRuleCounter << '\n';
+    std::cout << "Full Moves: " << totalFullMoves << '\n';
     std::cout << "Castling Rights KQkq: " << castlingRights.whiteKingSide << castlingRights.whiteQueenSide
         << castlingRights.blackKingSide << castlingRights.blackQueenSide << std::endl;
 }
