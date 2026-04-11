@@ -35,8 +35,26 @@ void PromotionInterface::drawPieces(ChessPieces& chessPieces, Vector2Int pawnPos
 }
 
 // Get the specific square under the cursor
-std::string PromotionInterface::getSquareOnHover(Vector2 mousePosition) {
-        // Vector2 squarePosition{(mousePosition - boardPosition) / tileSize.x};
-        // return ChessPieces::getNotationFromPos({(int)squarePosition.x, getRankByDirection((int)squarePosition.y)});
-        return "woah";
+PieceType PromotionInterface::getPieceOnHover(Vector2 mousePos, Vector2Int pawnPosition, PieceTeam playerTeam,
+    Vector2 boardPosition, Vector2 tileSize, bool flipPieces) {
+
+    Vector2 physicalPawnPosition{boardPosition.x + (float)pawnPosition.x * tileSize.x,
+        boardPosition.y + (flipPieces ? 7 - (float)pawnPosition.y : (float)pawnPosition.y) * tileSize.y};
+
+    bool flipUIPosition{(playerTeam == PieceTeam::White && flipPieces) || (playerTeam == PieceTeam::Black && !flipPieces)};
+    
+    Vector2 backgroundPosition{physicalPawnPosition.x - tileSize.x * 1.5f,
+    physicalPawnPosition.y + (flipUIPosition ? tileSize.y : -tileSize.y)};
+
+    // Check that the mouse is inside the UI
+    if (mousePos.x < backgroundPosition.x || mousePos.x > backgroundPosition.x + tileSize.x * 4) return PieceType::None;
+    if (mousePos.y < backgroundPosition.y || mousePos.y > backgroundPosition.y + tileSize.y) return PieceType::None;
+
+    switch ((int)((mousePos.x - backgroundPosition.x) / tileSize.x)) {
+    case 0: return PieceType::Queen;
+    case 1: return PieceType::Rook;
+    case 2: return PieceType::Bishop;
+    case 3: return PieceType::Knight;
+    default: return PieceType::None;
+    }
 }

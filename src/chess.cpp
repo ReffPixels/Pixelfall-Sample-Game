@@ -54,6 +54,17 @@ void Chess::onUpdate() {
             }
             if (appInput->isMouseButtonReleased(MouseButton::Left)) state.onBoardReleased(hoveredSquare);
         }
+        // Promotion UI Interaction
+        if (state.getInputState() == InputState::Promotion) {
+            if (appInput->isMouseButtonPressed(MouseButton::Left)) {
+                bool flipPieces = board.getBoardDirection() != BoardDirection::BlackOnTop;
+                PieceType chosenPiece = promotionUI.getPieceOnHover(cursorPos, state.getPromotionPosition(),
+                    state.getPlayerToMove(), board.getPosition(), board.getTileSize(), flipPieces);
+                if (chosenPiece != PieceType::None)
+                    state.onPromotionSelected(chosenPiece);
+            }
+        }
+
     }
     else {
         // Game has ended, only action is to reset the game

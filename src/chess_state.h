@@ -81,6 +81,7 @@ public:
     const CastlingRights& getCastlingRights() const { return castlingRights; }
     const GameOutcome& getGameOutcome() const { return gameOutcome; };
     Vector2Int getPromotionPosition() const { return promotionPosition; }
+    void onPromotionSelected(PieceType pieceType);
 
 private:
     FenParser fenParser;

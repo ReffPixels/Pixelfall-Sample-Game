@@ -127,7 +127,6 @@ void ChessState::movePiece(Vector2Int origin, Vector2Int target, MoveType moveTy
 
 // Swaps the current player and runs necessary functions to set up the next turn (Or end the game)
 void ChessState::nextTurn() {
-
     // Swap player
     playerToMove = (playerToMove == PieceTeam::White ? PieceTeam::Black : PieceTeam::White);
     // Count full moves
@@ -419,4 +418,9 @@ void ChessState::printStatistics() {
     std::cout << "Full Moves: " << totalFullMoves << '\n';
     std::cout << "Castling Rights KQkq: " << castlingRights.whiteKingSide << castlingRights.whiteQueenSide
         << castlingRights.blackKingSide << castlingRights.blackQueenSide << std::endl;
+}
+
+void ChessState::onPromotionSelected(PieceType pieceType) {
+    boardState[promotionPosition.x][promotionPosition.y] = {pieceType, playerToMove};
+    nextTurn();
 }
