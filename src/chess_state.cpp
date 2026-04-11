@@ -342,3 +342,7 @@ void ChessState::findGameOutcome() {
 
     endGame();
 }
+
+void ChessState::removePiece(Vector2Int position) {
+    boardState[position.x][position.y] = {PieceType::None, PieceTeam::None};
+}

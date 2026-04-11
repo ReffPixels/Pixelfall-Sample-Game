@@ -47,6 +47,10 @@ void Chess::onUpdate() {
                 if (state.getInputState() == InputState::PieceSelected)
                     dragAndDropPivot = visuals.computeDragPivot(cursorPos, board, state.getselPiecePosition());
             }
+            // [TEMP DEBUG] Delete Piece on Hover
+            if (appInput->isKeyPressed(KeyCode::Delete)) {
+                state.removePiece(hoveredSquare);
+            }
             if (appInput->isMouseButtonReleased(MouseButton::Left)) state.onBoardReleased(hoveredSquare);
         }
     }

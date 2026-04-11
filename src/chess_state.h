@@ -63,6 +63,9 @@ public:
     void endGame();
     void resetGame(PieceTeam startingPlayer = PieceTeam::White);
 
+    // Debug
+    void removePiece(Vector2Int position);
+
     // Getters
     const std::array<std::array<PieceInfo, 8>, 8>& getBoardState() const { return boardState; }
     InputState getInputState() const { return inputState; }
@@ -110,6 +113,7 @@ private:
 };
 
 // [TODO] Lerp animation piece when clicking instead of dragging
+// [TODO] Pawn Promotion Selection UI
 
 // Insufficient Material Rules:
 // king versus king
