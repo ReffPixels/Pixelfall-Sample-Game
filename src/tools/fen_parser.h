@@ -4,34 +4,23 @@
 
 #pragma once
 // Chess
-#include "game_objects/chess_pieces.h"
+#include "config/chess_config.h"
 // Standard Library
 #include <string>
-#include <map>
-#include <array>
+#include <vector>
 
-class FenParser {
-public:
-    // Methods
-    std::array<std::array<PieceInfo, 8>, 8> getBoardFromFEN(const std::string fenString);
-
-private:
-    std::map<char, PieceInfo> pieceCodes = {
-        // White
-        {'K', {PieceType::King, PieceTeam::White}},
-        {'Q', {PieceType::Queen, PieceTeam::White}},
-        {'R', {PieceType::Rook, PieceTeam::White}},
-        {'B', {PieceType::Bishop, PieceTeam::White}},
-        {'N', {PieceType::Knight, PieceTeam::White}},
-        {'P', {PieceType::Pawn, PieceTeam::White}},
-        // Black
-        {'k', {PieceType::King, PieceTeam::Black}},
-        {'q', {PieceType::Queen, PieceTeam::Black}},
-        {'r', {PieceType::Rook, PieceTeam::Black}},
-        {'b', {PieceType::Bishop, PieceTeam::Black}},
-        {'n', {PieceType::Knight, PieceTeam::Black}},
-        {'p', {PieceType::Pawn, PieceTeam::Black}}
-    };
+// FEN string translated to game data
+struct FenState {
+    std::vector<Piece> pieceList;
+    TeamColor playerToMove{TeamColor::White}; // Player that gets to move next.
+    CastlingRights castlingRights{false, false, false, false}; // Tracker for who's lost their castling rights.
+    Vector2Int enPassantTargetSquare{-1, -1}; // Record where en passant is possible (Cannot be deduced from positions)
+    int moveRuleCounter{0}; // Used for 50 fold and 75 fold repetition. Counts on every pawn move or capture.
+    int totalFullMoves{1}; // Starts at 1 due to some arcaic reason. Counts up only on black moves.
 };
 
-// [TODO] Opposite getter, Update FEN string based on array
+// Utility functions for parsing FEN strings
+namespace FenParser {
+    FenState getState(const std::string& fenString);
+    Piece getPieceFromSymbol(char symbol, Vector2Int position);
+};

@@ -11,35 +11,20 @@
 #include <array>
 #include <vector>
 
-enum class GameOutcome {
-    Playing,                            // The game is currently in progress
-    WhiteVictoryCheckmate,              // There are no legal moves for black and the king is under check
-    BlackVictoryCheckmate,              // There are no legal moves for white and the king is under check
-    WhiteVictoryResignation,            // [TODO LONG TERM] Button system
-    BlackVictoryResignation,            // [TODO LONG TERM] Button system
-    WhiteVictoryTimeout,                // [TODO LONG TERM] Clock
-    BlackVictoryTimeout,                // [TODO LONG TERM] Clock
-    DrawTimeoutVsInsufficientMaterial,  // [TODO LONG TERM] Clock
-    DrawStalemate,                      // There are no legal moves for the player but their king is not under check
-    DrawInsufficientMaterial,           // Checkmate is impossible (The pieces left on the board are insufficient)
-    Draw50Move,                         // [TODO LONG TERM] Button system (50 Move is not automatic)
-    Draw75Move,                         // 75 Half moves have passed since the last capture or pawn move.
-    Draw3FoldRepetition,                // [TODO LONG TERM] Fen snapshots
-    Draw5FoldRepetition,                // [TODO LONG TERM] Fen snapshots
-    DrawAgreement,                      // [TODO LONG TERM] Button system
+enum class InputState {
+    Normal,         // Default state. The user can select a piece.
+    PieceSelected,  // The user has selected a piece. Moving and capturing is available.
+    Promotion       // The user has moved a pawn to a promoting square and they need to choose a piece type.
 };
 
-enum class InputState { Normal, PieceSelected, Promotion};
-
-enum class MoveType { None, Move, Capture, EnPassant, CastlingKingSide, CastlingQueenSide, Promotion, CapturePromotion };
-
-struct Move { Vector2Int origin; Vector2Int target; };
-
-struct CastlingRights {
-    bool whiteKingSide;
-    bool whiteQueenSide;
-    bool blackKingSide;
-    bool blackQueenSide;
+struct BoardState {
+    // State (FEN)
+    std::vector<Piece> pieceList;
+    TeamColor playerToMove{TeamColor::White}; // Player that gets to move next.
+    CastlingRights castlingRights{true, true, true, true}; // Tracker for who's lost their castling rights.
+    Vector2Int enPassantTargetSquare{-1, -1}; // Record where en passant is possible (Cannot be deduced from positions)
+    int moveRuleCounter{0}; // Used for 50 fold and 75 fold repetition. Counts on every pawn move or capture.
+    int totalFullMoves{1}; // Starts at 1 due to some arcaic reason. Counts up only on black moves.
 };
 
 class ChessState {
@@ -57,7 +42,7 @@ public:
     void moveSelectedPiece(Vector2Int targetSquare);
     void movePiece(Vector2Int origin, Vector2Int target, MoveType moveType);
     void updateCastlingRights();
-    static std::array<std::array<bool, 8>, 8> getAttackedSquares(bool ignoreKing, PieceTeam playerTeam,
+    static std::array<std::array<bool, 8>, 8> getAttackedSquares(bool ignoreKing, TeamColor playerTeam,
         const std::array<std::array<PieceInfo, 8>, 8>& boardState, const CastlingRights& castlingRights);
     void nextTurn();
     void endGame();
@@ -70,15 +55,13 @@ public:
     void printStatistics();
 
     // Getters
-    const std::array<std::array<PieceInfo, 8>, 8>& getBoardState() const { return boardState; }
+    const BoardState& getBoardState() const { return boardStatus; }
     InputState getInputState() const { return inputState; }
     Vector2Int getselPiecePosition() const { return selPiecePosition; }
     Vector2Int getLastMoveOrigin() const { return lastMoveOrigin; }
     Vector2Int getLastMoveTarget() const { return lastMoveTarget; }
     const std::array<std::array<MoveType, 8>, 8>& getValidMoves() const { return validMoves; }
-    PieceTeam getPlayerToMove() const { return playerToMove; }
-    PieceTeam getOpponent();
-    const CastlingRights& getCastlingRights() const { return castlingRights; }
+    TeamColor getOpponent();
     const GameOutcome& getGameOutcome() const { return gameOutcome; };
     Vector2Int getPromotionPosition() const { return promotionPosition; }
     void onPromotionSelected(PieceType pieceType);
@@ -86,16 +69,12 @@ public:
 private:
     FenParser fenParser;
 
-    // State (FEN)
-    std::string currentBoardFEN = board::defaults::defaultBoardFEN.data(); // Description of the current board
-    std::array<std::array<PieceInfo, 8>, 8> boardState; // 8x8 2D array of files and ranks 
-    PieceTeam playerToMove{PieceTeam::White}; // White plays first
-    CastlingRights castlingRights{ true, true, true, true }; // Tracker for who's lost their castling rights.
-    Vector2Int enPassantTargetSquare{-1, -1}; // [TODO]
-    int moveRuleCounter{0}; // Used for 50 fold and 75 fold repetition. Counts on every pawn move or capture.
-    int totalFullMoves{1}; // Starts at 1 due to some arcaic reason. Counts up only on black moves.
+    // Current Board State
+    std::string currentBoardFEN = board::defaults::defaultBoardFEN.data(); // Description of the current board in FEN
+    BoardState boardStatus;
 
     // Last Move
+    // The current Board State does not record how it got there, so we need to track it separately.
     Vector2Int lastMoveOrigin{-1, -1};
     Vector2Int lastMoveTarget{-1, -1};
 
@@ -107,12 +86,9 @@ private:
     // Moves
     std::array<std::array<MoveType, 8>, 8> validMoves;
 
-    // Piece List (Currently only used for detecting insufficient material)
-    std::vector<Piece> pieceList;
-
     // Game Outcome
     GameOutcome gameOutcome{GameOutcome::Playing};
-    bool isKingInCheck(PieceTeam team) const;
-    bool hasLegalMoves(PieceTeam team) const;
+    bool isKingInCheck(TeamColor team) const;
+    bool hasLegalMoves(TeamColor team) const;
     void findGameOutcome();
 };

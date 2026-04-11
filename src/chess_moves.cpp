@@ -13,13 +13,13 @@ void ChessMoves::findLegalMovesForPiece(std::array<std::array<MoveType, 8>, 8>& 
 
             // Create a board that represents the next turn if this move was made 
             std::array<std::array<PieceInfo, 8>, 8> simulatedBoard = boardState;
-            simulatedBoard[position.x][position.y] = {PieceType::None, PieceTeam::None};
+            simulatedBoard[position.x][position.y] = {PieceType::None, TeamColor::None};
             simulatedBoard[f][r] = piece;
 
             // En passant is an exception because the captured pawn is in a different tile than the moved pawn 
             // This is the only move where this happens. We need to clear the pawn origin AND the captured pawn.
             if (moves[f][r] == MoveType::EnPassant)
-                simulatedBoard[f][position.y] = {PieceType::None, PieceTeam::None};
+                simulatedBoard[f][position.y] = {PieceType::None, TeamColor::None};
 
             // Find attacked squares in simulated board
             std::array<std::array<bool, 8>, 8> unsafeSquares =
@@ -36,16 +36,16 @@ void ChessMoves::findLegalMovesForPiece(std::array<std::array<MoveType, 8>, 8>& 
             // Castling is not allowed if the king is under attack or any of the passing squares are under attack.
             // We don't care if the rook is under attack.
             if (moves[f][r] == MoveType::CastlingKingSide)
-                if ((piece.team == PieceTeam::White && (
+                if ((piece.team == TeamColor::White && (
                     unsafeSquares[4][7] || unsafeSquares[5][7] || unsafeSquares[6][7])
-                        || piece.team == PieceTeam::Black && (
+                        || piece.team == TeamColor::Black && (
                         unsafeSquares[4][0] || unsafeSquares[5][0] || unsafeSquares[6][0])))
                     // Remove illegal move
                     moves[f][r] = MoveType::None;
             if (moves[f][r] == MoveType::CastlingQueenSide)
-                if ((piece.team == PieceTeam::White && (
+                if ((piece.team == TeamColor::White && (
                     unsafeSquares[2][7] || unsafeSquares[3][7] || unsafeSquares[4][7])
-                    || piece.team == PieceTeam::Black && (
+                    || piece.team == TeamColor::Black && (
                         unsafeSquares[2][0] || unsafeSquares[3][0] || unsafeSquares[4][0])))
                     // Remove illegal move
                     moves[f][r] = MoveType::None;
@@ -76,7 +76,7 @@ std::array<std::array<MoveType, 8>, 8> ChessMoves::generateMovesForPiece(
     case PieceType::Knight:
         return generateKnightMoves(position, piece.team, boardState);
     case PieceType::Pawn: {
-        bool isFirstMove = (piece.team == PieceTeam::White) ? (position.y == 6) : (position.y == 1);
+        bool isFirstMove = (piece.team == TeamColor::White) ? (position.y == 6) : (position.y == 1);
         return generatePawnMoves(position, piece.team, boardState, enPassantTargetSquare, isFirstMove);
     }
     default:
@@ -86,17 +86,17 @@ std::array<std::array<MoveType, 8>, 8> ChessMoves::generateMovesForPiece(
 }
 
 std::array<std::array<MoveType, 8>, 8> ChessMoves::generateKingMoves(
-    Vector2Int moveOrigin, PieceTeam pieceTeam, const std::array<std::array<PieceInfo, 8>, 8>& boardState,
+    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<PieceInfo, 8>, 8>& boardState,
     const CastlingRights& castlingRights) {
 
     // Normal Moves
     std::array<std::array<MoveType, 8>, 8> kingMoves =
-        generateMoves(moveOrigin, pieceTeam, boardState, {
+        generateMoves(moveOrigin, TeamColor, boardState, {
             Vector2Int::Up, Vector2Int::Right, Vector2Int::Down, Vector2Int::Left,
             Vector2Int::UpRight, Vector2Int::DownRight, Vector2Int::DownLeft, Vector2Int::UpLeft}, 1);
 
     // White Castling Moves
-    if (pieceTeam == PieceTeam::White) {
+    if (TeamColor == TeamColor::White) {
         if (castlingRights.whiteKingSide) {
             if (boardState[5][7].type == PieceType::None
                 && boardState[6][7].type == PieceType::None)
@@ -127,43 +127,43 @@ std::array<std::array<MoveType, 8>, 8> ChessMoves::generateKingMoves(
 }
 
 std::array<std::array<MoveType, 8>, 8> ChessMoves::generateQueenMoves(
-    Vector2Int moveOrigin, PieceTeam pieceTeam, const std::array<std::array<PieceInfo, 8>, 8>& boardState) {
+    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<PieceInfo, 8>, 8>& boardState) {
     
-    return generateMoves(moveOrigin, pieceTeam, boardState, {
+    return generateMoves(moveOrigin, TeamColor, boardState, {
         Vector2Int::Up, Vector2Int::Right, Vector2Int::Down, Vector2Int::Left,
         Vector2Int::UpRight, Vector2Int::DownRight, Vector2Int::DownLeft, Vector2Int::UpLeft}, 7);
 }
 
 std::array<std::array<MoveType, 8>, 8> ChessMoves::generateRookMoves(
-    Vector2Int moveOrigin, PieceTeam pieceTeam, const std::array<std::array<PieceInfo, 8>, 8>& boardState) {
+    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<PieceInfo, 8>, 8>& boardState) {
     
-    return generateMoves(moveOrigin, pieceTeam, boardState, {
+    return generateMoves(moveOrigin, TeamColor, boardState, {
         Vector2Int::Up, Vector2Int::Right, Vector2Int::Down, Vector2Int::Left}, 7);
 }
 
 std::array<std::array<MoveType, 8>, 8> ChessMoves::generateBishopMoves(
-    Vector2Int moveOrigin, PieceTeam pieceTeam, const std::array<std::array<PieceInfo, 8>, 8>& boardState) {
+    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<PieceInfo, 8>, 8>& boardState) {
     
-    return generateMoves(moveOrigin, pieceTeam, boardState, {
+    return generateMoves(moveOrigin, TeamColor, boardState, {
         Vector2Int::UpRight, Vector2Int::DownRight, Vector2Int::DownLeft, Vector2Int::UpLeft}, 7);
 }
 
 std::array<std::array<MoveType, 8>, 8> ChessMoves::generateKnightMoves(
-    Vector2Int moveOrigin, PieceTeam pieceTeam, const std::array<std::array<PieceInfo, 8>, 8>& boardState) {
+    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<PieceInfo, 8>, 8>& boardState) {
     
-    return generateMoves(moveOrigin, pieceTeam, boardState, {
+    return generateMoves(moveOrigin, TeamColor, boardState, {
         {2,1}, {2,-1}, {1,2}, {-1,2}, {-2,1}, {-2,-1}, {1,-2}, {-1,-2}}, 1);
 }
 
 std::array<std::array<MoveType, 8>, 8> ChessMoves::generatePawnMoves(
-    Vector2Int moveOrigin, PieceTeam pieceTeam, const std::array<std::array<PieceInfo, 8>, 8>& boardState,
+    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<PieceInfo, 8>, 8>& boardState,
     Vector2Int enPassantTargetSquare, bool isFirstMove) {
     
     std::array<std::array<MoveType, 8>, 8> moves;
     clearMoves(moves);
 
     // Pawns move in different directions depending on their team
-    int forwardDirection = (pieceTeam == PieceTeam::White) ? -1 : 1;
+    int forwardDirection = (TeamColor == TeamColor::White) ? -1 : 1;
 
     // Normal pawn movement direction is simply up.
     std::vector<Vector2Int> directions{Vector2Int::Up * forwardDirection};
@@ -205,7 +205,7 @@ std::array<std::array<MoveType, 8>, 8> ChessMoves::generatePawnMoves(
 
         // There is a piece in this square
         if (boardState[targetSquare.x][targetSquare.y].type != PieceType::None) {
-            if (boardState[targetSquare.x][targetSquare.y].team != pieceTeam)
+            if (boardState[targetSquare.x][targetSquare.y].team != TeamColor)
                 // Check if it's a promotion
                 if (targetSquare.y == 0 || targetSquare.y == 7) {
                     moves[targetSquare.x][targetSquare.y] = MoveType::CapturePromotion;
@@ -224,7 +224,7 @@ std::array<std::array<MoveType, 8>, 8> ChessMoves::generatePawnMoves(
 }
 
 std::array<std::array<MoveType, 8>, 8> ChessMoves::generateMoves(
-    Vector2Int moveOrigin, PieceTeam pieceTeam,
+    Vector2Int moveOrigin, TeamColor TeamColor,
     const std::array<std::array<PieceInfo, 8>, 8>& boardState,
     std::vector<Vector2Int> directions, int maxSteps) {
 
@@ -239,7 +239,7 @@ std::array<std::array<MoveType, 8>, 8> ChessMoves::generateMoves(
                 break;
 
             if (boardState[targetSquare.x][targetSquare.y].type != PieceType::None) {
-                if (boardState[targetSquare.x][targetSquare.y].team != pieceTeam)
+                if (boardState[targetSquare.x][targetSquare.y].team != TeamColor)
                     moves[targetSquare.x][targetSquare.y] = MoveType::Capture;
                 break;
             }

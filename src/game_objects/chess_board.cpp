@@ -7,29 +7,11 @@
 void ChessBoard::draw(Painter& painter) {
     for (int rank = 0; rank < 8; rank++) {
         for (int file = 0; file < 8; file++) {
-            if (projectionType == ThemeProjection::Isometric) {
-                // Center of this tile in screen space
-                float cx = boardPosition.x + (file - rank) * (tileSize.x / 2);
-                float cy = boardPosition.y + (file + rank) * (tileSize.y / 2);
-
-                // Four corners of the diamond
-                Vector2 top{cx,         cy - (tileSize.y / 2)};
-                Vector2 right{cx + (tileSize.x / 2), cy};
-                Vector2 bot{cx,         cy + (tileSize.y / 2)};
-                Vector2 left{cx - (tileSize.x / 2), cy};
-
-                painter.drawQuad(
-                    top, right, bot, left,
-                    ((file + rank + 1) % 2 == 0) ? darkSquareColor : lightSquareColor
-                );
-            }
-            else {
                 painter.drawRectangle(
                     {boardPosition.x + (file * tileSize.x), boardPosition.y + (rank * tileSize.y)},
                     tileSize,
                     ((file + rank + 1) % 2 == 0) ? darkSquareColor : lightSquareColor
                 );
-            }
         }
     }
 }

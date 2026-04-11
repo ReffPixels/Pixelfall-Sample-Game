@@ -7,7 +7,7 @@
 #include <algorithm>
 
 void ChessState::setupFromFEN() {
-    boardState = fenParser.getBoardFromFEN(currentBoardFEN);
+    boardStatus = fenParser.getBoardFromFEN(currentBoardFEN);
 }
 
 // Pressing allows to select a new piece or move if a piece is already selected.
@@ -86,7 +86,7 @@ void ChessState::movePiece(Vector2Int origin, Vector2Int target, MoveType moveTy
 
     // Was it en passant? Remove the captured pawn.
     if (moveType == MoveType::EnPassant)
-        boardState[target.x][origin.y] = {PieceType::None, PieceTeam::None};
+        boardState[target.x][origin.y] = {PieceType::None, TeamColor::None};
 
     // Was it a promotion?
     if (moveType == MoveType::Promotion || moveType == MoveType::CapturePromotion) {
@@ -94,43 +94,43 @@ void ChessState::movePiece(Vector2Int origin, Vector2Int target, MoveType moveTy
         promotionPosition = target;
 
         // Remove piece from its previous position
-        selected = {PieceType::None, PieceTeam::None};
+        selected = {PieceType::None, TeamColor::None};
         return;
     }
 
     // Was it castling? Move the rook to its new position
-    if (selected.team == PieceTeam::White) {
+    if (selected.team == TeamColor::White) {
         if (moveType == MoveType::CastlingKingSide) {
-            boardState[7][7] = {PieceType::None, PieceTeam::None};
-            boardState[5][7] = {PieceType::Rook, PieceTeam::White};
+            boardState[7][7] = {PieceType::None, TeamColor::None};
+            boardState[5][7] = {PieceType::Rook, TeamColor::White};
         }
         else if (moveType == MoveType::CastlingQueenSide) {
-            boardState[0][7] = {PieceType::None, PieceTeam::None};
-            boardState[3][7] = {PieceType::Rook, PieceTeam::White};
+            boardState[0][7] = {PieceType::None, TeamColor::None};
+            boardState[3][7] = {PieceType::Rook, TeamColor::White};
         }
     }
-    else if (selected.team == PieceTeam::Black) {
+    else if (selected.team == TeamColor::Black) {
         if (moveType == MoveType::CastlingKingSide) {
-            boardState[7][0] = {PieceType::None, PieceTeam::None};
-            boardState[5][0] = {PieceType::Rook, PieceTeam::Black};
+            boardState[7][0] = {PieceType::None, TeamColor::None};
+            boardState[5][0] = {PieceType::Rook, TeamColor::Black};
         }
         else if (moveType == MoveType::CastlingQueenSide) {
-            boardState[0][0] = {PieceType::None, PieceTeam::None};
-            boardState[3][0] = {PieceType::Rook, PieceTeam::Black};
+            boardState[0][0] = {PieceType::None, TeamColor::None};
+            boardState[3][0] = {PieceType::Rook, TeamColor::Black};
         }
     }
 
     // Remove piece from its previous position
-    selected = {PieceType::None, PieceTeam::None};
+    selected = {PieceType::None, TeamColor::None};
 }
 
 
 // Swaps the current player and runs necessary functions to set up the next turn (Or end the game)
 void ChessState::nextTurn() {
     // Swap player
-    playerToMove = (playerToMove == PieceTeam::White ? PieceTeam::Black : PieceTeam::White);
+    playerToMove = (playerToMove == TeamColor::White ? TeamColor::Black : TeamColor::White);
     // Count full moves
-    if (playerToMove == PieceTeam::Black) totalFullMoves++;
+    if (playerToMove == TeamColor::Black) totalFullMoves++;
 
     deselectPiece();
     updateCastlingRights();
@@ -183,7 +183,7 @@ void ChessState::deselectPiece() {
 // Find all of the squares attacked by the oponent. 
 // If ignoreKing is set to true, the attacked squares of sliding pieces will ignore the king.
 // This is necessary for finding safe king squares since the king cannot retreat to the squares it was blocking. (X-ray)
-std::array<std::array<bool, 8>, 8> ChessState::getAttackedSquares(bool ignoreKing, PieceTeam playerTeam,
+std::array<std::array<bool, 8>, 8> ChessState::getAttackedSquares(bool ignoreKing, TeamColor playerTeam,
     const std::array<std::array<PieceInfo, 8>, 8>& boardState, const CastlingRights& castlingRights) {
     // Store attacked squares
     std::array<std::array<bool, 8>, 8> attackedSquares;
@@ -199,7 +199,7 @@ std::array<std::array<bool, 8>, 8> ChessState::getAttackedSquares(bool ignoreKin
         for (int r = 0; r < 8; r++)
             for (int f = 0; f < 8; f++)
                 if (boardState[f][r].team == playerTeam && boardState[f][r].type == PieceType::King)
-                    adjustedBoardState[f][r] = {PieceType::None, PieceTeam::None};
+                    adjustedBoardState[f][r] = {PieceType::None, TeamColor::None};
     }
 
     // Find every enemy piece
@@ -213,7 +213,7 @@ std::array<std::array<bool, 8>, 8> ChessState::getAttackedSquares(bool ignoreKin
             // This cell is a pawn. Pawns attack diagonally so they require special treatment
             // We don't need an exception for en passant since it doesn't change the attack shape (Diagonal)
             if (cell.type == PieceType::Pawn) {
-                int direction = (cell.team == PieceTeam::White) ? -1 : 1;
+                int direction = (cell.team == TeamColor::White) ? -1 : 1;
                 int attackRank = rank + direction;
                 if (attackRank >= 0 && attackRank < 8) {
                     if (file - 1 >= 0) attackedSquares[file - 1][attackRank] = true;
@@ -245,10 +245,10 @@ std::array<std::array<bool, 8>, 8> ChessState::getAttackedSquares(bool ignoreKin
     return attackedSquares;
 }
 
-PieceTeam ChessState::getOpponent() {
-    if (playerToMove == PieceTeam::White) return PieceTeam::Black;
-    if (playerToMove == PieceTeam::Black) return PieceTeam::White;
-    return PieceTeam::None;
+TeamColor ChessState::getOpponent() {
+    if (playerToMove == TeamColor::White) return TeamColor::Black;
+    if (playerToMove == TeamColor::Black) return TeamColor::White;
+    return TeamColor::None;
 }
 
 void ChessState::endGame() {
@@ -272,7 +272,7 @@ void ChessState::endGame() {
 
 void ChessState::resetGame() {
     // White always goes first, even if we are playing from black's perspective
-    playerToMove = PieceTeam::White;
+    playerToMove = TeamColor::White;
     
     // Reset board state and trackers
     gameOutcome = GameOutcome::Playing;
@@ -288,7 +288,7 @@ void ChessState::resetGame() {
 }
 
 // Returns true if the given team's king is currently being attacked.
-bool ChessState::isKingInCheck(PieceTeam team) const {
+bool ChessState::isKingInCheck(TeamColor team) const {
     // Find the king's position
     Vector2Int kingPos{-1, -1};
     for (int rank = 0; rank < 8; rank++)
@@ -302,7 +302,7 @@ bool ChessState::isKingInCheck(PieceTeam team) const {
 }
 
 // Returns true if the given team has at least one legal move available.
-bool ChessState::hasLegalMoves(PieceTeam team) const {
+bool ChessState::hasLegalMoves(TeamColor team) const {
     for (int rank = 0; rank < 8; rank++) {
         for (int file = 0; file < 8; file++) {
             if (boardState[file][rank].team != team) continue;
@@ -328,7 +328,7 @@ void ChessState::findGameOutcome() {
     if (!hasLegalMoves(playerToMove))
         // There are no more legal moves available and the king is in check. This is a Checkmate.
         if (isKingInCheck(playerToMove)) {
-            gameOutcome = (playerToMove == PieceTeam::White)
+            gameOutcome = (playerToMove == TeamColor::White)
                 ? GameOutcome::BlackVictoryCheckmate
                 : GameOutcome::WhiteVictoryCheckmate;
             endGame();
@@ -357,7 +357,7 @@ void ChessState::findGameOutcome() {
 }
 
 void ChessState::removePiece(Vector2Int position) {
-    boardState[position.x][position.y] = {PieceType::None, PieceTeam::None};
+    boardState[position.x][position.y] = {PieceType::None, TeamColor::None};
 }
 
 void ChessState::updatePieceList() {
@@ -397,10 +397,10 @@ bool ChessState::hasInsufficientMaterial() {
     if (pieceList.size() == 4) {
 
         auto whiteBishop = std::find_if(pieceList.begin(), pieceList.end(), [](const Piece& e) {
-            return e.info.type == PieceType::Bishop && e.info.team == PieceTeam::White;});
+            return e.info.type == PieceType::Bishop && e.info.team == TeamColor::White;});
 
         auto blackBishop = std::find_if(pieceList.begin(), pieceList.end(), [](const Piece& e) {
-            return e.info.type == PieceType::Bishop && e.info.team == PieceTeam::Black;});
+            return e.info.type == PieceType::Bishop && e.info.team == TeamColor::Black;});
 
         // Check if both bishops exist
         if (whiteBishop != pieceList.end() && blackBishop != pieceList.end()

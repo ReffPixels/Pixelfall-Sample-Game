@@ -3,24 +3,9 @@
 #include "config/board_config.h"
 #include <stdexcept>
 
-// Converts a piece location from grid notation (a1 to h8) into a vector.
-Vector2Int ChessPieces::getPosFromNotation(std::string gridPosition) {
-    return Vector2Int{
-        gridPosition[0] - 'a', // 'a' -> 0, 'h' -> 7
-        '8' - gridPosition[1]  // '8' -> 0, '1' -> 7
-    };
-}
-
-// Converts a piece vector location into grid notation (a1 to h8).
-std::string ChessPieces::getNotationFromPos(Vector2Int gridPosition) {
-    return std::string() +
-        char('a' + gridPosition.x) +
-        char('8' - gridPosition.y);
-}
-
 // Returns the path of a chess piece image from it's piece information (Type and team)
 static std::filesystem::path findImagePath(PieceInfo pieceInfo) {
-    if (pieceInfo.team == PieceTeam::White) {
+    if (pieceInfo.team == TeamColor::White) {
         switch (pieceInfo.type) {
         case PieceType::King: return (board::piecesPath / "white_king.png");
         case PieceType::Queen: return (board::piecesPath / "white_queen.png");
@@ -49,7 +34,7 @@ void ChessPieces::draw(PieceInfo pieceInfo, Vector2Int piecePosition, Vector2 bo
     Painter& painter, Vector2 pieceOffset) {
 
     // Check that this is a valid piece
-    if ((pieceInfo.type == PieceType::None) || (pieceInfo.team == PieceTeam::None)) return;
+    if ((pieceInfo.type == PieceType::None) || (pieceInfo.team == TeamColor::None)) return;
 
     Vector2 physicalPosition{};
     if (board::projectionType == ThemeProjection::Isometric) {
@@ -92,11 +77,11 @@ void ChessPieces::draw(PieceInfo pieceInfo, Vector2Int piecePosition, Vector2 bo
 
 
 // Draws a piece floating in a given position
-void ChessPieces::drawFree(PieceType type, PieceTeam team, Vector2 physicalPosition, Vector2 spriteSize,
+void ChessPieces::drawFree(PieceType type, TeamColor team, Vector2 physicalPosition, Vector2 spriteSize,
     Painter& painter) {
 
     // Check that this is a valid piece
-    if ((type == PieceType::None) || (team == PieceTeam::None)) return;
+    if ((type == PieceType::None) || (team == TeamColor::None)) return;
 
     Texture& pieceTexture = painter.textureCache->loadTexture(findImagePath({type, team}).string());
 

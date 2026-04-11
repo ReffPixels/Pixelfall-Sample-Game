@@ -4,7 +4,6 @@
 // Engine
 #include "pixelfall/engine/math/vector2.h"
 #include "pixelfall/engine/graphics/painter.h"
-#include "config/chess_theme.h"
 
 enum class BoardDirection {
     BlackOnTop,
@@ -44,5 +43,4 @@ private:
     Vector2 tileSize{70.0f, 70.0f};  // width:height = 2:1
     Color lightSquareColor{Color::fromHexcode("#edd6b0")};
     Color darkSquareColor{Color::fromHexcode("#b88762")};
-    ThemeProjection projectionType = ThemeProjection::Rectangular;
 };
