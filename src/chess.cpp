@@ -114,6 +114,13 @@ void Chess::onRender() {
         visuals.pieceFollowCursor(cursorPos, pieces, board,
             state.getBoardState()[selPos.x][selPos.y], *painter, dragAndDropPivot);
     }
+
+    // Draw Promotion UI
+    if (state.getInputState() == InputState::Promotion) {
+        promotionUI.drawPieces(pieces, state.getPromotionPosition(), state.getPlayerToMove(),
+            board.getPosition(), board.getTileSize(), board.getTileSize() * 0.8f, *painter,
+            board.getBoardDirection() == BoardDirection::BlackOnTop ? false : true);
+    }
 }
 
 void Chess::startNewGame() {

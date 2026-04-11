@@ -29,7 +29,7 @@ enum class GameOutcome {
     DrawAgreement,                      // [TODO LONG TERM] Button system
 };
 
-enum class InputState { Normal, PieceSelected, };
+enum class InputState { Normal, PieceSelected, Promotion};
 
 enum class MoveType { None, Move, Capture, EnPassant, CastlingKingSide, CastlingQueenSide, Promotion, CapturePromotion };
 
@@ -80,6 +80,7 @@ public:
     PieceTeam getOpponent();
     const CastlingRights& getCastlingRights() const { return castlingRights; }
     const GameOutcome& getGameOutcome() const { return gameOutcome; };
+    Vector2Int getPromotionPosition() const { return promotionPosition; }
 
 private:
     FenParser fenParser;
@@ -100,6 +101,7 @@ private:
     // Interaction
     InputState inputState{InputState::Normal};
     Vector2Int selPiecePosition{-1, -1};  // (-1, -1) means no square is selected.
+    Vector2Int promotionPosition{-1, -1};
 
     // Moves
     std::array<std::array<MoveType, 8>, 8> validMoves;

@@ -13,6 +13,8 @@ void ChessState::setupFromFEN() {
 // Pressing allows to select a new piece or move if a piece is already selected.
 void ChessState::onBoardPressed(Vector2Int square) {
     PieceInfo& clicked = boardState[square.x][square.y];
+    if (inputState == InputState::Promotion) return;
+
     // It's a piece in the player's team
     if (clicked.type != PieceType::None && clicked.team == playerToMove)
         // Clicked on the same square, deselect
@@ -26,6 +28,8 @@ void ChessState::onBoardPressed(Vector2Int square) {
 
 // Release only allows to move if a piece is already selected. (Drag and drop behaviour) Otherwise it does nothing.
 void ChessState::onBoardReleased(Vector2Int square) {
+    if (inputState == InputState::Promotion) return;
+
     moveSelectedPiece(square);
 }
 
@@ -45,7 +49,7 @@ void ChessState::selectPiece(Vector2Int selectedSquare) {
 void ChessState::moveSelectedPiece(Vector2Int targetSquare) {
     MoveType moveType = validMoves[targetSquare.x][targetSquare.y];
 
-    if (inputState != InputState::PieceSelected) return;
+    if (inputState == InputState::Normal) return;
     if (targetSquare == selPiecePosition) return;
     if (moveType == MoveType::None) {
         deselectPiece();
@@ -53,7 +57,10 @@ void ChessState::moveSelectedPiece(Vector2Int targetSquare) {
     }
 
     movePiece(selPiecePosition, targetSquare, moveType);
-    nextTurn();
+
+    if (inputState != InputState::Promotion) {
+        nextTurn();
+    }
 }
 
 // Moves a piece from an origin square to a target square and applies rules based on the type of move.
@@ -82,8 +89,14 @@ void ChessState::movePiece(Vector2Int origin, Vector2Int target, MoveType moveTy
         boardState[target.x][origin.y] = {PieceType::None, PieceTeam::None};
 
     // Was it a promotion?
-    if (moveType == MoveType::Promotion || moveType == MoveType::CapturePromotion)
-        targetPiece.type = PieceType::Queen; // Temporary, eventually implement ui to select piece
+    if (moveType == MoveType::Promotion || moveType == MoveType::CapturePromotion) {
+        inputState = InputState::Promotion;
+        promotionPosition = target;
+
+        // Remove piece from its previous position
+        selected = {PieceType::None, PieceTeam::None};
+        return;
+    }
 
     // Was it castling? Move the rook to its new position
     if (selected.team == PieceTeam::White) {

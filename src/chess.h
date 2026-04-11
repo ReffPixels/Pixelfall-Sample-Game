@@ -8,6 +8,7 @@
 #include "chess_state.h"
 #include "game_objects/chess_board.h"
 #include "game_objects/chess_pieces.h"
+#include "game_objects/promotion_ui.h"
 #include "chess_visuals.h"
 // Standard Library
 #include <memory>
@@ -35,6 +36,7 @@ private:
     ChessBoard board;
     ChessPieces pieces;
     ChessVisuals visuals;
+    PromotionInterface promotionUI;
 
     void startNewGame();
 };
