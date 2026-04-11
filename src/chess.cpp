@@ -50,6 +50,7 @@ void Chess::onUpdate() {
             // [TEMP DEBUG] Delete Piece on Hover
             if (appInput->isKeyPressed(KeyCode::Delete)) {
                 state.removePiece(hoveredSquare);
+                state.nextTurn();
             }
             if (appInput->isMouseButtonReleased(MouseButton::Left)) state.onBoardReleased(hoveredSquare);
         }

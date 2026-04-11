@@ -53,7 +53,6 @@ void ChessState::moveSelectedPiece(Vector2Int targetSquare) {
     }
 
     movePiece(selPiecePosition, targetSquare, moveType);
-    deselectPiece();
     nextTurn();
 }
 
@@ -113,27 +112,20 @@ void ChessState::movePiece(Vector2Int origin, Vector2Int target, MoveType moveTy
 }
 
 
-// Swaps the current player (Local)
+// Swaps the current player and runs necessary functions to set up the next turn (Or end the game)
 void ChessState::nextTurn() {
-    // Castling Rights
-    updateCastlingRights();
 
-    if (playerToMove == PieceTeam::White) {
-        playerToMove = PieceTeam::Black;
-    }
-    else if (playerToMove == PieceTeam::Black) {
+    // Swap player
+    playerToMove = (playerToMove == PieceTeam::White ? PieceTeam::Black : PieceTeam::White);
+
+    // Count full moves
+    if (playerToMove == PieceTeam::Black) totalFullMoves++;
         playerToMove = PieceTeam::White;
-        totalFullMoves++;
-    };
-
-    std::cout << "-------------------------------" << std::endl;
-    std::cout << "Player to Move: " << static_cast<int>(playerToMove) << std::endl;
-    std::cout << "Half Moves: " << moveRuleCounter << std::endl;
-    std::cout << "Full Moves: " << totalFullMoves << std::endl;
-    std::cout << "Castling Rights KQkq: " << castlingRights.whiteKingSide << castlingRights.whiteQueenSide
-        << castlingRights.blackKingSide << castlingRights.blackQueenSide << std::endl;
-
-    // Check if the game should end
+        
+    deselectPiece();
+    updateCastlingRights();
+    updatePieceList();
+    printStatistics();
     findGameOutcome();
 }
 
@@ -318,31 +310,104 @@ bool ChessState::hasLegalMoves(PieceTeam team) const {
     return false;
 }
 
-// Checks for checkmate and stalemate after each move.
+// Checks for checkmate and stalemate after each move. (By order of priority)
 void ChessState::findGameOutcome() {
-    // 75 Move Rule (Automatic Draw)
-    if (moveRuleCounter == 75) {
-        gameOutcome = GameOutcome::Draw75Move;
-        endGame();
-        return;
-    }
 
-    // There are still legal moves, continue the game.
-    if (hasLegalMoves(playerToMove)) return;
-
-    // Is it checkmate?
-    if (isKingInCheck(playerToMove)) {
-        gameOutcome = (playerToMove == PieceTeam::White)
-            ? GameOutcome::BlackVictoryCheckmate
-            : GameOutcome::WhiteVictoryCheckmate;
-    }
+    if (!hasLegalMoves(playerToMove))
+        // There are no more legal moves available and the king is in check. This is a Checkmate.
+        if (isKingInCheck(playerToMove)) {
+            gameOutcome = (playerToMove == PieceTeam::White)
+                ? GameOutcome::BlackVictoryCheckmate
+                : GameOutcome::WhiteVictoryCheckmate;
+            endGame();
+            return;
+        }
+        // There are no more legal moves available but the king is not in check. This is a stalemate.
+        else {
+            gameOutcome = GameOutcome::DrawStalemate;
+            endGame();
+            return;
+        }
+    // There are still legal moves available, but this could still be a draw by repetition or insufficient material.
     else {
-        gameOutcome = GameOutcome::DrawStalemate;
+        if (hasInsufficientMaterial()) {
+            gameOutcome = GameOutcome::DrawInsufficientMaterial;
+            endGame();
+            return;
+        }
+        // 75 Move Rule (Automatic Draw)
+        if (moveRuleCounter == 75) {
+            gameOutcome = GameOutcome::Draw75Move;
+            endGame();
+            return;
+        }
     }
-
-    endGame();
 }
 
 void ChessState::removePiece(Vector2Int position) {
     boardState[position.x][position.y] = {PieceType::None, PieceTeam::None};
+}
+
+void ChessState::updatePieceList() {
+    pieceList.clear();
+
+    for (int r = 0; r < 8; r++)
+        for (int f = 0; f < 8; f++)
+            if (boardState[f][r].type != PieceType::None)
+                pieceList.push_back({boardState[f][r], Vector2Int(f, r)});
+}
+
+static SquareColor getSquareColor(Vector2Int position) {
+    return ((position.x + position.y) % 2 == 0) ? SquareColor::Light : SquareColor::Dark;
+}
+
+bool ChessState::hasInsufficientMaterial() {
+    // Find piece count in array
+    auto getPieceCount = [](const auto& m, PieceType t) -> int {
+        auto it = m.find(t);
+        return it != m.end() ? it->second : 0;
+        };
+
+    // King vs King
+    if (pieceList.size() == 2) return true;
+
+    // 3 Total Pieces
+    if (pieceList.size() == 3) {
+        // King and Knight vs King
+        if (std::count_if(pieceList.begin(), pieceList.end(), [](const Piece& e) {
+            return e.info.type == PieceType::Knight;}) == 1) return true;
+        // King and Bishop vs King
+        if (std::count_if(pieceList.begin(), pieceList.end(), [](const Piece& e) {
+            return e.info.type == PieceType::Bishop;}) == 1) return true;
+    }
+
+    // King and Bishop vs King and Bishop (Both Bishops must be in the same colour square)
+    if (pieceList.size() == 4) {
+
+        auto whiteBishop = std::find_if(pieceList.begin(), pieceList.end(), [](const Piece& e) {
+            return e.info.type == PieceType::Bishop && e.info.team == PieceTeam::White;});
+
+        auto blackBishop = std::find_if(pieceList.begin(), pieceList.end(), [](const Piece& e) {
+            return e.info.type == PieceType::Bishop && e.info.team == PieceTeam::Black;});
+
+        // Check if both bishops exist
+        if (whiteBishop != pieceList.end() && blackBishop != pieceList.end()
+            && getSquareColor(whiteBishop->position) == getSquareColor(blackBishop->position)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static Vector2Int findPiece() {
+
+}
+
+void ChessState::printStatistics() {
+    std::cout << "-------------------------------" << std::endl;
+    std::cout << "Player to Move: " << static_cast<int>(playerToMove) << std::endl;
+    std::cout << "Half Moves: " << moveRuleCounter << std::endl;
+    std::cout << "Full Moves: " << totalFullMoves << std::endl;
+    std::cout << "Castling Rights KQkq: " << castlingRights.whiteKingSide << castlingRights.whiteQueenSide
+        << castlingRights.blackKingSide << castlingRights.blackQueenSide << std::endl;
 }

@@ -11,6 +11,11 @@ enum class BoardDirection {
     WhiteOnTop
 };
 
+enum class SquareColor {
+    Light,
+    Dark
+};
+
 class ChessBoard {
 public:
     // Constructor

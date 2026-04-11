@@ -28,6 +28,11 @@ struct PieceInfo {
     PieceTeam team;
 };
 
+struct Piece {
+    PieceInfo info;
+    Vector2Int position;
+};
+
 class ChessPieces {
 public:
     // Methods

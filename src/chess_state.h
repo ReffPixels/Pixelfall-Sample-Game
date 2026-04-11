@@ -62,9 +62,12 @@ public:
     void nextTurn();
     void endGame();
     void resetGame(PieceTeam startingPlayer = PieceTeam::White);
+    void updatePieceList();
+    bool hasInsufficientMaterial();
 
     // Debug
     void removePiece(Vector2Int position);
+    void printStatistics();
 
     // Getters
     const std::array<std::array<PieceInfo, 8>, 8>& getBoardState() const { return boardState; }
@@ -94,16 +97,15 @@ private:
     Vector2Int lastMoveOrigin{-1, -1};
     Vector2Int lastMoveTarget{-1, -1};
 
-    // Captured Pieces
-    std::vector<PieceInfo> wCapturedPieces; // White's graveyard (Captured white pieces)
-    std::vector<PieceInfo> bCapturedPieces; // Black's graveyard (Captured black pieces)
-
     // Interaction
     InputState inputState{InputState::Normal};
     Vector2Int selPiecePosition{-1, -1};  // (-1, -1) means no square is selected.
 
     // Moves
     std::array<std::array<MoveType, 8>, 8> validMoves;
+
+    // Piece List (Currently only used for detecting insufficient material)
+    std::vector<Piece> pieceList;
 
     // Game Outcome
     GameOutcome gameOutcome{GameOutcome::Playing};
