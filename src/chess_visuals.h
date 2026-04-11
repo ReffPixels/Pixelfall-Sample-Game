@@ -28,3 +28,5 @@ public:
         PieceInfo pieceInfo, Painter& painter, Vector2 offset = Vector2::Zero);
     Vector2 computeDragPivot(Vector2& cursorPos, ChessBoard& board, Vector2Int selPiecePosition);
 };
+
+// [TODO] Lerp animation piece when clicking instead of dragging

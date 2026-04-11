@@ -116,12 +116,3 @@ private:
     bool hasLegalMoves(PieceTeam team) const;
     void findGameOutcome();
 };
-
-// [TODO] Lerp animation piece when clicking instead of dragging
-// [TODO] Pawn Promotion Selection UI
-
-// Insufficient Material Rules:
-// king versus king
-// king and bishop versus king
-// king and knight versus king
-// king and bishop versus king and bishop with the bishops on the same color.
