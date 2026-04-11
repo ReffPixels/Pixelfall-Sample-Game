@@ -42,11 +42,14 @@ public:
 
     // Setters
     void setHideSelectedPiece(bool hideSelectedPiece) { this->hideSelectedPiece = hideSelectedPiece; };
+    void setFlippedPieces(bool flipPieces) { this->flipPieces = flipPieces; };
 
     // Getters
     static Vector2Int getPosFromNotation(std::string gridPosition);
     static std::string getNotationFromPos(Vector2Int gridPosition);
 
 private:
+    // Rendering
     bool hideSelectedPiece{false};
+    bool flipPieces{false};
 };

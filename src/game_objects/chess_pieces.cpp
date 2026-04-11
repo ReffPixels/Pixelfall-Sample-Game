@@ -91,7 +91,7 @@ void ChessPieces::draw(PieceInfo pieceInfo, Vector2Int piecePosition, Vector2 bo
 }
 
 
-// Draws a piece floating in a giving position
+// Draws a piece floating in a given position
 void ChessPieces::drawFree(PieceType type, PieceTeam team, Vector2 physicalPosition, Vector2 spriteSize,
     Painter& painter) {
 
@@ -110,10 +110,6 @@ void ChessPieces::drawFree(PieceType type, PieceTeam team, Vector2 physicalPosit
 // Draws all the pieces in the pieces vector on the screen.
 void ChessPieces::drawPieces(std::array<std::array<PieceInfo, 8>, 8> boardState, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
     Painter& painter, Vector2 pieceOffset, Vector2Int selPiecePosition) {
-    
-    // Store position;
-    int file = 0;
-    int rank = 0;
 
     for (int rank = 0; rank < 8; rank++)
         for (int file = 0; file < 8; file++)
@@ -123,6 +119,6 @@ void ChessPieces::drawPieces(std::array<std::array<PieceInfo, 8>, 8> boardState,
                     // Don't draw this piece
                     continue;
                 }
-                draw(boardState[file][rank], {file, rank}, boardPosition, tileSize, spriteSize, painter, pieceOffset);
+                    draw(boardState[file][rank], {file, flipPieces ? 7 - rank : rank}, boardPosition, tileSize, spriteSize, painter, pieceOffset);
             }
 };

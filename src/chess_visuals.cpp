@@ -10,7 +10,7 @@ void ChessVisuals::highlightSelected(ChessBoard& board, Vector2Int selPiecePosit
         painter.drawRectangle(
             board.getPosition()
             + Vector2(selPiecePosition.x * board.getTileSize().x,
-                selPiecePosition.y * board.getTileSize().y),
+                board.getRankByDirection(selPiecePosition.y) * board.getTileSize().y),
             board.getTileSize(),
             Color::fromHexcode("#ffd94e92")
         );
@@ -24,14 +24,14 @@ void ChessVisuals::highlightLastMove(ChessBoard& board, Vector2Int lastMoveOrigi
         painter.drawRectangle(
             board.getPosition()
             + Vector2(lastMoveOrigin.x * board.getTileSize().x,
-                lastMoveOrigin.y * board.getTileSize().y),
+                board.getRankByDirection(lastMoveOrigin.y) * board.getTileSize().y),
             board.getTileSize(),
             Color::fromHexcode("#ffd94e92")
         );
         painter.drawRectangle(
             board.getPosition()
             + Vector2(lastMoveTarget.x * board.getTileSize().x,
-                lastMoveTarget.y * board.getTileSize().y),
+                board.getRankByDirection(lastMoveTarget.y) * board.getTileSize().y),
             board.getTileSize(),
             Color::fromHexcode("#ffd94e92")
         );
@@ -48,7 +48,7 @@ void ChessVisuals::highlightHoveredSquare(Vector2& cursorPos, ChessBoard& board,
     Vector2 snappedPositionInBoard{
         std::clamp(board.getPosition().x + (float)gridPos.x * board.getTileSize().x,
             board.getPosition().x, board.getPosition().x + board.getTileSize().x * 7),
-        std::clamp(board.getPosition().y + gridPos.y * board.getTileSize().y,
+        std::clamp(board.getPosition().y + board.getRankByDirection(gridPos.y) * board.getTileSize().y,
             board.getPosition().y, board.getPosition().y + board.getTileSize().y * 7)
     };
 
@@ -73,7 +73,7 @@ void ChessVisuals::highlightValidMoves(std::array<std::array<MoveType, 8>, 8> va
 
                 painter.drawCircle(
                     Vector2(board.getPosition().x + (float)file * board.getTileSize().x + board.getTileSize().x / 2,
-                        board.getPosition().y + (float)rank * board.getTileSize().y + board.getTileSize().y / 2),
+                        board.getPosition().y + (float)board.getRankByDirection(rank) * board.getTileSize().y + board.getTileSize().y / 2),
                     board.getTileSize().x * 0.15f,
                     Color::fromHexcode("#6e422d55")
                 );
@@ -83,7 +83,7 @@ void ChessVisuals::highlightValidMoves(std::array<std::array<MoveType, 8>, 8> va
                 || (validMoves[file][rank] == MoveType::CapturePromotion)) {
                 painter.drawCircleHollow(
                     Vector2(board.getPosition().x + (float)file * board.getTileSize().x + board.getTileSize().x / 2,
-                        board.getPosition().y + (float)rank * board.getTileSize().y + board.getTileSize().y / 2),
+                        board.getPosition().y + (float)board.getRankByDirection(rank) * board.getTileSize().y + board.getTileSize().y / 2),
                     board.getTileSize().x * 0.45f,
                     board.getTileSize().x * 0.3f,
                     Color::fromHexcode("#c5131355")
@@ -99,7 +99,7 @@ void ChessVisuals::highlightAttackedSquares(std::array<std::array<bool, 8>, 8> a
             if (attackedSquares[file][rank])
                 painter.drawRectangle(
                     board.getPosition()
-                    + Vector2(file * board.getTileSize().x, rank * board.getTileSize().y),
+                    + Vector2(file * board.getTileSize().x, board.getRankByDirection(rank) * board.getTileSize().y),
                     board.getTileSize(),
                     color
                 );
@@ -124,5 +124,5 @@ void ChessVisuals::pieceFollowCursor(Vector2& cursorPos, ChessPieces& pieces, Ch
 // Computes the pivot offset so the dragged piece stays attached at the grab point
 Vector2 ChessVisuals::computeDragPivot(Vector2& cursorPos, ChessBoard& board, Vector2Int selPiecePosition) {
     return {cursorPos - (board.getPosition() +
-        Vector2{(float)selPiecePosition.x, (float)selPiecePosition.y} * board.getTileSize())};
+        Vector2{(float)selPiecePosition.x, (float)board.getRankByDirection(selPiecePosition.y)} * board.getTileSize())};
 }

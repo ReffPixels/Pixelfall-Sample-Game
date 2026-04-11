@@ -20,9 +20,11 @@ public:
     const Vector2& getPosition() const { return boardPosition; };
     const Vector2& getTileSize() const { return tileSize; };
     const BoardDirection& getBoardDirection() const { return boardDirection; };
+    int getRankByDirection(int rank);
 
     // Setters
     void setPosition(Vector2 boardPosition) { this->boardPosition = boardPosition; };
+    void setBoardDirection(BoardDirection boardDirection) { this->boardDirection = boardDirection; };
 
     // Methods
     void draw(Painter& painter);

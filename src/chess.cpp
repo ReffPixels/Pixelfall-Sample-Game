@@ -20,16 +20,29 @@ bool Chess::onStart() {
     // Window Settings
     appWindow->setWReferenceSize({720, 720});
 
-    // Randomly choose who plays first
-    // Generate random sequence with Mersenne Twister Algorithm. 
+    // Generate reusable random sequence with Mersenne Twister Algorithm. 
     // Eventually we'll want an engine random header that handles this instead.
     std::mt19937 rng(std::random_device{}());
-    // Bernoulli Distribution 
-    // This returns a bool (True or False) at a given chance (50 % in this case) by using a random sequence item.
-    std::bernoulli_distribution coinFlip(0.5);
 
-    // Set initial state of board (Randomly picks first player)
-    state.resetGame((coinFlip(rng)) ? PieceTeam::White : PieceTeam::Black);
+    // Randomly choose who plays first using Bernoulli Distribution 
+    // This returns a bool (True or False) at a given chance (50 % in this case) by using our random sequence (rng)
+    std::bernoulli_distribution coinFlip(0.5);
+    PieceTeam firstPlayer = (coinFlip(rng)) ? PieceTeam::White : PieceTeam::Black;
+
+    // Set initial state of board.
+    state.resetGame(firstPlayer);
+
+    // We need to flip the board here since state does not handle board visuals.
+    if (firstPlayer == PieceTeam::White) {
+        board.setBoardDirection(BoardDirection::BlackOnTop);
+        pieces.setFlippedPieces(false);
+    }
+    else {
+        board.setBoardDirection(BoardDirection::WhiteOnTop);
+        pieces.setFlippedPieces(true);
+    }
+
+    // The pieces need to be drawn based on the newly assigned board direction
 
     return true;
 }
