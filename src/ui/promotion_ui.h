@@ -1,4 +1,4 @@
-// UI
+// [TODO SOON] Clean up
 
 #pragma once
 #include "game_objects/chess_pieces.h"

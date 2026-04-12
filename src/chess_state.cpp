@@ -369,8 +369,8 @@ void ChessState::updatePieceList() {
                 pieceList.push_back({boardState[f][r], Vector2Int(f, r)});
 }
 
-static SquareColor getSquareColor(Vector2Int position) {
-    return ((position.x + position.y) % 2 == 0) ? SquareColor::Light : SquareColor::Dark;
+static TileColor getTileColor(Vector2Int position) {
+    return ((position.x + position.y) % 2 == 0) ? TileColor::Light : TileColor::Dark;
 }
 
 bool ChessState::hasInsufficientMaterial() {
@@ -404,7 +404,7 @@ bool ChessState::hasInsufficientMaterial() {
 
         // Check if both bishops exist
         if (whiteBishop != pieceList.end() && blackBishop != pieceList.end()
-            && getSquareColor(whiteBishop->position) == getSquareColor(blackBishop->position)) {
+            && getTileColor(whiteBishop->position) == getTileColor(blackBishop->position)) {
             return true;
         }
     }

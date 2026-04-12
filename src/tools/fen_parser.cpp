@@ -1,4 +1,4 @@
-// Implementation for tools/fen_parser.h
+// Implementation for fen_parser.h
 
 #include "tools/fen_parser.h"
 #include "tools/notation_parser.h"

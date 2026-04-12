@@ -1,4 +1,4 @@
-// Defines a chess piece object and handles drawing it on the screen.
+// Defines a chess pieces object that handles drawing all the chess pieces on the screen.
 
 #pragma once
 // Engine
@@ -8,29 +8,32 @@
 #include <array>
 // Chess
 #include "config/chess_config.h"
+#include "game_objects/chess_board.h"
 
 class ChessPieces {
 public:
-    // Rendering
-    void draw(Piece piece, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
-        Painter& painter, Vector2 pieceOffset = Vector2::Zero);
+    // Rendering Methods
+    void drawPieces(std::vector<Piece>& pieces, ChessBoard& board, Painter& painter);
+    void drawFree(PieceType type, TeamColor team, Vector2 position, Painter& painter, Vector2 size = Vector2::Zero);
 
-    void drawPieces(std::vector<Piece> pieces, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
-        Painter& painter, Vector2 pieceOffset = Vector2::Zero, Vector2Int selPiecePosition = {-1, -1});
-
-    void drawFree(Piece piece, Vector2 physicalPosition, Vector2 spriteSize,
-        Painter& painter);
-
-    // Settings
+    // Setters
     void setHideSelectedPiece(bool hideSelectedPiece) { this->hideSelectedPiece = hideSelectedPiece; };
     void setFlippedPieces(bool flipPieces) { this->flipPieces = flipPieces; };
-
-    // Notation Conversions
-    static Vector2Int getPosFromNotation(std::string gridPosition);
-    static std::string getNotationFromPos(Vector2Int gridPosition);
+    void setSpriteSize(Vector2 spriteSize) { this->spriteSize = spriteSize; };
+    void setPieceOffset(Vector2 pieceOffset) { this->pieceOffset = pieceOffset; };
+    void setSpritesPath(std::filesystem::path spritesPath) { this->spritesPath = spritesPath; };
 
 private:
-    // Rendering
+    // Display Settings
     bool hideSelectedPiece{false};
     bool flipPieces{false};
+
+    // Visuals
+    Vector2 spriteSize{70.0f, 70.0f};
+    std::filesystem::path spritesPath{"assets/image/themes/Cburnett/"};
+    Vector2 pieceOffset{Vector2::Zero};
+
+    // Rendering Methods
+    void drawPiece(Piece& piece, ChessBoard& board, Painter& painter);
+    std::filesystem::path findImagePath(PieceType type, TeamColor team);
 };

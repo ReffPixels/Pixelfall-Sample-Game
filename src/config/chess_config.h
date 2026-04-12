@@ -67,3 +67,6 @@ enum class GameOutcome {
     Draw5FoldRepetition,                // [TODO LONG TERM] Fen snapshots
     DrawAgreement,                      // [TODO LONG TERM] Button system
 };
+
+// Default initial state of the board encoded in FEN
+constexpr std::string_view defaultBoardFEN{"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"};

@@ -2,7 +2,6 @@
 
 #pragma once
 // Chess
-#include "config/board_config.h"
 #include "tools/fen_parser.h"
 #include "game_objects/chess_board.h"
 #include "game_objects/chess_pieces.h"

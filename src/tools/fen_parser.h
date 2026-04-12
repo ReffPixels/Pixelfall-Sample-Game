@@ -1,6 +1,5 @@
-// This is a FEN parser that reads FEN strings and can populate the board to match them.
+// This is a FEN parser that reads a FEN strings and transforms it into usable game data.
 // FEN (Forsyth–Edwards Notation) is a standard notation for describing the position of the pieces in a chess game.
-// Default position is rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 
 #pragma once
 // Chess
