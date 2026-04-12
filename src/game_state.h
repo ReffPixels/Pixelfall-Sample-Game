@@ -12,8 +12,8 @@
 #include <vector>
 
 struct BoardState {
-    std::vector<Piece> pieceList;
-    std::array<std::array<Piece, 8>, 8> coordinates; // 8x8 2D array of files and ranks 
+    std::vector<Piece> pieces; // List of every active piece
+    std::array<std::array<Tile, 8>, 8> tiles; // 8x8 2D array of files and ranks 
 
     TeamColor playerToMove{TeamColor::White}; // Player that gets to move next.
     CastlingRights castlingRights{true, true, true, true}; // Tracker for who's lost their castling rights.
@@ -33,32 +33,27 @@ public:
     bool hasInsufficientMaterial();
 
     // Getters
-    const BoardState& getBoardState() const { return boardStatus; }
-    Vector2Int getselPiecePosition() const { return selPiecePosition; }
-    Vector2Int getLastMoveOrigin() const { return lastMoveOrigin; }
-    Vector2Int getLastMoveTarget() const { return lastMoveTarget; }
-    const std::array<std::array<MoveType, 8>, 8>& getValidMoves() const { return validMoves; }
+    const BoardState& getBoardState() const { return boardState; };
+    Move getLastMove() const { return lastMove; };
+    const std::array<std::array<MoveType, 8>, 8>& getValidMoves() const { return validMoves; };
     TeamColor getOpponent();
     const GameOutcome& getGameOutcome() const { return gameOutcome; };
-    Vector2Int getPromotionPosition() const { return promotionPosition; }
+
+    // Pawn Promotion
+    Vector2Int getPromotionPosition() const { return promotionPosition; };
     void onPromotionSelected(PieceType pieceType);
 
     // Debug
     void removePiece(Vector2Int position);
 
 private:
-    FenParser fenParser;
-
     // Current Board State
-    std::string currentBoardFEN = board::defaults::defaultBoardFEN.data(); // Description of the current board in FEN
-    BoardState boardStatus;
-
-    // Last Move
-    // The current Board State does not record how it got there, so we need to track it separately.
-    Vector2Int lastMoveOrigin{-1, -1};
-    Vector2Int lastMoveTarget{-1, -1};
+    std::string currentBoardFEN = defaults::startPositionFEN.data(); // Description of the current board in FEN
+    BoardState boardState;
+    Vector2Int promotionPosition{-1, -1};
 
     // Moves
+    Move lastMove;
     std::array<std::array<MoveType, 8>, 8> validMoves;
 
     // Game Outcome

@@ -17,6 +17,7 @@ public:
     void drawFree(PieceType type, TeamColor team, Vector2 position, Painter& painter, Vector2 size = Vector2::Zero);
     void pieceFollowCursor(Vector2& cursorPos, ChessBoard& board, PieceType type, TeamColor team,
         Painter& painter, Vector2 offset = Vector2::Zero);
+    static Vector2 computeDragPivot(Vector2& cursorPos, ChessBoard& board);
 
     // Setters
     void setSpriteSize(Vector2 spriteSize) { this->spriteSize = spriteSize; };

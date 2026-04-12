@@ -49,7 +49,6 @@ private:
     // Interaction
     InputState inputState{InputState::Normal};
     Vector2Int selPiecePosition{-1, -1};  // (-1, -1) means no square is selected.
-    Vector2Int promotionPosition{-1, -1};
     void selectPiece(Vector2Int selectedSquare);
     void deselectPiece();
     void moveSelectedPiece(Vector2Int targetSquare);

@@ -62,9 +62,6 @@ enum class GameOutcome {
     DrawAgreement,                      // [TODO LONG TERM] Button system
 };
 
-// Default initial state of the board encoded in FEN
-constexpr std::string_view defaultBoardFEN{"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"};
-
 // -------- BOARD REPRESENTATION -------- //
 // We need a way to keep track of the state of the board. There are two main approaches to achieve this:
 // Piece centric (Where we keep a list of every piece, ith their type, colour and position), and 
@@ -88,4 +85,9 @@ struct Piece {
 struct Tile {
     PieceType type;
     TeamColor team;
+};
+
+namespace defaults {
+    // Default initial state of the board encoded in FEN
+    constexpr std::string_view startPositionFEN{"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"};
 };

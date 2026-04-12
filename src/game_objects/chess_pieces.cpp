@@ -84,19 +84,9 @@ std::filesystem::path ChessPieces::findImagePath(PieceType type, TeamColor team)
     }
 }
 
-// Computes the pivot offset so the dragged piece stays attached at the grab point
-static Vector2 computeDragPivot(Vector2& cursorPos, ChessBoard& board) {
-    Vector2Int piecePosition = board.getTileOnHover(cursorPos);
-    return {cursorPos - (board.getPosition() +
-        Vector2{(float)piecePosition.x, (float)piecePosition.y} * board.getTileSize())};
-}
-
 // Draw a piece attached to the cursor
 void ChessPieces::pieceFollowCursor(Vector2& cursorPos, ChessBoard& board,
     PieceType type, TeamColor team, Painter& painter, Vector2 offset) {
-        
-    // Adjust cursorPos so that it is attached to the point of contact with the piece and not piece position.
-    Vector2 adjustedPosition{computeDragPivot(cursorPos, board)};
 
     // Clamp cursor position to inside the board
     Vector2 positionInBoard{
@@ -106,5 +96,12 @@ void ChessPieces::pieceFollowCursor(Vector2& cursorPos, ChessBoard& board,
             board.getPosition().y, board.getPosition().y + board.getTileSize().y * 8)
     };
 
-    drawFree(type, team, adjustedPosition + offset, painter, spriteSize);
+    drawFree(type, team, positionInBoard + offset, painter, spriteSize);
+}
+
+// Computes the pivot offset so the dragged piece stays attached at the grab point
+Vector2 ChessPieces::computeDragPivot(Vector2& cursorPos, ChessBoard& board) {
+    Vector2Int piecePosition = board.getTileOnHover(cursorPos);
+    return {cursorPos - (board.getPosition() +
+        Vector2{(float)piecePosition.x, (float)piecePosition.y} * board.getTileSize())};
 }
