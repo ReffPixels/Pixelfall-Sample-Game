@@ -26,7 +26,7 @@ void move_generation::findLegalMovesForPiece(std::array<std::array<MoveType, 8>,
                 getAttackedSquares(true, piece.team, simulatedBoard, castlingRights);
 
             // Find king position
-            Vector2Int kingPosition = {};
+            Vector2Int kingPosition = {-1, -1};
             for (int kr = 0; kr < 8; kr++)
                 for (int kf = 0; kf < 8; kf++)
                     if (simulatedBoard[kf][kr].team == piece.team
@@ -62,22 +62,22 @@ void move_generation::findLegalMovesForPiece(std::array<std::array<MoveType, 8>,
 // Dispatch move generation to the correct function based on piece type
 std::array<std::array<MoveType, 8>, 8> move_generation::generateMovesForPiece(
     Tile piece, Vector2Int position, const std::array<std::array<Tile, 8>, 8>& boardState,
-    const CastlingRights& castlingRights, Vector2Int enPassantTargetSquare) {
+    const CastlingRights& castlingRights, Vector2Int enPassantTargetSquare, bool attackMode) {
 
     switch (piece.type) {
     case PieceType::King:
-        return generateKingMoves(position, piece.team, boardState, castlingRights);
+        return generateKingMoves(position, piece.team, boardState, castlingRights, attackMode);
     case PieceType::Queen:
-        return generateQueenMoves(position, piece.team, boardState);
+        return generateQueenMoves(position, piece.team, boardState, attackMode);
     case PieceType::Rook:
-        return generateRookMoves(position, piece.team, boardState);
+        return generateRookMoves(position, piece.team, boardState, attackMode);
     case PieceType::Bishop:
-        return generateBishopMoves(position, piece.team, boardState);
+        return generateBishopMoves(position, piece.team, boardState, attackMode);
     case PieceType::Knight:
-        return generateKnightMoves(position, piece.team, boardState);
+        return generateKnightMoves(position, piece.team, boardState, attackMode);
     case PieceType::Pawn: {
         bool isFirstMove = (piece.team == TeamColor::White) ? (position.y == 6) : (position.y == 1);
-        return generatePawnMoves(position, piece.team, boardState, enPassantTargetSquare, isFirstMove);
+        return generatePawnMoves(position, piece.team, boardState, enPassantTargetSquare, isFirstMove, attackMode);
     }
     default:
         std::array<std::array<MoveType, 8>, 8> empty{};
@@ -87,13 +87,13 @@ std::array<std::array<MoveType, 8>, 8> move_generation::generateMovesForPiece(
 
 std::array<std::array<MoveType, 8>, 8> move_generation::generateKingMoves(
     Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState,
-    const CastlingRights& castlingRights) {
+    const CastlingRights& castlingRights, bool attackMode) {
 
     // Normal Moves
     std::array<std::array<MoveType, 8>, 8> kingMoves =
         generateMoves(moveOrigin, TeamColor, boardState, {
             Vector2Int::Up, Vector2Int::Right, Vector2Int::Down, Vector2Int::Left,
-            Vector2Int::UpRight, Vector2Int::DownRight, Vector2Int::DownLeft, Vector2Int::UpLeft}, 1);
+            Vector2Int::UpRight, Vector2Int::DownRight, Vector2Int::DownLeft, Vector2Int::UpLeft}, 1, attackMode);
 
     // White Castling Moves
     if (TeamColor == TeamColor::White) {
@@ -127,37 +127,37 @@ std::array<std::array<MoveType, 8>, 8> move_generation::generateKingMoves(
 }
 
 std::array<std::array<MoveType, 8>, 8> move_generation::generateQueenMoves(
-    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState) {
+    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState, bool attackMode) {
     
     return generateMoves(moveOrigin, TeamColor, boardState, {
         Vector2Int::Up, Vector2Int::Right, Vector2Int::Down, Vector2Int::Left,
-        Vector2Int::UpRight, Vector2Int::DownRight, Vector2Int::DownLeft, Vector2Int::UpLeft}, 7);
+        Vector2Int::UpRight, Vector2Int::DownRight, Vector2Int::DownLeft, Vector2Int::UpLeft}, 7, attackMode);
 }
 
 std::array<std::array<MoveType, 8>, 8> move_generation::generateRookMoves(
-    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState) {
+    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState, bool attackMode) {
     
     return generateMoves(moveOrigin, TeamColor, boardState, {
-        Vector2Int::Up, Vector2Int::Right, Vector2Int::Down, Vector2Int::Left}, 7);
+        Vector2Int::Up, Vector2Int::Right, Vector2Int::Down, Vector2Int::Left}, 7, attackMode);
 }
 
 std::array<std::array<MoveType, 8>, 8> move_generation::generateBishopMoves(
-    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState) {
+    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState, bool attackMode) {
     
     return generateMoves(moveOrigin, TeamColor, boardState, {
-        Vector2Int::UpRight, Vector2Int::DownRight, Vector2Int::DownLeft, Vector2Int::UpLeft}, 7);
+        Vector2Int::UpRight, Vector2Int::DownRight, Vector2Int::DownLeft, Vector2Int::UpLeft}, 7, attackMode);
 }
 
 std::array<std::array<MoveType, 8>, 8> move_generation::generateKnightMoves(
-    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState) {
+    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState, bool attackMode) {
     
     return generateMoves(moveOrigin, TeamColor, boardState, {
-        {2,1}, {2,-1}, {1,2}, {-1,2}, {-2,1}, {-2,-1}, {1,-2}, {-1,-2}}, 1);
+        {2,1}, {2,-1}, {1,2}, {-1,2}, {-2,1}, {-2,-1}, {1,-2}, {-1,-2}}, 1, attackMode);
 }
 
 std::array<std::array<MoveType, 8>, 8> move_generation::generatePawnMoves(
     Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState,
-    Vector2Int enPassantTargetSquare, bool isFirstMove) {
+    Vector2Int enPassantTargetSquare, bool isFirstMove, bool attackMode) {
     
     std::array<std::array<MoveType, 8>, 8> moves;
     clearMoves(moves);
@@ -205,7 +205,7 @@ std::array<std::array<MoveType, 8>, 8> move_generation::generatePawnMoves(
 
         // There is a piece in this square
         if (boardState[targetSquare.x][targetSquare.y].type != PieceType::None) {
-            if (boardState[targetSquare.x][targetSquare.y].team != TeamColor)
+            if (boardState[targetSquare.x][targetSquare.y].team != TeamColor || attackMode)
                 // Check if it's a promotion
                 if (targetSquare.y == 0 || targetSquare.y == 7) {
                     moves[targetSquare.x][targetSquare.y] = MoveType::CapturePromotion;
@@ -218,6 +218,10 @@ std::array<std::array<MoveType, 8>, 8> move_generation::generatePawnMoves(
         // Empty square (Could it be en passant?)
         if (targetSquare == enPassantTargetSquare)
             moves[targetSquare.x][targetSquare.y] = MoveType::EnPassant;
+        // Attack mode: mark empty diagonal squares as attacked
+        else if (attackMode)
+            moves[targetSquare.x][targetSquare.y] = MoveType::Move;
+
     }
 
     return moves;
@@ -226,7 +230,7 @@ std::array<std::array<MoveType, 8>, 8> move_generation::generatePawnMoves(
 std::array<std::array<MoveType, 8>, 8> move_generation::generateMoves(
     Vector2Int moveOrigin, TeamColor TeamColor,
     const std::array<std::array<Tile, 8>, 8>& boardState,
-    std::vector<Vector2Int> directions, int maxSteps) {
+    std::vector<Vector2Int> directions, int maxSteps, bool attackMode) {
 
     std::array<std::array<MoveType, 8>, 8> moves;
     clearMoves(moves);
@@ -239,7 +243,7 @@ std::array<std::array<MoveType, 8>, 8> move_generation::generateMoves(
                 break;
 
             if (boardState[targetSquare.x][targetSquare.y].type != PieceType::None) {
-                if (boardState[targetSquare.x][targetSquare.y].team != TeamColor)
+                if (boardState[targetSquare.x][targetSquare.y].team != TeamColor || attackMode)
                     moves[targetSquare.x][targetSquare.y] = MoveType::Capture;
                 break;
             }
@@ -299,7 +303,7 @@ std::array<std::array<bool, 8>, 8> move_generation::getAttackedSquares(bool igno
 
             // This cell is a piece other than a pawn, we can use move generation to find its attack squares
             std::array<std::array<MoveType, 8>, 8> moves =
-                move_generation::generateMovesForPiece(cell, Vector2Int(file, rank), adjustedBoardState, castlingRights);
+                move_generation::generateMovesForPiece(cell, Vector2Int(file, rank), adjustedBoardState, castlingRights, {-1, -1}, true);
 
             // Only add valid attack moves to the attacked squares (Not Empty or Castling)
             // We don't need to account for promotion since forward pawn moves don't attack anyway.

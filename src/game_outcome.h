@@ -12,6 +12,7 @@
 #include <vector>
 
 namespace game_outcome {
+    
     Outcome getOutcome(const BoardState& boardState);
 
     // Methods used to determine game outcome
@@ -19,4 +20,7 @@ namespace game_outcome {
     bool hasLegalMoves(const BoardState& boardState);
     bool hasInsufficientMaterial(const BoardState& boardState);
     TileColor getTileColor(const Vector2Int& position);
+
+    // Other
+    void displayOutcome(Outcome outcome);
 };

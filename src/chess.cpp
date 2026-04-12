@@ -54,10 +54,10 @@ void Chess::onUpdate() {
         if (inputState == InputState::Promotion) {
             if (appInput->isMouseButtonPressed(MouseButton::Left)) {
                 bool flipPieces = board.getBoardDirection() != BoardDirection::BlackOnTop;
-                PieceType chosenPiece = promotion_interface::getPieceOnHover(cursorPos, state.getPromotionPosition(),
+                PieceType chosenPiece = promotion_interface::getPieceOnHover(cursorPos, state.getLastMove().target,
                     state.getBoardState().playerToMove, board.getPosition(), board.getTileSize(), flipPieces);
                 if (chosenPiece != PieceType::None) {
-                    state.onPromotionSelected(chosenPiece);
+                    state.selectPromotionPiece(chosenPiece);
                     nextTurn();
                 }
             }
@@ -127,7 +127,7 @@ void Chess::onRender() {
 
     // Draw Promotion UI
     if (inputState == InputState::Promotion) {
-        promotion_interface::drawPieces(pieces, state.getPromotionPosition(), boardState.playerToMove,
+        promotion_interface::drawPieces(pieces, state.getLastMove().target, boardState.playerToMove,
             board.getPosition(), board.getTileSize(), board.getTileSize() * 0.8f, *painter,
             board.getBoardDirection() == BoardDirection::BlackOnTop ? false : true);
     }
@@ -152,32 +152,18 @@ void Chess::startNewGame() {
 // Swaps the current player and runs necessary functions to set up the next turn (Or end the game)
 void Chess::nextTurn() {
 
+    // Update Game State
     state.updateCastlingRights();
-    state.swapPlayers();
     state.incrementTotalMoves();
-    deselectPiece();
     state.syncPieceState();
-    gameOutcome = game_outcome::getOutcome(state.getBoardState());
-    displayOutcome();
-}
 
-void Chess::displayOutcome() {
-    switch (gameOutcome) {
-    case Outcome::WhiteVictoryCheckmate: std::cout << "WHITE VICTORY (CHECKMATE)" << std::endl; break;
-    case Outcome::BlackVictoryCheckmate: std::cout << "BLACK VICTORY (CHECKMATE)" << std::endl; break;
-    case Outcome::WhiteVictoryResignation: std::cout << "WHITE VICTORY (RESIGNATION)" << std::endl; break;
-    case Outcome::BlackVictoryResignation: std::cout << "BLACK VICTORY (RESIGNATION)" << std::endl; break;
-    case Outcome::WhiteVictoryTimeout: std::cout << "WHITE VICTORY (TIMEOUT)" << std::endl; break;
-    case Outcome::BlackVictoryTimeout: std::cout << "BLACK VICTORY (TIMEOUT)" << std::endl; break;
-    case Outcome::DrawStalemate: std::cout << "DRAW (STALEMATE)" << std::endl; break;
-    case Outcome::DrawInsufficientMaterial: std::cout << "DRAW (INSUFFICIENT MATERIAL)" << std::endl; break;
-    case Outcome::Draw50Move: std::cout << "DRAW (50 MOVE RULE)" << std::endl; break;
-    case Outcome::Draw75Move: std::cout << "DRAW (75 MOVE RULE)" << std::endl; break;
-    case Outcome::Draw3FoldRepetition: std::cout << "DRAW (3 FOLD REPETITION)" << std::endl; break;
-    case Outcome::Draw5FoldRepetition: std::cout << "DRAW (5 FOLD REPETITION)" << std::endl; break;
-    case Outcome::DrawAgreement: std::cout << "DRAW (AGREEMENT)" << std::endl; break;
-    default: break; // Do nothing if the game is still playing
-    }
+    // Let the other player move.
+    deselectPiece();
+    state.swapPlayers();
+
+    // Analize the board to detect if the game has ended
+    gameOutcome = game_outcome::getOutcome(state.getBoardState());
+    game_outcome::displayOutcome(gameOutcome);
 }
 
 void Chess::resetGame() {
@@ -187,7 +173,7 @@ void Chess::resetGame() {
     move_generation::clearMoves(selectedPieceMoves);
     state.clearState();
     gameOutcome = Outcome::Playing;
-    state.setupFromFEN();
+    state.setupFromFEN(defaults::startPositionFEN.data());
 }
 
 // Pressing allows to select a new piece or move if a piece is already selected.

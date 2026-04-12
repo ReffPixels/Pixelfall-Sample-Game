@@ -1,8 +1,10 @@
 // Implementation for game_outcome.h
 #include "game_outcome.h"
 #include "move_generation.h"
+#include <iostream>
 
-// Checks for checkmate and stalemate after each move. (By order of priority)
+// Returns the game's outcome by reading the board.
+// This normally returns the default of "Playing" unless a game ending condition has been met, like Checkmate.
 Outcome game_outcome::getOutcome(const BoardState& boardState) {
     // Default game outcome is playing
     Outcome gameOutcome{Outcome::Playing};
@@ -23,8 +25,8 @@ Outcome game_outcome::getOutcome(const BoardState& boardState) {
         if (hasInsufficientMaterial(boardState)) {
             gameOutcome = Outcome::DrawInsufficientMaterial;
         }
-        // 75 Move Rule (Automatic Draw)
-        if (boardState.moveRuleCounter == 75) {
+        // 75 Move Rule (Automatic Draw) (We must track this as 150 half moves because the counter can start at any ply)
+        if (boardState.moveRuleCounter >= 150) {
             gameOutcome = Outcome::Draw75Move;
         }
     }
@@ -71,10 +73,13 @@ bool game_outcome::hasLegalMoves(const BoardState& boardState) {
     return false;
 }
 
+// Get the color of a tile (Dark or Light) from it's grid position.
 TileColor game_outcome::getTileColor(const Vector2Int& position) {
     return ((position.x + position.y) % 2 == 0) ? TileColor::Light : TileColor::Dark;
 }
 
+// Checks if there is not enough pieces on the board for a checkmate to be delivered.
+// When this happens, a game outcome of Draw by Insufficient Material should be triggered.
 bool game_outcome::hasInsufficientMaterial(const BoardState& boardState) {
     // Find piece count in array
     auto getPieceCount = [](const auto& m, PieceType t) -> int {
@@ -111,4 +116,24 @@ bool game_outcome::hasInsufficientMaterial(const BoardState& boardState) {
         }
     }
     return false;
+}
+
+// Displays the outcome on the console using std::cout
+void game_outcome::displayOutcome(Outcome outcome) {
+    switch (outcome) {
+    case Outcome::WhiteVictoryCheckmate: std::cout << "WHITE VICTORY (CHECKMATE)" << std::endl; break;
+    case Outcome::BlackVictoryCheckmate: std::cout << "BLACK VICTORY (CHECKMATE)" << std::endl; break;
+    case Outcome::WhiteVictoryResignation: std::cout << "WHITE VICTORY (RESIGNATION)" << std::endl; break;
+    case Outcome::BlackVictoryResignation: std::cout << "BLACK VICTORY (RESIGNATION)" << std::endl; break;
+    case Outcome::WhiteVictoryTimeout: std::cout << "WHITE VICTORY (TIMEOUT)" << std::endl; break;
+    case Outcome::BlackVictoryTimeout: std::cout << "BLACK VICTORY (TIMEOUT)" << std::endl; break;
+    case Outcome::DrawStalemate: std::cout << "DRAW (STALEMATE)" << std::endl; break;
+    case Outcome::DrawInsufficientMaterial: std::cout << "DRAW (INSUFFICIENT MATERIAL)" << std::endl; break;
+    case Outcome::Draw50Move: std::cout << "DRAW (50 MOVE RULE)" << std::endl; break;
+    case Outcome::Draw75Move: std::cout << "DRAW (75 MOVE RULE)" << std::endl; break;
+    case Outcome::Draw3FoldRepetition: std::cout << "DRAW (3 FOLD REPETITION)" << std::endl; break;
+    case Outcome::Draw5FoldRepetition: std::cout << "DRAW (5 FOLD REPETITION)" << std::endl; break;
+    case Outcome::DrawAgreement: std::cout << "DRAW (AGREEMENT)" << std::endl; break;
+    default: break; // Do nothing if the game is still playing
+    }
 }

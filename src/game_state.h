@@ -1,4 +1,5 @@
-// Defines behaviours of the chess game
+// Defines the state of a chess game. 
+// The main purpose of GameState is to take a move as input, and update the state of the board to match.
 
 #pragma once
 // Chess
@@ -11,10 +12,10 @@
 #include <array>
 #include <vector>
 
+// Records all of the information necessary to track the current state of the game.
 struct BoardState {
     std::vector<Piece> pieces; // List of every active piece
     std::array<std::array<Tile, 8>, 8> tiles; // 8x8 2D array of files and ranks 
-
     TeamColor playerToMove{TeamColor::White}; // Player that gets to move next.
     CastlingRights castlingRights{true, true, true, true}; // Tracker for who's lost their castling rights.
     Vector2Int enPassantTargetSquare{-1, -1}; // Record where en passant is possible (Cannot be deduced from positions)
@@ -25,37 +26,34 @@ struct BoardState {
 class GameState {
 public:
     // Setup
-    void setupFromFEN();
+    void setupFromFEN(std::string fenString);
 
     // State Control
     const BoardState& getBoardState() const { return boardState; };
     void syncPieceState();
     void syncTileState();
     void clearState();
-
-    // Moves
-    void movePiece(Vector2Int origin, Vector2Int target, MoveType moveType);
+    void clearTileState();
     void updateCastlingRights();
-    Move getLastMove() const { return lastMove; };
     void incrementTotalMoves();
 
-    // Pawn Promotion
-    Vector2Int getPromotionPosition() const { return promotionPosition; };
-    void onPromotionSelected(PieceType pieceType);
-
-    // Players
+    // User Interaction (Input that modifies the game state)
+    void movePiece(Vector2Int origin, Vector2Int target, MoveType moveType);
+    void selectPromotionPiece(PieceType pieceType);
     void swapPlayers();
+
+    // Getters
+    Move getLastMove() const { return lastMove; };
     TeamColor getOpponent();
 
     // Debug
     void removePiece(Vector2Int position);
 
 private:
-    // Current Board State
-    std::string currentBoardFEN = defaults::startPositionFEN.data(); // Description of the current board in FEN
+    // Board State
     BoardState boardState;
-    Vector2Int promotionPosition{-1, -1};
+    std::string currentBoardFEN; // [TODO] Description of the current board in FEN
 
-    // Moves
+    // Board Memory
     Move lastMove;
 };
