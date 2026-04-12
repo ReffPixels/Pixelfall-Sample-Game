@@ -3,7 +3,7 @@
 #include "ui/promotion_widget.h"
 
 // Draws promotion piece options above/below the board
-void PromotionInterface::drawPieces(ChessPieces& chessPieces, Vector2Int pawnPosition, TeamColor playerTeam,
+void promotion_interface::drawPieces(ChessPieces& chessPieces, Vector2Int pawnPosition, TeamColor playerTeam,
     Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
     Painter& painter, bool flipPieces, Color backgroundColor) {
         
@@ -37,7 +37,7 @@ void PromotionInterface::drawPieces(ChessPieces& chessPieces, Vector2Int pawnPos
 }
 
 // Get the specific square under the cursor
-PieceType PromotionInterface::getPieceOnHover(Vector2 mousePos, Vector2Int pawnPosition, TeamColor playerTeam,
+PieceType promotion_interface::getPieceOnHover(Vector2 mousePos, Vector2Int pawnPosition, TeamColor playerTeam,
     Vector2 boardPosition, Vector2 tileSize, bool flipPieces) {
 
     Vector2 physicalPawnPosition{boardPosition.x + (float)pawnPosition.x * tileSize.x,

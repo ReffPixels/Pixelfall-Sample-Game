@@ -1,5 +1,6 @@
 src/chess.cpp
 src/game_state.cpp
+src/game_outcome.cpp
 src/move_generation.cpp
 src/tools/fen_parser.cpp
 src/game_objects/chess_pieces.cpp

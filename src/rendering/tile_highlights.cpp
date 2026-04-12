@@ -5,7 +5,7 @@
 #include <algorithm>
 
 // Draw a highlight on the square of the selected piece
-void TileHighlights::highlightSelected(ChessBoard& board, Vector2Int selPiecePosition, Painter& painter) {
+void tile_highlights::highlightSelected(ChessBoard& board, Vector2Int selPiecePosition, Painter& painter) {
     if (selPiecePosition != Vector2Int{-1, -1}) {
         painter.drawRectangle(
             board.getPosition()
@@ -18,7 +18,7 @@ void TileHighlights::highlightSelected(ChessBoard& board, Vector2Int selPiecePos
 }
 
 // Draw a highlight on the start and end squares of the last move
-void TileHighlights::highlightLastMove(ChessBoard& board, Vector2Int lastMoveOrigin,
+void tile_highlights::highlightLastMove(ChessBoard& board, Vector2Int lastMoveOrigin,
     Vector2Int lastMoveTarget, Painter& painter) {
     if (lastMoveOrigin != Vector2Int{-1, -1} && lastMoveTarget != Vector2Int{-1, -1}) {
         painter.drawRectangle(
@@ -39,7 +39,7 @@ void TileHighlights::highlightLastMove(ChessBoard& board, Vector2Int lastMoveOri
 }
 
 // Draw a highlight on the square that the cursor is hovering
-void TileHighlights::highlightHoveredSquare(Vector2& cursorPos, ChessBoard& board,
+void tile_highlights::highlightHoveredSquare(Vector2& cursorPos, ChessBoard& board,
     Painter& painter, Vector2Int selPiecePosition) {
     // Snap to grid position
     Vector2Int gridPos = board.getTileOnHover(cursorPos);
@@ -62,7 +62,7 @@ void TileHighlights::highlightHoveredSquare(Vector2& cursorPos, ChessBoard& boar
 }
 
 // Draw a circle at every move location provided
-void TileHighlights::highlightMoves(std::array<std::array<MoveType, 8>, 8> validMoves, ChessBoard& board, Painter& painter) {
+void tile_highlights::highlightMoves(std::array<std::array<MoveType, 8>, 8> validMoves, ChessBoard& board, Painter& painter) {
     for (int rank = 0; rank < 8; rank++)
         for (int file = 0; file < 8; file++)
             // It's a normal move or it's castling
@@ -92,7 +92,7 @@ void TileHighlights::highlightMoves(std::array<std::array<MoveType, 8>, 8> valid
 }
 
 // Draw a red highlight on every square attacked by the opponent
-void TileHighlights::highlightAttackedSquares(std::array<std::array<bool, 8>, 8> attackedSquares,
+void tile_highlights::highlightAttackedSquares(std::array<std::array<bool, 8>, 8> attackedSquares,
     ChessBoard& board, Painter& painter, Color color) {
     for (int rank = 0; rank < 8; rank++)
         for (int file = 0; file < 8; file++)

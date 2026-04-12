@@ -6,7 +6,7 @@
 #include "move_generation.h"
 #include "game_objects/chess_board.h"
 
-namespace TileHighlights {
+namespace tile_highlights {
     void highlightSelected(ChessBoard& board, Vector2Int selPiecePosition, Painter& painter);
     void highlightLastMove(ChessBoard& board, Vector2Int lastMoveOrigin,
         Vector2Int lastMoveTarget, Painter& painter);

@@ -6,7 +6,7 @@
 #include <vector>
 
 // Utility functions for parsing algebraic notations
-namespace NotationParser {
+namespace notation_parser {
     // Converts a piece location from grid notation (a1 to h8) into a vector.
     static Vector2Int getPosFromNotation(const std::string& gridPosition) {
         return Vector2Int{

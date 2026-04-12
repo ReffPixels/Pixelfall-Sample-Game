@@ -19,7 +19,7 @@ struct FenState {
 };
 
 // Utility functions for parsing FEN strings
-namespace fenParser {
+namespace fen_parser {
     FenState getState(const std::string& fenString);
     Piece getPieceFromSymbol(char symbol, Vector2Int position);
 };

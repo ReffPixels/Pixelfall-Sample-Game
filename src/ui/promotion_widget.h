@@ -3,7 +3,7 @@
 #pragma once
 #include "game_objects/chess_pieces.h"
 
-namespace PromotionInterface {
+namespace promotion_interface {
     // Rendering
     void drawPieces(ChessPieces& chessPieces, Vector2Int pawnPosition, TeamColor playerTeam,
         Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,

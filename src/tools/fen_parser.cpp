@@ -22,7 +22,7 @@ static bool parsePieceList(const std::string& pieceList, FenState& fenState) {
         }
         // Piece detected - Add it to the FEN state
         else if (std::string("KQRBNPkqrbnp").find(c) != std::string::npos) {
-            fenState.pieceList.push_back(fenParser::getPieceFromSymbol(c, gridPosition));
+            fenState.pieceList.push_back(fen_parser::getPieceFromSymbol(c, gridPosition));
             // Move to next square
             gridPosition.x++;
         }
@@ -89,7 +89,7 @@ static bool parseEnPassantSquare(const std::string& enPassantTargetSquare, FenSt
     // Check that the notation is in the correct format
     if (std::string("abcdefgh").find(enPassantTargetSquare[0]) != std::string::npos
         && std::string("12345678").find(enPassantTargetSquare[1]) != std::string::npos) {
-        fenState.enPassantTargetSquare = NotationParser::getPosFromNotation(enPassantTargetSquare);
+        fenState.enPassantTargetSquare = notation_parser::getPosFromNotation(enPassantTargetSquare);
         return true;
     }
 
@@ -136,7 +136,7 @@ static bool parseTotalFullMoves(const std::string & totalFullMoves, FenState & f
 
 // Transforms a piece in symbol format (Like k for black king) into a usable Piece struct.
 // Position is required for a piece struct.
-Piece fenParser::getPieceFromSymbol(char symbol, Vector2Int position) {
+Piece fen_parser::getPieceFromSymbol(char symbol, Vector2Int position) {
     switch (symbol) {
         // White Pieces
     case 'K': return Piece{PieceType::King, TeamColor::White, position};
@@ -170,7 +170,7 @@ static std::vector<std::string> split(const std::string& str, char delimiter) {
 
 // Parse an entire fen string and return its values in a usable struct format.
 // Returns a default empty board struct if the format is invalid.
-FenState fenParser::getState(const std::string& fenString) {
+FenState fen_parser::getState(const std::string& fenString) {
 
     // Split the FEN string into its different categories
     std::vector<std::string> fenCategories = split(fenString, ' ');

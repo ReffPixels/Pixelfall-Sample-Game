@@ -39,11 +39,6 @@ public:
     Move getLastMove() const { return lastMove; };
     void incrementTotalMoves();
 
-    // Outcome
-    bool hasInsufficientMaterial();
-    bool findGameOutcome();
-    const GameOutcome& getGameOutcome() const { return gameOutcome; };
-
     // Pawn Promotion
     Vector2Int getPromotionPosition() const { return promotionPosition; };
     void onPromotionSelected(PieceType pieceType);
@@ -63,9 +58,4 @@ private:
 
     // Moves
     Move lastMove;
-
-    // Game Outcome
-    GameOutcome gameOutcome{GameOutcome::Playing};
-    bool isKingInCheck(TeamColor team) const;
-    bool hasLegalMoves(TeamColor team) const;
 };

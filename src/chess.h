@@ -6,6 +6,7 @@
 #include "pixelfall/engine/core/application.h"
 // Chess
 #include "game_state.h"
+#include "game_outcome.h"
 #include "game_objects/chess_board.h"
 #include "game_objects/chess_pieces.h"
 #include "ui/promotion_widget.h"
@@ -33,12 +34,13 @@ private:
     GameState state;
     ChessBoard board;
     ChessPieces pieces;
+    Outcome gameOutcome{Outcome::Playing};  // Game starts as "Playing"
 
     // Game Stages
     void startNewGame();
     void nextTurn();
-    void endGame();
     void resetGame();
+    void displayOutcome();
 
     // Input
     Vector2 cursorPos{};

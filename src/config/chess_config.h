@@ -44,7 +44,7 @@ struct CastlingRights {
     bool blackQueenSide;    // Black is still allowed to castle on the queen's side.
 };
 
-enum class GameOutcome {
+enum class Outcome {
     Playing,                            // The game is currently in progress
     WhiteVictoryCheckmate,              // There are no legal moves for black and the king is under check
     BlackVictoryCheckmate,              // There are no legal moves for white and the king is under check

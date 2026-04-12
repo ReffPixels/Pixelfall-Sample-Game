@@ -38,7 +38,7 @@ void Chess::onUpdate() {
     board.setPosition((appWindow->getLogicalSize() / 2) - (board.getTileSize() * 4));
 
     // Handle board interaction
-    if (state.getGameOutcome() == GameOutcome::Playing) {
+    if (gameOutcome == Outcome::Playing) {
         if (board.isBoardOnHover(cursorPos)) {
             Vector2Int hoveredSquare = board.getTileOnHover(cursorPos);
             if (appInput->isMouseButtonPressed(MouseButton::Left)) onBoardPressed(hoveredSquare);
@@ -54,7 +54,7 @@ void Chess::onUpdate() {
         if (inputState == InputState::Promotion) {
             if (appInput->isMouseButtonPressed(MouseButton::Left)) {
                 bool flipPieces = board.getBoardDirection() != BoardDirection::BlackOnTop;
-                PieceType chosenPiece = PromotionInterface::getPieceOnHover(cursorPos, state.getPromotionPosition(),
+                PieceType chosenPiece = promotion_interface::getPieceOnHover(cursorPos, state.getPromotionPosition(),
                     state.getBoardState().playerToMove, board.getPosition(), board.getTileSize(), flipPieces);
                 if (chosenPiece != PieceType::None) {
                     state.onPromotionSelected(chosenPiece);
@@ -74,7 +74,7 @@ void Chess::onRender() {
 
     // Draw Background
     Color backgroundColor{
-        state.getGameOutcome() == GameOutcome::Playing ?
+        gameOutcome == Outcome::Playing ?
         Color::fromHexcode("#212121") : Color::fromHexcode("#33ff00")};
     
     painter->drawRectangle(
@@ -87,27 +87,27 @@ void Chess::onRender() {
     board.draw(*painter);
 
     // Draw Attacked Squares (Player)
-    if (appInput->isKeyDown(KeyCode::Q)) TileHighlights::highlightAttackedSquares(moveGeneration::getAttackedSquares(
+    if (appInput->isKeyDown(KeyCode::Q)) tile_highlights::highlightAttackedSquares(move_generation::getAttackedSquares(
         false, boardState.playerToMove, boardState.tiles, boardState.castlingRights), board, *painter);
 
     // Draw Attacked Squares (Opponent)
-    if (appInput->isKeyDown(KeyCode::E)) TileHighlights::highlightAttackedSquares(moveGeneration::getAttackedSquares(
+    if (appInput->isKeyDown(KeyCode::E)) tile_highlights::highlightAttackedSquares(move_generation::getAttackedSquares(
         false, state.getOpponent(), boardState.tiles, boardState.castlingRights), board, *painter,
         Color::fromHexcode("#0000ff88"));
 
     // Draw Highlights
     Move lastMove = state.getLastMove();
-    TileHighlights::highlightLastMove(board, lastMove.origin, lastMove.target, *painter);
+    tile_highlights::highlightLastMove(board, lastMove.origin, lastMove.target, *painter);
 
     if (inputState == InputState::PieceSelected) {
-        TileHighlights::highlightSelected(board, selectedPiece.position, *painter);
-        TileHighlights::highlightMoves(selectedPieceMoves, board, *painter);
+        tile_highlights::highlightSelected(board, selectedPiece.position, *painter);
+        tile_highlights::highlightMoves(selectedPieceMoves, board, *painter);
     }
 
     bool dragAndDrop = inputState == InputState::PieceSelected
         && appInput->isMouseButtonDown(MouseButton::Left);
     // Draw Drag and Drop Highlight (Under pieces)
-    if (dragAndDrop) TileHighlights::highlightHoveredSquare(cursorPos, board, *painter, selectedPiece.position);
+    if (dragAndDrop) tile_highlights::highlightHoveredSquare(cursorPos, board, *painter, selectedPiece.position);
 
     // Draw Pieces
     if (dragAndDrop) {
@@ -127,7 +127,7 @@ void Chess::onRender() {
 
     // Draw Promotion UI
     if (inputState == InputState::Promotion) {
-        PromotionInterface::drawPieces(pieces, state.getPromotionPosition(), boardState.playerToMove,
+        promotion_interface::drawPieces(pieces, state.getPromotionPosition(), boardState.playerToMove,
             board.getPosition(), board.getTileSize(), board.getTileSize() * 0.8f, *painter,
             board.getBoardDirection() == BoardDirection::BlackOnTop ? false : true);
     }
@@ -142,7 +142,7 @@ void Chess::startNewGame() {
     // Set initial state of board.
     resetGame();
 
-    // We need to flip the board and pieces here since state does not handle board TileHighlights::
+    // We need to flip the board and pieces here since state does not handle board tile_highlights::
     if (playerTeam == TeamColor::White)
         board.setBoardDirection(BoardDirection::BlackOnTop);
     else
@@ -157,25 +157,26 @@ void Chess::nextTurn() {
     state.incrementTotalMoves();
     deselectPiece();
     state.syncPieceState();
-    if (state.findGameOutcome()) endGame();
+    gameOutcome = game_outcome::getOutcome(state.getBoardState());
+    displayOutcome();
 }
 
-void Chess::endGame() {
-    std::cout << "-------------------------------" << std::endl;
-    switch (state.getGameOutcome()) {
-    case GameOutcome::WhiteVictoryCheckmate: std::cout << "WHITE VICTORY (CHECKMATE)" << std::endl; break;
-    case GameOutcome::BlackVictoryCheckmate: std::cout << "BLACK VICTORY (CHECKMATE)" << std::endl; break;
-    case GameOutcome::WhiteVictoryResignation: std::cout << "WHITE VICTORY (RESIGNATION)" << std::endl; break;
-    case GameOutcome::BlackVictoryResignation: std::cout << "BLACK VICTORY (RESIGNATION)" << std::endl; break;
-    case GameOutcome::WhiteVictoryTimeout: std::cout << "WHITE VICTORY (TIMEOUT)" << std::endl; break;
-    case GameOutcome::BlackVictoryTimeout: std::cout << "BLACK VICTORY (TIMEOUT)" << std::endl; break;
-    case GameOutcome::DrawStalemate: std::cout << "DRAW (STALEMATE)" << std::endl; break;
-    case GameOutcome::DrawInsufficientMaterial: std::cout << "DRAW (INSUFFICIENT MATERIAL)" << std::endl; break;
-    case GameOutcome::Draw50Move: std::cout << "DRAW (50 MOVE RULE)" << std::endl; break;
-    case GameOutcome::Draw75Move: std::cout << "DRAW (75 MOVE RULE)" << std::endl; break;
-    case GameOutcome::Draw3FoldRepetition: std::cout << "DRAW (3 FOLD REPETITION)" << std::endl; break;
-    case GameOutcome::Draw5FoldRepetition: std::cout << "DRAW (5 FOLD REPETITION)" << std::endl; break;
-    case GameOutcome::DrawAgreement: std::cout << "DRAW (AGREEMENT)" << std::endl; break;
+void Chess::displayOutcome() {
+    switch (gameOutcome) {
+    case Outcome::WhiteVictoryCheckmate: std::cout << "WHITE VICTORY (CHECKMATE)" << std::endl; break;
+    case Outcome::BlackVictoryCheckmate: std::cout << "BLACK VICTORY (CHECKMATE)" << std::endl; break;
+    case Outcome::WhiteVictoryResignation: std::cout << "WHITE VICTORY (RESIGNATION)" << std::endl; break;
+    case Outcome::BlackVictoryResignation: std::cout << "BLACK VICTORY (RESIGNATION)" << std::endl; break;
+    case Outcome::WhiteVictoryTimeout: std::cout << "WHITE VICTORY (TIMEOUT)" << std::endl; break;
+    case Outcome::BlackVictoryTimeout: std::cout << "BLACK VICTORY (TIMEOUT)" << std::endl; break;
+    case Outcome::DrawStalemate: std::cout << "DRAW (STALEMATE)" << std::endl; break;
+    case Outcome::DrawInsufficientMaterial: std::cout << "DRAW (INSUFFICIENT MATERIAL)" << std::endl; break;
+    case Outcome::Draw50Move: std::cout << "DRAW (50 MOVE RULE)" << std::endl; break;
+    case Outcome::Draw75Move: std::cout << "DRAW (75 MOVE RULE)" << std::endl; break;
+    case Outcome::Draw3FoldRepetition: std::cout << "DRAW (3 FOLD REPETITION)" << std::endl; break;
+    case Outcome::Draw5FoldRepetition: std::cout << "DRAW (5 FOLD REPETITION)" << std::endl; break;
+    case Outcome::DrawAgreement: std::cout << "DRAW (AGREEMENT)" << std::endl; break;
+    default: break; // Do nothing if the game is still playing
     }
 }
 
@@ -183,9 +184,9 @@ void Chess::resetGame() {
     selectedPiece.position = {-1, -1};
     selectedPiece.type = PieceType::None;
     selectedPiece.team = TeamColor::None;
-    moveGeneration::clearMoves(selectedPieceMoves);
-
+    move_generation::clearMoves(selectedPieceMoves);
     state.clearState();
+    gameOutcome = Outcome::Playing;
     state.setupFromFEN();
 }
 
@@ -228,9 +229,9 @@ void Chess::selectPiece(Vector2Int selectedSquare) {
 
     Tile selTile = state.getBoardState().tiles[selectedPiece.position.x][selectedPiece.position.y];
     inputState = InputState::PieceSelected;
-    selectedPieceMoves = moveGeneration::generateMovesForPiece(
+    selectedPieceMoves = move_generation::generateMovesForPiece(
         selTile, selectedPiece.position, boardState.tiles, boardState.castlingRights, boardState.enPassantTargetSquare);
-    moveGeneration::findLegalMovesForPiece(
+    move_generation::findLegalMovesForPiece(
         selectedPieceMoves, selTile, selectedPiece.position, boardState.tiles,
         boardState.castlingRights, boardState.enPassantTargetSquare);
 }
@@ -239,7 +240,7 @@ void Chess::selectPiece(Vector2Int selectedSquare) {
 void Chess::deselectPiece() {
     selectedPiece.position = {-1, -1};
     inputState = InputState::Normal;
-    moveGeneration::clearMoves(selectedPieceMoves);
+    move_generation::clearMoves(selectedPieceMoves);
 }
 
 // Moves the selected piece to a new square and updates the board state to match. 
