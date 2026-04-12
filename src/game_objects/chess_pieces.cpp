@@ -21,11 +21,13 @@ void ChessPieces::drawPiece(Piece& piece, ChessBoard& board, Painter& painter) {
             board.getPosition().x
             + (float)piece.position.x
             * board.getTileSize().x
+            + (board.getTileSize().x - spriteSize.x) / 2 // Center piece
             + pieceOffset.x,
 
             board.getPosition().y
             + (float)board.getRankByDirection(piece.position.y) // Check if the board is flipped
             * board.getTileSize().y
+            + (board.getTileSize().y - spriteSize.y) / 2
             + pieceOffset.y,
     };
 
@@ -90,10 +92,18 @@ void ChessPieces::pieceFollowCursor(Vector2& cursorPos, ChessBoard& board,
 
     // Clamp cursor position to inside the board
     Vector2 positionInBoard{
-        std::clamp(cursorPos.x,
-            board.getPosition().x, board.getPosition().x + board.getTileSize().x * 8),
-        std::clamp(cursorPos.y,
-            board.getPosition().y, board.getPosition().y + board.getTileSize().y * 8)
+        std::clamp(
+            cursorPos.x
+            + (board.getTileSize().x - spriteSize.x) / 2 // Center piece
+            + pieceOffset.x,
+            board.getPosition().x,
+            board.getPosition().x + board.getTileSize().x * 8),
+        std::clamp(
+            cursorPos.y
+            + (board.getTileSize().y - spriteSize.y) / 2 // Center piece
+            + pieceOffset.y,
+            board.getPosition().y,
+            board.getPosition().y + board.getTileSize().y * 8)
     };
 
     drawFree(type, team, positionInBoard + offset, painter, spriteSize);

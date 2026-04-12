@@ -8,7 +8,7 @@
 
 void GameState::setupFromFEN() {
     // Get FEN of the initial position
-    FenState fenState{FenParser::getState(currentBoardFEN)};
+    FenState fenState{fenParser::getState(currentBoardFEN)};
 
     // Assign FEN values to the board state
     boardState.pieces = fenState.pieceList;
@@ -49,12 +49,9 @@ void GameState::movePiece(Vector2Int origin, Vector2Int target, MoveType moveTyp
 
     // Was it a promotion?
     if (moveType == MoveType::Promotion || moveType == MoveType::CapturePromotion) {
-        // inputState = InputState::Promotion; [TODO SOON] Return movetype?
         promotionPosition = target;
-
-        // Remove piece from its previous position
-        selected = {PieceType::None, TeamColor::None};
-        return;
+        // Temporily show the pawn in the target square, although this will be replaced by the chosen piece.
+        boardState.tiles[target.x][target.y] = selected;
     }
 
     // Was it castling? Move the rook to its new position
@@ -143,7 +140,7 @@ bool GameState::isKingInCheck(TeamColor team) const {
                 kingPos = {file, rank};
 
     // Get squares attacked by the opponent (ignoreKing = false, we want accurate attacks)
-    auto attacked = MoveGeneration::getAttackedSquares(false, team, boardState.tiles, boardState.castlingRights);
+    auto attacked = moveGeneration::getAttackedSquares(false, team, boardState.tiles, boardState.castlingRights);
     return attacked[kingPos.x][kingPos.y];
 }
 
@@ -156,8 +153,8 @@ bool GameState::hasLegalMoves(TeamColor team) const {
             Tile piece = boardState.tiles[file][rank];
             Vector2Int pos{file, rank};
 
-            auto moves = MoveGeneration::generateMovesForPiece(piece, pos, boardState.tiles, boardState.castlingRights, boardState.enPassantTargetSquare);
-            MoveGeneration::findLegalMovesForPiece(moves, piece, pos, boardState.tiles, boardState.castlingRights, boardState.enPassantTargetSquare);
+            auto moves = moveGeneration::generateMovesForPiece(piece, pos, boardState.tiles, boardState.castlingRights, boardState.enPassantTargetSquare);
+            moveGeneration::findLegalMovesForPiece(moves, piece, pos, boardState.tiles, boardState.castlingRights, boardState.enPassantTargetSquare);
 
             for (int r = 0; r < 8; r++)
                 for (int f = 0; f < 8; f++)

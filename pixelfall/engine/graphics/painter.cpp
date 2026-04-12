@@ -167,6 +167,12 @@ void Painter::drawRegularPolygon(Vector2 center, float radius, Color color, int 
 }
 
 // Draws a mesh with a texture to display an image on the screen. Can also be tinted.
+void Painter::drawSprite(Vector2 position, Texture& texture, Color tint) {
+    Vector2Int texSize = texture.getSize();
+    drawSprite(position, {(float)texSize.x, (float)texSize.y}, texture, tint);
+}
+
+// Overload of drawSprite with a specific texture size provided by the user.
 void Painter::drawSprite(Vector2 position, Vector2 size, Texture& texture, Color tint) {
     spriteShader.use();
     spriteShader.setUniformMat4("projectionMatrix", projectionMatrix);

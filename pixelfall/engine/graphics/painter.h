@@ -22,9 +22,11 @@ public:
     Painter(Shader& geometryShader, Shader& spriteShader, Shader& screenShader,
         Window& window, std::filesystem::path projectPath);
 
-    // Methods
+    // Life Cycle
     void begin(); // Called by engine before onRender() — binds FBO and sets up projection
     void end();   // Called by engine after onRender() — applies FXAA and blits to screen
+
+    // Basic shapes
     void drawPolygon(const std::vector<Vector2>& points, Color color);
     void drawTriangle(Vector2 a, Vector2 b, Vector2 c, Color color);
     void drawQuad(Vector2 a, Vector2 b, Vector2 c, Vector2 d, Color color);
@@ -33,8 +35,14 @@ public:
         int segments = painter::defaults::arcSegments);
     void drawCircle(Vector2 center, float radius, Color color);
     void drawRegularPolygon(Vector2 center, float radius, Color color, int segments);
-    void drawSprite(Vector2 position, Vector2 size, Texture& texture,
+
+    // Textures
+    void drawSprite(Vector2 position, Texture& texture,
         Color tint = painter::defaults::textureTint);
+    void drawSprite(Vector2 position, Vector2 size, Texture& texture,   // Size overload
+        Color tint = painter::defaults::textureTint);
+
+    // Complex Shapes
     void drawRectangleHollow(Vector2 position, Vector2 size, Vector2 innerSize, Color color);
     void drawCircleHollow(Vector2 center, float radius, float innerRadius, Color color);
 

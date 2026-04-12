@@ -22,7 +22,7 @@ static bool parsePieceList(const std::string& pieceList, FenState& fenState) {
         }
         // Piece detected - Add it to the FEN state
         else if (std::string("KQRBNPkqrbnp").find(c) != std::string::npos) {
-            fenState.pieceList.push_back(FenParser::getPieceFromSymbol(c, gridPosition));
+            fenState.pieceList.push_back(fenParser::getPieceFromSymbol(c, gridPosition));
             // Move to next square
             gridPosition.x++;
         }
@@ -136,7 +136,7 @@ static bool parseTotalFullMoves(const std::string & totalFullMoves, FenState & f
 
 // Transforms a piece in symbol format (Like k for black king) into a usable Piece struct.
 // Position is required for a piece struct.
-Piece FenParser::getPieceFromSymbol(char symbol, Vector2Int position) {
+Piece fenParser::getPieceFromSymbol(char symbol, Vector2Int position) {
     switch (symbol) {
         // White Pieces
     case 'K': return Piece{PieceType::King, TeamColor::White, position};
@@ -170,7 +170,7 @@ static std::vector<std::string> split(const std::string& str, char delimiter) {
 
 // Parse an entire fen string and return its values in a usable struct format.
 // Returns a default empty board struct if the format is invalid.
-FenState FenParser::getState(const std::string& fenString) {
+FenState fenParser::getState(const std::string& fenString) {
 
     // Split the FEN string into its different categories
     std::vector<std::string> fenCategories = split(fenString, ' ');

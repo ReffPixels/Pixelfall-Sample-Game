@@ -4,6 +4,8 @@
 // Engine
 #include "pixelfall/engine/math/vector2.h"
 #include "pixelfall/engine/graphics/painter.h"
+// Config
+#include "config/theme_config.h"
 
 // The board direction is simply the perspective we are visualizing the board from. (Black or White's point of view)
 // This does not determine who plays first.
@@ -27,6 +29,8 @@ public:
     // Setters
     void setPosition(Vector2 position) { this->position = position; };
     void setBoardDirection(BoardDirection direction) { this->direction = direction; };
+
+    // Theme Setters
     void setTileSize(Vector2 tileSize) { this->tileSize = tileSize; };
     void setDarkTileColor(Color darkTileColor) { this->darkTileColor = darkTileColor; };
     void setLightTileColor(Color lightTileColor) { this->lightTileColor = lightTileColor; };
@@ -42,8 +46,8 @@ private:
     Vector2 position{Vector2::Zero};
     BoardDirection direction{BoardDirection::BlackOnTop};
 
-    // Visuals
-    Vector2 tileSize{70.0f, 70.0f};
-    Color lightTileColor{Color::fromHexcode("#edd6b0")};
-    Color darkTileColor{Color::fromHexcode("#b88762")};
+    // Theme
+    Vector2 tileSize{theme::defaults::tileSize};
+    Color lightTileColor{theme::defaults::lightTileColor};
+    Color darkTileColor{theme::defaults::darkTileColor};
 };

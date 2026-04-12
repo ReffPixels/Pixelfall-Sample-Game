@@ -6,7 +6,7 @@
 #include <array>
 #include <vector>
 
-namespace MoveGeneration {
+namespace moveGeneration {
     // Piece Movement
      void findLegalMovesForPiece(std::array<std::array<MoveType, 8>, 8>& moves,
         Tile piece, Vector2Int position, const std::array<std::array<Tile, 8>, 8>& boardState,

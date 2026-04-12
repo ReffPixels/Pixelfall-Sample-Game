@@ -19,16 +19,16 @@ public:
         Painter& painter, Vector2 offset = Vector2::Zero);
     static Vector2 computeDragPivot(Vector2& cursorPos, ChessBoard& board);
 
-    // Setters
+    // Theme Setters
     void setSpriteSize(Vector2 spriteSize) { this->spriteSize = spriteSize; };
-    void setPieceOffset(Vector2 pieceOffset) { this->pieceOffset = pieceOffset; };
     void setSpritesPath(std::filesystem::path spritesPath) { this->spritesPath = spritesPath; };
+    void setPieceOffset(Vector2 pieceOffset) { this->pieceOffset = pieceOffset; };
 
 private:
-    // Visuals
-    Vector2 spriteSize{70.0f, 70.0f};
-    std::filesystem::path spritesPath{"assets/image/themes/Cburnett/"};
-    Vector2 pieceOffset{Vector2::Zero};
+    // Theme
+    Vector2 spriteSize{theme::defaults::spriteSize};
+    std::filesystem::path spritesPath{theme::defaults::spritesPath};
+    Vector2 pieceOffset{theme::defaults::pieceOffset};
 
     // Rendering Methods
     void drawPiece(Piece& piece, ChessBoard& board, Painter& painter);

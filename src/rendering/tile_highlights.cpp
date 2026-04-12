@@ -75,7 +75,7 @@ void TileHighlights::highlightMoves(std::array<std::array<MoveType, 8>, 8> valid
                     Vector2(board.getPosition().x + (float)file * board.getTileSize().x + board.getTileSize().x / 2,
                         board.getPosition().y + (float)board.getRankByDirection(rank) * board.getTileSize().y + board.getTileSize().y / 2),
                     board.getTileSize().x * 0.15f,
-                    Color::fromHexcode("#6e422d55")
+                    Color::fromHexcode("#0000002a")
                 );
             // It's a capture
             else if ((validMoves[file][rank] == MoveType::Capture)

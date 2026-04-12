@@ -42,6 +42,7 @@ void Chess::onUpdate() {
         if (board.isBoardOnHover(cursorPos)) {
             Vector2Int hoveredSquare = board.getTileOnHover(cursorPos);
             if (appInput->isMouseButtonPressed(MouseButton::Left)) onBoardPressed(hoveredSquare);
+
             // [TEMP DEBUG] Delete Piece on Hover
             if (appInput->isKeyPressed(KeyCode::Delete)) {
                 state.removePiece(hoveredSquare);
@@ -86,11 +87,11 @@ void Chess::onRender() {
     board.draw(*painter);
 
     // Draw Attacked Squares (Player)
-    if (appInput->isKeyDown(KeyCode::Q)) TileHighlights::highlightAttackedSquares(MoveGeneration::getAttackedSquares(
+    if (appInput->isKeyDown(KeyCode::Q)) TileHighlights::highlightAttackedSquares(moveGeneration::getAttackedSquares(
         false, boardState.playerToMove, boardState.tiles, boardState.castlingRights), board, *painter);
 
     // Draw Attacked Squares (Opponent)
-    if (appInput->isKeyDown(KeyCode::E)) TileHighlights::highlightAttackedSquares(MoveGeneration::getAttackedSquares(
+    if (appInput->isKeyDown(KeyCode::E)) TileHighlights::highlightAttackedSquares(moveGeneration::getAttackedSquares(
         false, state.getOpponent(), boardState.tiles, boardState.castlingRights), board, *painter,
         Color::fromHexcode("#0000ff88"));
 
@@ -176,7 +177,7 @@ void Chess::resetGame() {
     selectedPiece.position = {-1, -1};
     selectedPiece.type = PieceType::None;
     selectedPiece.team = TeamColor::None;
-    MoveGeneration::clearMoves(selectedPieceMoves);
+    moveGeneration::clearMoves(selectedPieceMoves);
 
     state.clearState();
     state.setupFromFEN();
@@ -184,13 +185,13 @@ void Chess::resetGame() {
 
 // Pressing allows to select a new piece or move if a piece is already selected.
 void Chess::onBoardPressed(Vector2Int square) {
+    if (inputState == InputState::Promotion) return;
+
     Tile tile = state.getBoardState().tiles[square.x][square.y];
     
     // Update drag and drop pivot when clicking
     dragAndDropPivot = ChessPieces::computeDragPivot(cursorPos, board);
     
-    if (inputState == InputState::Promotion) return;
-
     // It's a piece in the player's team
     if (tile.type != PieceType::None && tile.team == state.getBoardState().playerToMove)
         // Clicked on the same square, deselect
@@ -221,9 +222,9 @@ void Chess::selectPiece(Vector2Int selectedSquare) {
 
     Tile selTile = state.getBoardState().tiles[selectedPiece.position.x][selectedPiece.position.y];
     inputState = InputState::PieceSelected;
-    selectedPieceMoves = MoveGeneration::generateMovesForPiece(
+    selectedPieceMoves = moveGeneration::generateMovesForPiece(
         selTile, selectedPiece.position, boardState.tiles, boardState.castlingRights, boardState.enPassantTargetSquare);
-    MoveGeneration::findLegalMovesForPiece(
+    moveGeneration::findLegalMovesForPiece(
         selectedPieceMoves, selTile, selectedPiece.position, boardState.tiles,
         boardState.castlingRights, boardState.enPassantTargetSquare);
 }
@@ -232,7 +233,7 @@ void Chess::selectPiece(Vector2Int selectedSquare) {
 void Chess::deselectPiece() {
     selectedPiece.position = {-1, -1};
     inputState = InputState::Normal;
-    MoveGeneration::clearMoves(selectedPieceMoves);
+    moveGeneration::clearMoves(selectedPieceMoves);
 }
 
 // Moves the selected piece to a new square and updates the board state to match. 
@@ -249,7 +250,12 @@ void Chess::moveSelectedPiece(Vector2Int targetSquare) {
 
     state.movePiece(selectedPiece.position, targetSquare, moveType);
 
-    if (inputState != InputState::Promotion) {
-        nextTurn();
+    // If this was a promotion, don't go to next turn! We need extra input from the user (Choose promotion piece)
+    if (moveType == MoveType::Promotion || moveType == MoveType::CapturePromotion) {
+        inputState = InputState::Promotion;
+        // Manually update the state of pieces. Normally this is handled by nextTurn() but we are skipping it.
+        state.syncPieceState();
     }
+    else
+        nextTurn();
 }
