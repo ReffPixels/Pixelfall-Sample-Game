@@ -54,7 +54,21 @@ private:
     std::array<std::array<MoveType, 8>, 8> selectedPieceMoves;
     void selectPiece(Vector2Int selectedSquare);
     void deselectPiece();
-    void moveSelectedPiece(Vector2Int targetSquare);
+    void moveSelectedPiece(Vector2Int targetSquare, bool isDrag);
+
+    // Rendering
+    void drawPieces(bool dragAndDrop);
+
+    // Piece Animation 
+    // [TODO] Eventually the engine should have an animation system, but this is literally the only animation we need.
+    struct PieceAnimation {
+        Piece piece{};              // Piece at its target square
+        Vector2Int origin{};          // origin square
+        float progress{1.0f};       // 1.0 = complete or inactive
+        static constexpr float duration = 0.1f;
+        bool isActive() const { return progress < 1.0f; }
+    };
+    PieceAnimation pieceAnimation{};
 
     // Generate reusable random sequence with Mersenne Twister Algorithm.
     // [TODO] This should be provided by the Engine.

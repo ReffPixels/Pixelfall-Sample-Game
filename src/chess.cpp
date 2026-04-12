@@ -27,7 +27,6 @@ bool Chess::onStart() {
 
 // Called every frame
 void Chess::onUpdate() {
-
     // Track FPS in window title
     appWindow->setWindowTitle("Chess | FPS: " + std::to_string(appClock->getFPS()));
 
@@ -66,6 +65,12 @@ void Chess::onUpdate() {
     }
     // Game has ended, only action is to reset the game
     else if (appInput->isMouseButtonPressed(MouseButton::Left)) startNewGame();
+
+
+    // Advance Piece Movement Animation
+    if (pieceAnimation.isActive())
+        pieceAnimation.progress = std::min(1.0f,
+            pieceAnimation.progress + (float)(appClock->getDeltaTime() / PieceAnimation::duration));
 }
 
 // Called at the end of each frame (Handles rendering)
@@ -109,27 +114,52 @@ void Chess::onRender() {
     // Draw Drag and Drop Highlight (Under pieces)
     if (dragAndDrop) tile_highlights::highlightHoveredSquare(cursorPos, board, *painter, selectedPiece.position);
 
-    // Draw Pieces
-    if (dragAndDrop) {
-        // Hide selected piece during drag-and-drop, and draw it at the mouse position instead.
-        std::vector<Piece> visiblePieces;
-        for (Piece piece : boardState.pieces)
-            if (piece.position != selectedPiece.position)
-                visiblePieces.push_back(piece);
-        
-        pieces.drawPieces(visiblePieces, board, *painter);
-        pieces.pieceFollowCursor(cursorPos, board, selectedPiece.type, selectedPiece.team, *painter, dragAndDropPivot);
-    }
-    else {
-        // Draw the pieces normally.
-        pieces.drawPieces(boardState.pieces, board, *painter);
-    }
+    // Draw the pieces
+    drawPieces(dragAndDrop);
 
     // Draw Promotion UI
     if (inputState == InputState::Promotion) {
         promotion_interface::drawPieces(pieces, state.getLastMove().target, boardState.playerToMove,
             board.getPosition(), board.getTileSize(), board.getTileSize() * 0.8f, *painter,
             board.getBoardDirection() == BoardDirection::BlackOnTop ? false : true);
+    }
+}
+
+void Chess::drawPieces(bool dragAndDrop) {
+    BoardState boardState = state.getBoardState();
+
+    // Draw Pieces with the selected piece following the mouse (Drag and Drop)
+    if (dragAndDrop) {
+        // Draw the pieces without the selected piece to avoid duplication.
+        std::vector<Piece> visiblePieces;
+        for (Piece piece : boardState.pieces)
+            if (piece.position != selectedPiece.position)
+                visiblePieces.push_back(piece);
+        pieces.drawPieces(visiblePieces, board, *painter);
+
+        // Draw the selected piece following the mouse
+        pieces.pieceFollowCursor(cursorPos, board, selectedPiece.type, selectedPiece.team, *painter, dragAndDropPivot);
+    }
+    // Draw Pieces with the selected piece animating towards the target square. (Click)
+    else if (pieceAnimation.isActive()) {
+        // Draw the pieces without the selected piece to avoid duplication.
+        std::vector<Piece> visiblePieces;
+        for (Piece piece : boardState.pieces)
+            if (piece.position != pieceAnimation.piece.position)
+                visiblePieces.push_back(piece);
+        pieces.drawPieces(visiblePieces, board, *painter);
+
+        // Draw the selected piece with animation
+        float t = pieceAnimation.progress;
+        t = t * t * (3.0f - 2.0f * t); // Smooth ease
+        Vector2 fromPos = pieces.getDrawPosition(pieceAnimation.origin, board);
+        Vector2 toPos = pieces.getDrawPosition(pieceAnimation.piece.position, board);
+        pieces.drawFree(pieceAnimation.piece.type, pieceAnimation.piece.team,
+            fromPos + (toPos - fromPos) * t, *painter);
+    }
+    // Draw the pieces at their final position.
+    else {
+        pieces.drawPieces(boardState.pieces, board, *painter);
     }
 }
 
@@ -194,14 +224,14 @@ void Chess::onBoardPressed(Vector2Int square) {
         }
         else selectPiece(square);
     else
-        moveSelectedPiece(square);
+        moveSelectedPiece(square, false);
 }
 
 // Release only allows to move if a piece is already selected. (Drag and drop behaviour) Otherwise it does nothing.
 void Chess::onBoardReleased(Vector2Int square) {
     if (inputState == InputState::Promotion) return;
 
-    moveSelectedPiece(square);
+    moveSelectedPiece(square, true);
 }
 
 // Selects a piece in a specific square and changes the input state to selected.
@@ -229,19 +259,25 @@ void Chess::deselectPiece() {
     move_generation::clearMoves(selectedPieceMoves);
 }
 
-// Moves the selected piece to a new square and updates the board state to match. 
+// Moves the selected piece to a new square and updates the board state to match.
 // A succesful move triggers the next turn.
-void Chess::moveSelectedPiece(Vector2Int targetSquare) {
+void Chess::moveSelectedPiece(Vector2Int targetSquare, bool isDrag) {
     MoveType moveType = selectedPieceMoves[targetSquare.x][targetSquare.y];
 
+    // Don't move the piece if the move is invalid.
     if (inputState == InputState::Normal) return;
     if (targetSquare == selectedPiece.position) return;
-    if (moveType == MoveType::None) {
-        deselectPiece();
-        return;
-    }
+    if (moveType == MoveType::None) { deselectPiece(); return; }
 
+    // Move the piece.
     state.movePiece(selectedPiece.position, targetSquare, moveType);
+
+    // Start piece movement animation for click moves only (Not drag-and-drop)
+    if (!isDrag) {
+        pieceAnimation.piece = {selectedPiece.type, selectedPiece.team, targetSquare};
+        pieceAnimation.origin = selectedPiece.position;
+        pieceAnimation.progress = 0.0f;
+    }
 
     // If this was a promotion, don't go to next turn! We need extra input from the user (Choose promotion piece)
     if (moveType == MoveType::Promotion || moveType == MoveType::CapturePromotion) {
@@ -249,6 +285,5 @@ void Chess::moveSelectedPiece(Vector2Int targetSquare) {
         // Manually update the state of pieces. Normally this is handled by nextTurn() but we are skipping it.
         state.syncPieceState();
     }
-    else
-        nextTurn();
+    else nextTurn();
 }

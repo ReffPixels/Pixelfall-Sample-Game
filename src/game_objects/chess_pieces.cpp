@@ -17,19 +17,7 @@ void ChessPieces::drawPiece(Piece& piece, ChessBoard& board, Painter& painter) {
     if ((piece.type == PieceType::None) || (piece.team == TeamColor::None)) return;
 
     // Calculate the final position on the screen
-    Vector2 physicalPosition{
-            board.getPosition().x
-            + (float)piece.position.x
-            * board.getTileSize().x
-            + (board.getTileSize().x - spriteSize.x) / 2 // Center piece
-            + pieceOffset.x,
-
-            board.getPosition().y
-            + (float)board.getRankByDirection(piece.position.y) // Check if the board is flipped
-            * board.getTileSize().y
-            + (board.getTileSize().y - spriteSize.y) / 2
-            + pieceOffset.y,
-    };
+    Vector2 physicalPosition{getDrawPosition(piece.position, board)};
 
     // Create a texture with the correct image depending on the piece type and team.
     Texture& pieceTexture = painter.textureCache->loadTexture(findImagePath(piece.type, piece.team).string());
@@ -58,6 +46,23 @@ void ChessPieces::drawFree(PieceType type, TeamColor team, Vector2 position, Pai
         size,
         pieceTexture
     );
+}
+
+// Returns the position a piece sprite would be drawn at for the given grid position.
+Vector2 ChessPieces::getDrawPosition(Vector2Int position, ChessBoard& board) const {
+    return {
+        board.getPosition().x
+        + (float)position.x
+        * board.getTileSize().x
+        + (board.getTileSize().x - spriteSize.x) / 2 // Center piece
+        + pieceOffset.x,
+
+        board.getPosition().y
+        + (float)board.getRankByDirection(position.y) // Check if the board is flipped
+        * board.getTileSize().y
+        + (board.getTileSize().y - spriteSize.y) / 2
+        + pieceOffset.y,
+    };
 }
 
 // Returns the path of a chess piece image from it's piece information (Type and team)
