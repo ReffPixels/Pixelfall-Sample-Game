@@ -40,11 +40,11 @@ void Chess::onUpdate() {
     // Handle board interaction
     if (state.getGameOutcome() == GameOutcome::Playing) {
         if (board.isBoardOnHover(cursorPos)) {
-            Vector2Int hoveredSquare = ChessPieces::getPosFromNotation(board.getSquareOnHover(cursorPos));
+            Vector2Int hoveredSquare = board.getTileOnHover(cursorPos);
             if (appInput->isMouseButtonPressed(MouseButton::Left)) {
-                state.onBoardPressed(hoveredSquare);
+                onBoardPressed(hoveredSquare);
                 // Capture drag pivot at the moment of selection
-                if (state.getInputState() == InputState::PieceSelected)
+                if (inputState == InputState::PieceSelected)
                     dragAndDropPivot = visuals.computeDragPivot(cursorPos, board, state.getselPiecePosition());
             }
             // [TEMP DEBUG] Delete Piece on Hover
@@ -91,11 +91,11 @@ void Chess::onRender() {
     board.draw(*painter);
 
     // Draw Attacked Squares (Player)
-    if (appInput->isKeyDown(KeyCode::Q)) visuals.highlightAttackedSquares(ChessState::getAttackedSquares(
+    if (appInput->isKeyDown(KeyCode::Q)) visuals.highlightAttackedSquares(GameState::getAttackedSquares(
         false, state.getPlayerToMove(), state.getBoardState(), state.getCastlingRights()), board, *painter);
 
     // Draw Attacked Squares (Opponent)
-    if (appInput->isKeyDown(KeyCode::E)) visuals.highlightAttackedSquares(ChessState::getAttackedSquares(
+    if (appInput->isKeyDown(KeyCode::E)) visuals.highlightAttackedSquares(GameState::getAttackedSquares(
         false, state.getOpponent(), state.getBoardState(), state.getCastlingRights()), board, *painter,
         Color::fromHexcode("#0000ff88"));
 
@@ -151,5 +151,125 @@ void Chess::startNewGame() {
     else {
         board.setBoardDirection(BoardDirection::WhiteOnTop);
         pieces.setFlippedPieces(true);
+    }
+}
+
+// Swaps the current player and runs necessary functions to set up the next turn (Or end the game)
+void GameState::nextTurn() {
+    // Swap player
+    playerToMove = (playerToMove == TeamColor::White ? TeamColor::Black : TeamColor::White);
+    // Count full moves
+    if (playerToMove == TeamColor::Black) totalFullMoves++;
+
+    deselectPiece();
+    updateCastlingRights();
+    updatePieceList();
+    printStatistics();
+    findGameOutcome();
+}
+
+void GameState::endGame() {
+    std::cout << "-------------------------------" << std::endl;
+    switch (gameOutcome) {
+    case GameOutcome::WhiteVictoryCheckmate: std::cout << "WHITE VICTORY (CHECKMATE)" << std::endl; break;
+    case GameOutcome::BlackVictoryCheckmate: std::cout << "BLACK VICTORY (CHECKMATE)" << std::endl; break;
+    case GameOutcome::WhiteVictoryResignation: std::cout << "WHITE VICTORY (RESIGNATION)" << std::endl; break;
+    case GameOutcome::BlackVictoryResignation: std::cout << "BLACK VICTORY (RESIGNATION)" << std::endl; break;
+    case GameOutcome::WhiteVictoryTimeout: std::cout << "WHITE VICTORY (TIMEOUT)" << std::endl; break;
+    case GameOutcome::BlackVictoryTimeout: std::cout << "BLACK VICTORY (TIMEOUT)" << std::endl; break;
+    case GameOutcome::DrawStalemate: std::cout << "DRAW (STALEMATE)" << std::endl; break;
+    case GameOutcome::DrawInsufficientMaterial: std::cout << "DRAW (INSUFFICIENT MATERIAL)" << std::endl; break;
+    case GameOutcome::Draw50Move: std::cout << "DRAW (50 MOVE RULE)" << std::endl; break;
+    case GameOutcome::Draw75Move: std::cout << "DRAW (75 MOVE RULE)" << std::endl; break;
+    case GameOutcome::Draw3FoldRepetition: std::cout << "DRAW (3 FOLD REPETITION)" << std::endl; break;
+    case GameOutcome::Draw5FoldRepetition: std::cout << "DRAW (5 FOLD REPETITION)" << std::endl; break;
+    case GameOutcome::DrawAgreement: std::cout << "DRAW (AGREEMENT)" << std::endl; break;
+    }
+}
+
+void GameState::resetGame() {
+    // White always goes first, even if we are playing from black's perspective
+    playerToMove = TeamColor::White;
+
+    // Reset board state and trackers
+    gameOutcome = GameOutcome::Playing;
+    castlingRights = {true, true, true, true};
+    enPassantTargetSquare = {-1, -1};
+    moveRuleCounter = 0;
+    totalFullMoves = 1;
+    lastMoveOrigin = {-1, -1};
+    lastMoveTarget = {-1, -1};
+    setupFromFEN();
+
+    printStatistics();
+}
+
+void GameState::printStatistics() {
+    std::cout << "-------------------------------" << '\n';
+    std::cout << "Player to Move: " << static_cast<int>(playerToMove) << '\n';
+    std::cout << "Half Moves: " << moveRuleCounter << '\n';
+    std::cout << "Full Moves: " << totalFullMoves << '\n';
+    std::cout << "Castling Rights KQkq: " << castlingRights.whiteKingSide << castlingRights.whiteQueenSide
+        << castlingRights.blackKingSide << castlingRights.blackQueenSide << std::endl;
+}
+
+// Pressing allows to select a new piece or move if a piece is already selected.
+void GameState::onBoardPressed(Vector2Int square) {
+    PieceInfo& clicked = boardState[square.x][square.y];
+    if (inputState == InputState::Promotion) return;
+
+    // It's a piece in the player's team
+    if (clicked.type != PieceType::None && clicked.team == playerToMove)
+        // Clicked on the same square, deselect
+        if (square == selPiecePosition) {
+            deselectPiece();
+            return;
+        }
+        else selectPiece(square);
+    else
+        moveSelectedPiece(square);
+}
+
+// Release only allows to move if a piece is already selected. (Drag and drop behaviour) Otherwise it does nothing.
+void GameState::onBoardReleased(Vector2Int square) {
+    if (inputState == InputState::Promotion) return;
+
+    moveSelectedPiece(square);
+}
+
+// Selects a piece in a specific square and changes the input state to selected.
+void GameState::selectPiece(Vector2Int selectedSquare) {
+    selPiecePosition = selectedSquare;
+    PieceInfo& selPieceInfo = boardState[selPiecePosition.x][selPiecePosition.y];
+    inputState = InputState::PieceSelected;
+    validMoves = ChessMoves::generateMovesForPiece(
+        selPieceInfo, selPiecePosition, boardState, castlingRights, enPassantTargetSquare);
+    ChessMoves::findLegalMovesForPiece(
+        validMoves, selPieceInfo, selPiecePosition, boardState, castlingRights, enPassantTargetSquare);
+}
+
+// Reset selected piece trackers
+void GameState::deselectPiece() {
+    selPiecePosition = {-1, -1};
+    inputState = InputState::Normal;
+    ChessMoves::clearMoves(validMoves);
+}
+
+// Moves the selected piece to a new square and updates the board state to match. 
+// A succesful move triggers the next turn.
+void GameState::moveSelectedPiece(Vector2Int targetSquare) {
+    MoveType moveType = validMoves[targetSquare.x][targetSquare.y];
+
+    if (inputState == InputState::Normal) return;
+    if (targetSquare == selPiecePosition) return;
+    if (moveType == MoveType::None) {
+        deselectPiece();
+        return;
+    }
+
+    movePiece(selPiecePosition, targetSquare, moveType);
+
+    if (inputState != InputState::Promotion) {
+        nextTurn();
     }
 }

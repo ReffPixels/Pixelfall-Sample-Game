@@ -1,6 +1,6 @@
-//  [TODO] Clean up
+// [TODO SOON] Clean up
 
-#include "ui/promotion_ui.h"
+#include "ui/promotion_widget.h"
 
 // Draws promotion piece options above/below the board
 void PromotionInterface::drawPieces(ChessPieces& chessPieces, Vector2Int pawnPosition, TeamColor playerTeam,

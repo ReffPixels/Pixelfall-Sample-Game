@@ -20,12 +20,6 @@ enum class TeamColor {
     None
 };
 
-struct Piece {
-    PieceType type;
-    TeamColor team;
-    Vector2Int position;
-};
-
 enum class MoveType {
     Move,               // A move into an empty square.
     Capture,            // A move that takes an enemy piece.
@@ -70,3 +64,28 @@ enum class GameOutcome {
 
 // Default initial state of the board encoded in FEN
 constexpr std::string_view defaultBoardFEN{"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"};
+
+// -------- BOARD REPRESENTATION -------- //
+// We need a way to keep track of the state of the board. There are two main approaches to achieve this:
+// Piece centric (Where we keep a list of every piece, ith their type, colour and position), and 
+// Board centric (Where we keep a map of all 64 tiles that says if they are empty or if they hold a specific piece)
+
+// In this project we use both methods at the same time.
+// Normally, this would be frowned upon, since keeping two separate sources of truth for the same data has the danger
+// of the data going out of sync. 
+// However, in the case of a chess engine, being able to quickly access the piece inside of a specific square 
+// by using boardState[x][y] *AND* being able to quickly find a piece from the piece list without having to loop
+// through all the empty squares is incredibly valuable for performance, so keeping this duplication makes sense.
+
+// Stores information about a piece. Used by the pieceState vector
+struct Piece {
+    PieceType type;
+    TeamColor team;
+    Vector2Int position;
+};
+
+// Stores information about a tile. Used by the boardState 2D array
+struct Tile {
+    PieceType type;
+    TeamColor team;
+};

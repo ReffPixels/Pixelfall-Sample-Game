@@ -1,11 +1,11 @@
-// Implementation for chess_visuals.h
+// Implementation for tile_highlights.h
 
-#include "chess_visuals.h"
+#include "tile_highlights.h"
 // Standard Library
 #include <algorithm>
 
 // Draw a highlight on the square of the selected piece
-void ChessVisuals::highlightSelected(ChessBoard& board, Vector2Int selPiecePosition, Painter& painter) {
+void TileHighlights::highlightSelected(ChessBoard& board, Vector2Int selPiecePosition, Painter& painter) {
     if (selPiecePosition != Vector2Int{-1, -1}) {
         painter.drawRectangle(
             board.getPosition()
@@ -18,7 +18,7 @@ void ChessVisuals::highlightSelected(ChessBoard& board, Vector2Int selPiecePosit
 }
 
 // Draw a highlight on the start and end squares of the last move
-void ChessVisuals::highlightLastMove(ChessBoard& board, Vector2Int lastMoveOrigin,
+void TileHighlights::highlightLastMove(ChessBoard& board, Vector2Int lastMoveOrigin,
     Vector2Int lastMoveTarget, Painter& painter) {
     if (lastMoveOrigin != Vector2Int{-1, -1} && lastMoveTarget != Vector2Int{-1, -1}) {
         painter.drawRectangle(
@@ -39,10 +39,10 @@ void ChessVisuals::highlightLastMove(ChessBoard& board, Vector2Int lastMoveOrigi
 }
 
 // Draw a highlight on the square that the cursor is hovering
-void ChessVisuals::highlightHoveredSquare(Vector2& cursorPos, ChessBoard& board,
+void TileHighlights::highlightHoveredSquare(Vector2& cursorPos, ChessBoard& board,
     Painter& painter, Vector2Int selPiecePosition) {
     // Snap to grid position
-    Vector2Int gridPos = ChessPieces::getPosFromNotation(board.getSquareOnHover(cursorPos));
+    Vector2Int gridPos = board.getTileOnHover(cursorPos);
     if (gridPos == selPiecePosition) return; // Don't draw highlight over origin square
 
     Vector2 snappedPositionInBoard{
@@ -62,7 +62,7 @@ void ChessVisuals::highlightHoveredSquare(Vector2& cursorPos, ChessBoard& board,
 }
 
 // Draw a circle at every valid move spot
-void ChessVisuals::highlightValidMoves(std::array<std::array<MoveType, 8>, 8> validMoves, ChessBoard& board, Painter& painter) {
+void TileHighlights::highlightValidMoves(std::array<std::array<MoveType, 8>, 8> validMoves, ChessBoard& board, Painter& painter) {
     for (int rank = 0; rank < 8; rank++)
         for (int file = 0; file < 8; file++)
             // It's a normal move or it's castling
@@ -92,7 +92,7 @@ void ChessVisuals::highlightValidMoves(std::array<std::array<MoveType, 8>, 8> va
 }
 
 // Draw a red highlight on every square attacked by the opponent
-void ChessVisuals::highlightAttackedSquares(std::array<std::array<bool, 8>, 8> attackedSquares,
+void TileHighlights::highlightAttackedSquares(std::array<std::array<bool, 8>, 8> attackedSquares,
     ChessBoard& board, Painter& painter, Color color) {
     for (int rank = 0; rank < 8; rank++)
         for (int file = 0; file < 8; file++)
@@ -103,26 +103,4 @@ void ChessVisuals::highlightAttackedSquares(std::array<std::array<bool, 8>, 8> a
                     board.getTileSize(),
                     color
                 );
-}
-
-// Attach a piece visual to the cursor
-void ChessVisuals::pieceFollowCursor(Vector2& cursorPos, ChessPieces& pieces, ChessBoard& board,
-    PieceInfo pieceInfo, Painter& painter, Vector2 offset) {
-    // Clamp cursor position to inside the board
-    Vector2 positionInBoard{
-        std::clamp(cursorPos.x,
-            board.getPosition().x, board.getPosition().x + board.getTileSize().x * 8),
-        std::clamp(cursorPos.y,
-            board.getPosition().y, board.getPosition().y + board.getTileSize().y * 8)
-    };
-
-    pieces.drawFree(
-        pieceInfo.type, pieceInfo.team,
-        positionInBoard - offset, board.getTileSize(), painter);
-}
-
-// Computes the pivot offset so the dragged piece stays attached at the grab point
-Vector2 ChessVisuals::computeDragPivot(Vector2& cursorPos, ChessBoard& board, Vector2Int selPiecePosition) {
-    return {cursorPos - (board.getPosition() +
-        Vector2{(float)selPiecePosition.x, (float)board.getRankByDirection(selPiecePosition.y)} * board.getTileSize())};
 }

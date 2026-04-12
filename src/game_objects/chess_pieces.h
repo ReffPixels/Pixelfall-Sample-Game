@@ -12,22 +12,18 @@
 
 class ChessPieces {
 public:
-    // Rendering Methods
+    // Rendering
     void drawPieces(std::vector<Piece>& pieces, ChessBoard& board, Painter& painter);
     void drawFree(PieceType type, TeamColor team, Vector2 position, Painter& painter, Vector2 size = Vector2::Zero);
+    void pieceFollowCursor(Vector2& cursorPos, ChessBoard& board, PieceType type, TeamColor team,
+        Painter& painter, Vector2 offset = Vector2::Zero);
 
     // Setters
-    void setHideSelectedPiece(bool hideSelectedPiece) { this->hideSelectedPiece = hideSelectedPiece; };
-    void setFlippedPieces(bool flipPieces) { this->flipPieces = flipPieces; };
     void setSpriteSize(Vector2 spriteSize) { this->spriteSize = spriteSize; };
     void setPieceOffset(Vector2 pieceOffset) { this->pieceOffset = pieceOffset; };
     void setSpritesPath(std::filesystem::path spritesPath) { this->spritesPath = spritesPath; };
 
 private:
-    // Display Settings
-    bool hideSelectedPiece{false};
-    bool flipPieces{false};
-
     // Visuals
     Vector2 spriteSize{70.0f, 70.0f};
     std::filesystem::path spritesPath{"assets/image/themes/Cburnett/"};

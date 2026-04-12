@@ -26,10 +26,10 @@ bool ChessBoard::isBoardOnHover(Vector2 mousePosition) {
 }
 
 // Get the specific tile under the cursor
-std::string ChessBoard::getTileOnHover(Vector2 mousePosition) {
+Vector2Int ChessBoard::getTileOnHover(Vector2 mousePosition) {
     Vector2 squarePosition{(mousePosition - position) / tileSize.x};
-    return NotationParser::getNotationFromPos(
-        {(int)squarePosition.x, getRankByDirection((int)squarePosition.y)});
+    return {static_cast<int>(squarePosition.x),
+        getRankByDirection(static_cast<int>(squarePosition.y))};
 }
 
 // Get rank adjusted by the board direction (Flipped when black is at the bottom)

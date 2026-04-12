@@ -34,7 +34,7 @@ public:
     // Methods
     void draw(Painter& painter);
     bool isBoardOnHover(Vector2 mousePosition);
-    std::string getTileOnHover(Vector2 mousePosition);
+    Vector2Int getTileOnHover(Vector2 mousePosition);
     int getRankByDirection(int rank);
     
 private:

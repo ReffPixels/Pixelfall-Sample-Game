@@ -2,12 +2,11 @@
 
 #pragma once
 // Chess
+#include "config/chess_config.h"
+#include "move_generation.h"
 #include "game_objects/chess_board.h"
-#include "game_objects/chess_pieces.h"
-#include "chess_moves.h"
 
-class ChessVisuals {
-public:
+namespace TileHighlights {
     // Square Highlights
     void highlightSelected(ChessBoard& board, Vector2Int selPiecePosition, Painter& painter);
     void highlightLastMove(ChessBoard& board, Vector2Int lastMoveOrigin,
@@ -24,8 +23,6 @@ public:
         ChessBoard& board, Painter& painter, Color color = Color::fromHexcode("#ff000088"));
 
     // Cursor
-    void pieceFollowCursor(Vector2& cursorPos, ChessPieces& pieces, ChessBoard& board,
-        PieceInfo pieceInfo, Painter& painter, Vector2 offset = Vector2::Zero);
     Vector2 computeDragPivot(Vector2& cursorPos, ChessBoard& board, Vector2Int selPiecePosition);
 };
 

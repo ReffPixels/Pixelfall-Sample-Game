@@ -2,6 +2,7 @@
 
 #pragma once
 // Chess
+#include "config/chess_config.h"
 #include "tools/fen_parser.h"
 #include "game_objects/chess_board.h"
 #include "game_objects/chess_pieces.h"
@@ -10,15 +11,10 @@
 #include <array>
 #include <vector>
 
-enum class InputState {
-    Normal,         // Default state. The user can select a piece.
-    PieceSelected,  // The user has selected a piece. Moving and capturing is available.
-    Promotion       // The user has moved a pawn to a promoting square and they need to choose a piece type.
-};
-
 struct BoardState {
-    // State (FEN)
     std::vector<Piece> pieceList;
+    std::array<std::array<Piece, 8>, 8> coordinates; // 8x8 2D array of files and ranks 
+
     TeamColor playerToMove{TeamColor::White}; // Player that gets to move next.
     CastlingRights castlingRights{true, true, true, true}; // Tracker for who's lost their castling rights.
     Vector2Int enPassantTargetSquare{-1, -1}; // Record where en passant is possible (Cannot be deduced from positions)
@@ -26,36 +22,18 @@ struct BoardState {
     int totalFullMoves{1}; // Starts at 1 due to some arcaic reason. Counts up only on black moves.
 };
 
-class ChessState {
+class GameState {
 public:
     // Setup
     void setupFromFEN();
 
-    // Update Methods
-    void onBoardPressed(Vector2Int square);
-    void onBoardReleased(Vector2Int square);
-
-    // Gameplay
-    void selectPiece(Vector2Int selectedSquare);
-    void deselectPiece();
-    void moveSelectedPiece(Vector2Int targetSquare);
     void movePiece(Vector2Int origin, Vector2Int target, MoveType moveType);
     void updateCastlingRights();
-    static std::array<std::array<bool, 8>, 8> getAttackedSquares(bool ignoreKing, TeamColor playerTeam,
-        const std::array<std::array<PieceInfo, 8>, 8>& boardState, const CastlingRights& castlingRights);
-    void nextTurn();
-    void endGame();
-    void resetGame();
     void updatePieceList();
     bool hasInsufficientMaterial();
 
-    // Debug
-    void removePiece(Vector2Int position);
-    void printStatistics();
-
     // Getters
     const BoardState& getBoardState() const { return boardStatus; }
-    InputState getInputState() const { return inputState; }
     Vector2Int getselPiecePosition() const { return selPiecePosition; }
     Vector2Int getLastMoveOrigin() const { return lastMoveOrigin; }
     Vector2Int getLastMoveTarget() const { return lastMoveTarget; }
@@ -64,6 +42,9 @@ public:
     const GameOutcome& getGameOutcome() const { return gameOutcome; };
     Vector2Int getPromotionPosition() const { return promotionPosition; }
     void onPromotionSelected(PieceType pieceType);
+
+    // Debug
+    void removePiece(Vector2Int position);
 
 private:
     FenParser fenParser;
@@ -76,11 +57,6 @@ private:
     // The current Board State does not record how it got there, so we need to track it separately.
     Vector2Int lastMoveOrigin{-1, -1};
     Vector2Int lastMoveTarget{-1, -1};
-
-    // Interaction
-    InputState inputState{InputState::Normal};
-    Vector2Int selPiecePosition{-1, -1};  // (-1, -1) means no square is selected.
-    Vector2Int promotionPosition{-1, -1};
 
     // Moves
     std::array<std::array<MoveType, 8>, 8> validMoves;

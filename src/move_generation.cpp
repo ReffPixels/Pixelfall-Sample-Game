@@ -1,8 +1,8 @@
-// [TODO] describe
-#include "chess_moves.h"
+// [TODO] Clean up and describe
+#include "move_generation.h"
 
-void ChessMoves::findLegalMovesForPiece(std::array<std::array<MoveType, 8>, 8>& moves,
-    PieceInfo piece, Vector2Int position, const std::array<std::array<PieceInfo, 8>, 8>& boardState,
+void MoveGeneration::findLegalMovesForPiece(std::array<std::array<MoveType, 8>, 8>& moves,
+    Tile piece, Vector2Int position, const std::array<std::array<Tile, 8>, 8>& boardState,
     const CastlingRights& castlingRights, Vector2Int enPassantTargetSquare) {
 
     // Iterate through every pseudo legal move
@@ -12,7 +12,7 @@ void ChessMoves::findLegalMovesForPiece(std::array<std::array<MoveType, 8>, 8>& 
                 continue; // Not a valid move, keep looking
 
             // Create a board that represents the next turn if this move was made 
-            std::array<std::array<PieceInfo, 8>, 8> simulatedBoard = boardState;
+            std::array<std::array<Tile, 8>, 8> simulatedBoard = boardState;
             simulatedBoard[position.x][position.y] = {PieceType::None, TeamColor::None};
             simulatedBoard[f][r] = piece;
 
@@ -23,7 +23,7 @@ void ChessMoves::findLegalMovesForPiece(std::array<std::array<MoveType, 8>, 8>& 
 
             // Find attacked squares in simulated board
             std::array<std::array<bool, 8>, 8> unsafeSquares =
-                ChessState::getAttackedSquares(true, piece.team, simulatedBoard, castlingRights);
+                getAttackedSquares(true, piece.team, simulatedBoard, castlingRights);
 
             // Find king position
             Vector2Int kingPosition = {};
@@ -60,8 +60,8 @@ void ChessMoves::findLegalMovesForPiece(std::array<std::array<MoveType, 8>, 8>& 
 }
 
 // Dispatch move generation to the correct function based on piece type
-std::array<std::array<MoveType, 8>, 8> ChessMoves::generateMovesForPiece(
-    PieceInfo piece, Vector2Int position, const std::array<std::array<PieceInfo, 8>, 8>& boardState,
+std::array<std::array<MoveType, 8>, 8> MoveGeneration::generateMovesForPiece(
+    Tile piece, Vector2Int position, const std::array<std::array<Tile, 8>, 8>& boardState,
     const CastlingRights& castlingRights, Vector2Int enPassantTargetSquare) {
 
     switch (piece.type) {
@@ -85,8 +85,8 @@ std::array<std::array<MoveType, 8>, 8> ChessMoves::generateMovesForPiece(
     }
 }
 
-std::array<std::array<MoveType, 8>, 8> ChessMoves::generateKingMoves(
-    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<PieceInfo, 8>, 8>& boardState,
+std::array<std::array<MoveType, 8>, 8> MoveGeneration::generateKingMoves(
+    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState,
     const CastlingRights& castlingRights) {
 
     // Normal Moves
@@ -126,37 +126,37 @@ std::array<std::array<MoveType, 8>, 8> ChessMoves::generateKingMoves(
     return kingMoves;
 }
 
-std::array<std::array<MoveType, 8>, 8> ChessMoves::generateQueenMoves(
-    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<PieceInfo, 8>, 8>& boardState) {
+std::array<std::array<MoveType, 8>, 8> MoveGeneration::generateQueenMoves(
+    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState) {
     
     return generateMoves(moveOrigin, TeamColor, boardState, {
         Vector2Int::Up, Vector2Int::Right, Vector2Int::Down, Vector2Int::Left,
         Vector2Int::UpRight, Vector2Int::DownRight, Vector2Int::DownLeft, Vector2Int::UpLeft}, 7);
 }
 
-std::array<std::array<MoveType, 8>, 8> ChessMoves::generateRookMoves(
-    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<PieceInfo, 8>, 8>& boardState) {
+std::array<std::array<MoveType, 8>, 8> MoveGeneration::generateRookMoves(
+    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState) {
     
     return generateMoves(moveOrigin, TeamColor, boardState, {
         Vector2Int::Up, Vector2Int::Right, Vector2Int::Down, Vector2Int::Left}, 7);
 }
 
-std::array<std::array<MoveType, 8>, 8> ChessMoves::generateBishopMoves(
-    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<PieceInfo, 8>, 8>& boardState) {
+std::array<std::array<MoveType, 8>, 8> MoveGeneration::generateBishopMoves(
+    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState) {
     
     return generateMoves(moveOrigin, TeamColor, boardState, {
         Vector2Int::UpRight, Vector2Int::DownRight, Vector2Int::DownLeft, Vector2Int::UpLeft}, 7);
 }
 
-std::array<std::array<MoveType, 8>, 8> ChessMoves::generateKnightMoves(
-    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<PieceInfo, 8>, 8>& boardState) {
+std::array<std::array<MoveType, 8>, 8> MoveGeneration::generateKnightMoves(
+    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState) {
     
     return generateMoves(moveOrigin, TeamColor, boardState, {
         {2,1}, {2,-1}, {1,2}, {-1,2}, {-2,1}, {-2,-1}, {1,-2}, {-1,-2}}, 1);
 }
 
-std::array<std::array<MoveType, 8>, 8> ChessMoves::generatePawnMoves(
-    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<PieceInfo, 8>, 8>& boardState,
+std::array<std::array<MoveType, 8>, 8> MoveGeneration::generatePawnMoves(
+    Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState,
     Vector2Int enPassantTargetSquare, bool isFirstMove) {
     
     std::array<std::array<MoveType, 8>, 8> moves;
@@ -223,9 +223,9 @@ std::array<std::array<MoveType, 8>, 8> ChessMoves::generatePawnMoves(
     return moves;
 }
 
-std::array<std::array<MoveType, 8>, 8> ChessMoves::generateMoves(
+std::array<std::array<MoveType, 8>, 8> MoveGeneration::generateMoves(
     Vector2Int moveOrigin, TeamColor TeamColor,
-    const std::array<std::array<PieceInfo, 8>, 8>& boardState,
+    const std::array<std::array<Tile, 8>, 8>& boardState,
     std::vector<Vector2Int> directions, int maxSteps) {
 
     std::array<std::array<MoveType, 8>, 8> moves;
@@ -251,10 +251,75 @@ std::array<std::array<MoveType, 8>, 8> ChessMoves::generateMoves(
     return moves;
 }
 
-void ChessMoves::clearMoves(std::array<std::array<MoveType, 8>, 8>& moves) {
+void MoveGeneration::clearMoves(std::array<std::array<MoveType, 8>, 8>& moves) {
     
     // Set all moves to none
     for (auto& rank : moves)
         for (auto& move : rank)
             move = MoveType::None;
+}
+
+// Find all of the squares attacked by the oponent. 
+// If ignoreKing is set to true, the attacked squares of sliding pieces will ignore the king.
+// This is necessary for finding safe king squares since the king cannot retreat to the squares it was blocking. (X-ray)
+std::array<std::array<bool, 8>, 8> MoveGeneration::getAttackedSquares(bool ignoreKing, TeamColor playerTeam,
+    const std::array<std::array<Tile, 8>, 8>& boardState, const CastlingRights& castlingRights) {
+    // Store attacked squares
+    std::array<std::array<bool, 8>, 8> attackedSquares;
+
+    // Set attacked squares to none
+    for (auto& rank : attackedSquares)
+        for (auto& square : rank)
+            square = false;
+
+    // Store an adjusted board state (In case we are ignoring the king)
+    std::array<std::array<Tile, 8>, 8> adjustedBoardState = boardState;
+    if (ignoreKing) {
+        for (int r = 0; r < 8; r++)
+            for (int f = 0; f < 8; f++)
+                if (boardState[f][r].team == playerTeam && boardState[f][r].type == PieceType::King)
+                    adjustedBoardState[f][r] = {PieceType::None, TeamColor::None};
+    }
+
+    // Find every enemy piece
+    for (int rank = 0; rank < 8; rank++) {
+        for (int file = 0; file < 8; file++) {
+            Tile& cell = adjustedBoardState[file][rank];
+            // This cell is empty, do nothing
+            if (cell.type == PieceType::None || cell.team == playerTeam)
+                continue;
+
+            // This cell is a pawn. Pawns attack diagonally so they require special treatment
+            // We don't need an exception for en passant since it doesn't change the attack shape (Diagonal)
+            if (cell.type == PieceType::Pawn) {
+                int direction = (cell.team == TeamColor::White) ? -1 : 1;
+                int attackRank = rank + direction;
+                if (attackRank >= 0 && attackRank < 8) {
+                    if (file - 1 >= 0) attackedSquares[file - 1][attackRank] = true;
+                    if (file + 1 < 8)  attackedSquares[file + 1][attackRank] = true;
+                }
+                continue;
+            }
+
+            // This cell is a piece other than a pawn, we can use move generation to find its attack squares
+            std::array<std::array<MoveType, 8>, 8> moves =
+                MoveGeneration::generateMovesForPiece(cell, Vector2Int(file, rank), adjustedBoardState, castlingRights);
+
+            // Only add valid attack moves to the attacked squares (Not Empty or Castling)
+            // We don't need to account for promotion since forward pawn moves don't attack anyway.
+            for (int r = 0; r < 8; r++) {
+                for (int f = 0; f < 8; f++) {
+                    MoveType m = moves[f][r];
+                    if (m == MoveType::None
+                        || m == MoveType::CastlingKingSide
+                        || m == MoveType::CastlingQueenSide)
+                        continue;
+
+                    attackedSquares[f][r] = true;
+                }
+            }
+        }
+    }
+
+    return attackedSquares;
 }
