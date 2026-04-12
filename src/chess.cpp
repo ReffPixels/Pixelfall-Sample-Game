@@ -109,14 +109,20 @@ void Chess::onRender() {
     // Draw Drag and Drop Highlight (Under pieces)
     if (dragAndDrop) TileHighlights::highlightHoveredSquare(cursorPos, board, *painter, selectedPiece.position);
 
-    // Draw Pieces (hide selected piece during drag to avoid duplication)
-    // [TODO] remove selected piece from list somehow
-    pieces.drawPieces(boardState.pieces, board, *painter);
-
-    // Drag and Drop Visuals (piece following cursor, over pieces)
-    // [TODO] get selected piece
+    // Draw Pieces
     if (dragAndDrop) {
+        // Hide selected piece during drag-and-drop, and draw it at the mouse position instead.
+        std::vector<Piece> visiblePieces;
+        for (Piece piece : boardState.pieces)
+            if (piece.position != selectedPiece.position)
+                visiblePieces.push_back(piece);
+        
+        pieces.drawPieces(visiblePieces, board, *painter);
         pieces.pieceFollowCursor(cursorPos, board, selectedPiece.type, selectedPiece.team, *painter, dragAndDropPivot);
+    }
+    else {
+        // Draw the pieces normally.
+        pieces.drawPieces(boardState.pieces, board, *painter);
     }
 
     // Draw Promotion UI
