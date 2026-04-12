@@ -12,7 +12,7 @@ namespace TileHighlights {
         Vector2Int lastMoveTarget, Painter& painter);
     void highlightHoveredSquare(Vector2& cursorPos, ChessBoard& board,
         Painter& painter, Vector2Int selPiecePosition);
-    void highlightValidMoves(std::array<std::array<MoveType, 8>, 8> validMoves,
+    void highlightMoves(std::array<std::array<MoveType, 8>, 8> validMoves,
         ChessBoard& board, Painter& painter);
 
     // Debug

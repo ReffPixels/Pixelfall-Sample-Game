@@ -48,7 +48,8 @@ private:
 
     // Interaction
     InputState inputState{InputState::Normal};
-    Vector2Int selPiecePosition{-1, -1};  // (-1, -1) means no square is selected.
+    Piece selectedPiece;
+    std::array<std::array<MoveType, 8>, 8> selectedPieceMoves;
     void selectPiece(Vector2Int selectedSquare);
     void deselectPiece();
     void moveSelectedPiece(Vector2Int targetSquare);
@@ -56,7 +57,4 @@ private:
     // Generate reusable random sequence with Mersenne Twister Algorithm.
     // [TODO] This should be provided by the Engine.
     std::mt19937 rng{std::random_device{}()};
-
-    // Debug
-    void printStatistics();
 };

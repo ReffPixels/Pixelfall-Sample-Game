@@ -7,37 +7,49 @@
 #include <algorithm>
 
 void GameState::setupFromFEN() {
-    boardStatus = fenParser.getBoardFromFEN(currentBoardFEN);
+    // Get FEN of the initial position
+    FenState fenState{FenParser::getState(currentBoardFEN)};
+
+    // Assign FEN values to the board state
+    boardState.pieces = fenState.pieceList;
+    boardState.playerToMove = fenState.playerToMove;
+    boardState.castlingRights = fenState.castlingRights;
+    boardState.enPassantTargetSquare = fenState.enPassantTargetSquare;
+    boardState.moveRuleCounter = fenState.moveRuleCounter;
+    boardState.totalFullMoves = fenState.totalFullMoves;
+
+    // We have to manually sync the tileState since FEN only provides us with the pieceState
+    syncTileState();
 }
 
 // Moves a piece from an origin square to a target square and applies rules based on the type of move.
 void GameState::movePiece(Vector2Int origin, Vector2Int target, MoveType moveType) {
-    PieceInfo& selected = boardState[origin.x][origin.y];
-    PieceInfo& targetPiece = boardState[target.x][target.y];
+    Tile& selected = boardState.tiles[origin.x][origin.y];
+    Tile& targetPiece = boardState.tiles[target.x][target.y];
 
     // Reset enPassant availability
-    enPassantTargetSquare = {-1, -1};
+    boardState.enPassantTargetSquare = {-1, -1};
 
     // Reset move rule counter if this was a capture or a pawn move
-    if (targetPiece.type != PieceType::None || selected.type == PieceType::Pawn) moveRuleCounter = 0;
-    else moveRuleCounter++;
+    if (targetPiece.type != PieceType::None || selected.type == PieceType::Pawn) boardState.moveRuleCounter = 0;
+    else boardState.moveRuleCounter++;
 
     // Move piece
     targetPiece = selected;
-    lastMoveOrigin = origin;
-    lastMoveTarget = target;
+    lastMove.origin = origin;
+    lastMove.target = target;
 
     // Was it a double pawn push? Record en passant square.
     if (selected.type == PieceType::Pawn && abs(target.y - origin.y) == 2)
-        enPassantTargetSquare = {target.x, (origin.y + target.y) / 2};
+        boardState.enPassantTargetSquare = {target.x, (origin.y + target.y) / 2};
 
     // Was it en passant? Remove the captured pawn.
     if (moveType == MoveType::EnPassant)
-        boardState[target.x][origin.y] = {PieceType::None, TeamColor::None};
+        boardState.tiles[target.x][origin.y] = {PieceType::None, TeamColor::None};
 
     // Was it a promotion?
     if (moveType == MoveType::Promotion || moveType == MoveType::CapturePromotion) {
-        inputState = InputState::Promotion;
+        // inputState = InputState::Promotion; [TODO SOON] Return movetype?
         promotionPosition = target;
 
         // Remove piece from its previous position
@@ -48,22 +60,22 @@ void GameState::movePiece(Vector2Int origin, Vector2Int target, MoveType moveTyp
     // Was it castling? Move the rook to its new position
     if (selected.team == TeamColor::White) {
         if (moveType == MoveType::CastlingKingSide) {
-            boardState[7][7] = {PieceType::None, TeamColor::None};
-            boardState[5][7] = {PieceType::Rook, TeamColor::White};
+            boardState.tiles[7][7] = {PieceType::None, TeamColor::None};
+            boardState.tiles[5][7] = {PieceType::Rook, TeamColor::White};
         }
         else if (moveType == MoveType::CastlingQueenSide) {
-            boardState[0][7] = {PieceType::None, TeamColor::None};
-            boardState[3][7] = {PieceType::Rook, TeamColor::White};
+            boardState.tiles[0][7] = {PieceType::None, TeamColor::None};
+            boardState.tiles[3][7] = {PieceType::Rook, TeamColor::White};
         }
     }
     else if (selected.team == TeamColor::Black) {
         if (moveType == MoveType::CastlingKingSide) {
-            boardState[7][0] = {PieceType::None, TeamColor::None};
-            boardState[5][0] = {PieceType::Rook, TeamColor::Black};
+            boardState.tiles[7][0] = {PieceType::None, TeamColor::None};
+            boardState.tiles[5][0] = {PieceType::Rook, TeamColor::Black};
         }
         else if (moveType == MoveType::CastlingQueenSide) {
-            boardState[0][0] = {PieceType::None, TeamColor::None};
-            boardState[3][0] = {PieceType::Rook, TeamColor::Black};
+            boardState.tiles[0][0] = {PieceType::None, TeamColor::None};
+            boardState.tiles[3][0] = {PieceType::Rook, TeamColor::Black};
         }
     }
 
@@ -71,44 +83,54 @@ void GameState::movePiece(Vector2Int origin, Vector2Int target, MoveType moveTyp
     selected = {PieceType::None, TeamColor::None};
 }
 
-// Update Castling Rights (Must be called at the end of a move, since it uses lastMoveOrigin and lastMoveTarget)
+// Update Castling Rights (Must be called at the end of a move, since it uses lastMove.origin and lastMove.target)
 void GameState::updateCastlingRights() {
+    CastlingRights cr = boardState.castlingRights;
     // White King-side Rook
-    if (castlingRights.whiteKingSide &&
-        ((lastMoveOrigin == Vector2Int{7, 7}) || (lastMoveTarget == Vector2Int{7, 7}))) {
-        castlingRights.whiteKingSide = false;
+    if (cr.whiteKingSide &&
+        ((lastMove.origin == Vector2Int{7, 7}) || (lastMove.target == Vector2Int{7, 7}))) {
+        cr.whiteKingSide = false;
     }
     // White Queen-side Rook
-    if (castlingRights.whiteQueenSide &&
-        ((lastMoveOrigin == Vector2Int{0, 7}) || (lastMoveTarget == Vector2Int{0, 7}))) {
-        castlingRights.whiteQueenSide = false;
+    if (cr.whiteQueenSide &&
+        ((lastMove.origin == Vector2Int{0, 7}) || (lastMove.target == Vector2Int{0, 7}))) {
+        cr.whiteQueenSide = false;
     }
     // White King
-    if ((castlingRights.whiteKingSide || castlingRights.whiteQueenSide) && lastMoveOrigin == Vector2Int{4, 7}) {
-        castlingRights.whiteKingSide = false;
-        castlingRights.whiteQueenSide = false;
+    if ((cr.whiteKingSide || cr.whiteQueenSide) && lastMove.origin == Vector2Int{4, 7}) {
+        cr.whiteKingSide = false;
+        cr.whiteQueenSide = false;
     }
     // Black King-side Rook
-    if (castlingRights.blackKingSide &&
-        ((lastMoveOrigin == Vector2Int{7, 0}) || (lastMoveTarget == Vector2Int{7, 0}))) {
-        castlingRights.blackKingSide = false;
+    if (cr.blackKingSide &&
+        ((lastMove.origin == Vector2Int{7, 0}) || (lastMove.target == Vector2Int{7, 0}))) {
+        cr.blackKingSide = false;
     }
     // Black Queen-side Rook
-    if (castlingRights.blackQueenSide &&
-        ((lastMoveOrigin == Vector2Int{0, 0}) || (lastMoveTarget == Vector2Int{0, 0}))) {
-        castlingRights.blackQueenSide = false;
+    if (cr.blackQueenSide &&
+        ((lastMove.origin == Vector2Int{0, 0}) || (lastMove.target == Vector2Int{0, 0}))) {
+        cr.blackQueenSide = false;
     }
     // Black King
-    if ((castlingRights.blackKingSide || castlingRights.blackQueenSide) && lastMoveOrigin == Vector2Int{4, 0}) {
-        castlingRights.blackKingSide = false;
-        castlingRights.blackQueenSide = false;
+    if ((cr.blackKingSide || cr.blackQueenSide) && lastMove.origin == Vector2Int{4, 0}) {
+        cr.blackKingSide = false;
+        cr.blackQueenSide = false;
     }
+    boardState.castlingRights = cr;
 }
 
 TeamColor GameState::getOpponent() {
-    if (playerToMove == TeamColor::White) return TeamColor::Black;
-    if (playerToMove == TeamColor::Black) return TeamColor::White;
+    if (boardState.playerToMove == TeamColor::White) return TeamColor::Black;
+    if (boardState.playerToMove == TeamColor::Black) return TeamColor::White;
     return TeamColor::None;
+}
+
+void GameState::swapPlayers() {
+    boardState.playerToMove = getOpponent();
+}
+
+void GameState::incrementTotalMoves() {
+    if (boardState.playerToMove == TeamColor::Black) boardState.totalFullMoves++;
 }
 
 // Returns true if the given team's king is currently being attacked.
@@ -117,11 +139,11 @@ bool GameState::isKingInCheck(TeamColor team) const {
     Vector2Int kingPos{-1, -1};
     for (int rank = 0; rank < 8; rank++)
         for (int file = 0; file < 8; file++)
-            if (boardState[file][rank].type == PieceType::King && boardState[file][rank].team == team)
+            if (boardState.tiles[file][rank].type == PieceType::King && boardState.tiles[file][rank].team == team)
                 kingPos = {file, rank};
 
     // Get squares attacked by the opponent (ignoreKing = false, we want accurate attacks)
-    auto attacked = getAttackedSquares(false, team, boardState, castlingRights);
+    auto attacked = MoveGeneration::getAttackedSquares(false, team, boardState.tiles, boardState.castlingRights);
     return attacked[kingPos.x][kingPos.y];
 }
 
@@ -129,13 +151,13 @@ bool GameState::isKingInCheck(TeamColor team) const {
 bool GameState::hasLegalMoves(TeamColor team) const {
     for (int rank = 0; rank < 8; rank++) {
         for (int file = 0; file < 8; file++) {
-            if (boardState[file][rank].team != team) continue;
+            if (boardState.tiles[file][rank].team != team) continue;
 
-            PieceInfo piece = boardState[file][rank];
+            Tile piece = boardState.tiles[file][rank];
             Vector2Int pos{file, rank};
 
-            auto moves = ChessMoves::generateMovesForPiece(piece, pos, boardState, castlingRights, enPassantTargetSquare);
-            ChessMoves::findLegalMovesForPiece(moves, piece, pos, boardState, castlingRights, enPassantTargetSquare);
+            auto moves = MoveGeneration::generateMovesForPiece(piece, pos, boardState.tiles, boardState.castlingRights, boardState.enPassantTargetSquare);
+            MoveGeneration::findLegalMovesForPiece(moves, piece, pos, boardState.tiles, boardState.castlingRights, boardState.enPassantTargetSquare);
 
             for (int r = 0; r < 8; r++)
                 for (int f = 0; f < 8; f++)
@@ -147,50 +169,56 @@ bool GameState::hasLegalMoves(TeamColor team) const {
 }
 
 // Checks for checkmate and stalemate after each move. (By order of priority)
-void GameState::findGameOutcome() {
-
-    if (!hasLegalMoves(playerToMove))
+bool GameState::findGameOutcome() {
+    if (!hasLegalMoves(boardState.playerToMove))
         // There are no more legal moves available and the king is in check. This is a Checkmate.
-        if (isKingInCheck(playerToMove)) {
-            gameOutcome = (playerToMove == TeamColor::White)
+        if (isKingInCheck(boardState.playerToMove)) {
+            gameOutcome = (boardState.playerToMove == TeamColor::White)
                 ? GameOutcome::BlackVictoryCheckmate
                 : GameOutcome::WhiteVictoryCheckmate;
-            endGame();
-            return;
+            return true;
         }
         // There are no more legal moves available but the king is not in check. This is a stalemate.
         else {
             gameOutcome = GameOutcome::DrawStalemate;
-            endGame();
-            return;
+            return true;
         }
     // There are still legal moves available, but this could still be a draw by repetition or insufficient material.
     else {
         if (hasInsufficientMaterial()) {
             gameOutcome = GameOutcome::DrawInsufficientMaterial;
-            endGame();
-            return;
+            return true;
         }
         // 75 Move Rule (Automatic Draw)
-        if (moveRuleCounter == 75) {
+        if (boardState.moveRuleCounter == 75) {
             gameOutcome = GameOutcome::Draw75Move;
-            endGame();
-            return;
+            return true;
         }
     }
+    return false;
 }
 
 void GameState::removePiece(Vector2Int position) {
-    boardState[position.x][position.y] = {PieceType::None, TeamColor::None};
+    boardState.tiles[position.x][position.y] = {PieceType::None, TeamColor::None};
 }
 
-void GameState::updatePieceList() {
-    pieceList.clear();
+void GameState::syncPieceState() {
+    boardState.pieces.clear();
 
     for (int r = 0; r < 8; r++)
         for (int f = 0; f < 8; f++)
-            if (boardState[f][r].type != PieceType::None)
-                pieceList.push_back({boardState[f][r], Vector2Int(f, r)});
+            if (boardState.tiles[f][r].type != PieceType::None)
+                boardState.pieces.push_back(
+                    {boardState.tiles[f][r].type, boardState.tiles[f][r].team, Vector2Int(f, r)});
+}
+
+void GameState::syncTileState() {
+    for (auto& file : boardState.tiles)
+        for (auto& tile : file)
+            tile = {PieceType::None, TeamColor::None};
+
+    for (const auto& piece : boardState.pieces)
+        boardState.tiles[piece.position.x][piece.position.y] = {piece.type, piece.team};
 }
 
 static TileColor getTileColor(Vector2Int position) {
@@ -205,29 +233,29 @@ bool GameState::hasInsufficientMaterial() {
         };
 
     // King vs King
-    if (pieceList.size() == 2) return true;
+    if (boardState.pieces.size() == 2) return true;
 
     // 3 Total Pieces
-    if (pieceList.size() == 3) {
+    if (boardState.pieces.size() == 3) {
         // King and Knight vs King
-        if (std::count_if(pieceList.begin(), pieceList.end(), [](const Piece& e) {
-            return e.info.type == PieceType::Knight;}) == 1) return true;
+        if (std::count_if(boardState.pieces.begin(), boardState.pieces.end(), [](const Piece& e) {
+            return e.type == PieceType::Knight;}) == 1) return true;
         // King and Bishop vs King
-        if (std::count_if(pieceList.begin(), pieceList.end(), [](const Piece& e) {
-            return e.info.type == PieceType::Bishop;}) == 1) return true;
+        if (std::count_if(boardState.pieces.begin(), boardState.pieces.end(), [](const Piece& e) {
+            return e.type == PieceType::Bishop;}) == 1) return true;
     }
 
     // King and Bishop vs King and Bishop (Both Bishops must be in the same colour square)
-    if (pieceList.size() == 4) {
+    if (boardState.pieces.size() == 4) {
 
-        auto whiteBishop = std::find_if(pieceList.begin(), pieceList.end(), [](const Piece& e) {
-            return e.info.type == PieceType::Bishop && e.info.team == TeamColor::White;});
+        auto whiteBishop = std::find_if(boardState.pieces.begin(), boardState.pieces.end(), [](const Piece& e) {
+            return e.type == PieceType::Bishop && e.team == TeamColor::White;});
 
-        auto blackBishop = std::find_if(pieceList.begin(), pieceList.end(), [](const Piece& e) {
-            return e.info.type == PieceType::Bishop && e.info.team == TeamColor::Black;});
+        auto blackBishop = std::find_if(boardState.pieces.begin(), boardState.pieces.end(), [](const Piece& e) {
+            return e.type == PieceType::Bishop && e.team == TeamColor::Black;});
 
         // Check if both bishops exist
-        if (whiteBishop != pieceList.end() && blackBishop != pieceList.end()
+        if (whiteBishop != boardState.pieces.end() && blackBishop != boardState.pieces.end()
             && getTileColor(whiteBishop->position) == getTileColor(blackBishop->position)) {
             return true;
         }
@@ -236,6 +264,19 @@ bool GameState::hasInsufficientMaterial() {
 }
 
 void GameState::onPromotionSelected(PieceType pieceType) {
-    boardState[promotionPosition.x][promotionPosition.y] = {pieceType, playerToMove};
-    nextTurn();
+    boardState.tiles[promotionPosition.x][promotionPosition.y] = {pieceType, boardState.playerToMove};
+}
+
+void GameState::clearState() {
+    // Reset Board State
+    boardState.playerToMove = TeamColor::White;
+    boardState.castlingRights = {true, true, true, true};
+    boardState.enPassantTargetSquare = {-1, -1};
+    boardState.moveRuleCounter = 0;
+    boardState.totalFullMoves = 1;
+    lastMove = {{-1,-1},{-1,-1}};
+
+    // Reset other trackers
+    gameOutcome = GameOutcome::Playing;
+    promotionPosition = {-1, -1};
 }

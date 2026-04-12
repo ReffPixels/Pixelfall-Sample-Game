@@ -61,8 +61,8 @@ void TileHighlights::highlightHoveredSquare(Vector2& cursorPos, ChessBoard& boar
     );
 }
 
-// Draw a circle at every valid move spot
-void TileHighlights::highlightValidMoves(std::array<std::array<MoveType, 8>, 8> validMoves, ChessBoard& board, Painter& painter) {
+// Draw a circle at every move location provided
+void TileHighlights::highlightMoves(std::array<std::array<MoveType, 8>, 8> validMoves, ChessBoard& board, Painter& painter) {
     for (int rank = 0; rank < 8; rank++)
         for (int file = 0; file < 8; file++)
             // It's a normal move or it's castling

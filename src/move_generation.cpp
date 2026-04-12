@@ -252,11 +252,7 @@ std::array<std::array<MoveType, 8>, 8> MoveGeneration::generateMoves(
 }
 
 void MoveGeneration::clearMoves(std::array<std::array<MoveType, 8>, 8>& moves) {
-    
-    // Set all moves to none
-    for (auto& rank : moves)
-        for (auto& move : rank)
-            move = MoveType::None;
+    for (auto& rank : moves) rank.fill(MoveType::None);
 }
 
 // Find all of the squares attacked by the oponent. 

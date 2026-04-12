@@ -27,21 +27,30 @@ public:
     // Setup
     void setupFromFEN();
 
+    // State Control
+    const BoardState& getBoardState() const { return boardState; };
+    void syncPieceState();
+    void syncTileState();
+    void clearState();
+
+    // Moves
     void movePiece(Vector2Int origin, Vector2Int target, MoveType moveType);
     void updateCastlingRights();
-    void updatePieceList();
-    bool hasInsufficientMaterial();
-
-    // Getters
-    const BoardState& getBoardState() const { return boardState; };
     Move getLastMove() const { return lastMove; };
-    const std::array<std::array<MoveType, 8>, 8>& getValidMoves() const { return validMoves; };
-    TeamColor getOpponent();
+    void incrementTotalMoves();
+
+    // Outcome
+    bool hasInsufficientMaterial();
+    bool findGameOutcome();
     const GameOutcome& getGameOutcome() const { return gameOutcome; };
 
     // Pawn Promotion
     Vector2Int getPromotionPosition() const { return promotionPosition; };
     void onPromotionSelected(PieceType pieceType);
+
+    // Players
+    void swapPlayers();
+    TeamColor getOpponent();
 
     // Debug
     void removePiece(Vector2Int position);
@@ -54,11 +63,9 @@ private:
 
     // Moves
     Move lastMove;
-    std::array<std::array<MoveType, 8>, 8> validMoves;
 
     // Game Outcome
     GameOutcome gameOutcome{GameOutcome::Playing};
     bool isKingInCheck(TeamColor team) const;
     bool hasLegalMoves(TeamColor team) const;
-    void findGameOutcome();
 };

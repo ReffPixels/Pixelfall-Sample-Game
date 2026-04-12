@@ -102,6 +102,6 @@ void ChessPieces::pieceFollowCursor(Vector2& cursorPos, ChessBoard& board,
 // Computes the pivot offset so the dragged piece stays attached at the grab point
 Vector2 ChessPieces::computeDragPivot(Vector2& cursorPos, ChessBoard& board) {
     Vector2Int piecePosition = board.getTileOnHover(cursorPos);
-    return {cursorPos - (board.getPosition() +
-        Vector2{(float)piecePosition.x, (float)piecePosition.y} * board.getTileSize())};
+    return {(board.getPosition() +
+        Vector2{(float)piecePosition.x, (float)board.getRankByDirection(piecePosition.y)} * board.getTileSize()) - cursorPos};
 }

@@ -8,41 +8,41 @@
 
 namespace MoveGeneration {
     // Piece Movement
-    static void findLegalMovesForPiece(std::array<std::array<MoveType, 8>, 8>& moves,
+     void findLegalMovesForPiece(std::array<std::array<MoveType, 8>, 8>& moves,
         Tile piece, Vector2Int position, const std::array<std::array<Tile, 8>, 8>& boardState,
         const CastlingRights& castlingRights, Vector2Int enPassantTargetSquare = Vector2Int(-1, -1));
 
-    static std::array<std::array<MoveType, 8>, 8> generateMovesForPiece(
+     std::array<std::array<MoveType, 8>, 8> generateMovesForPiece(
         Tile piece, Vector2Int position, const std::array<std::array<Tile, 8>, 8>& boardState,
         const CastlingRights& castlingRights, Vector2Int enPassantTargetSquare = Vector2Int(-1, -1));
 
-    static std::array<std::array<MoveType, 8>, 8> generateMoves(
+     std::array<std::array<MoveType, 8>, 8> generateMoves(
         Vector2Int moveOrigin, TeamColor TeamColor,
         const std::array<std::array<Tile, 8>, 8>& boardState,
         std::vector<Vector2Int> directions, int maxSteps);
 
-    static std::array<std::array<bool, 8>, 8> getAttackedSquares(bool ignoreKing, TeamColor playerTeam,
+     std::array<std::array<bool, 8>, 8> getAttackedSquares(bool ignoreKing, TeamColor playerTeam,
         const std::array<std::array<Tile, 8>, 8>& boardState, const CastlingRights& castlingRights);
 
-    static std::array<std::array<MoveType, 8>, 8> generateKingMoves(
+     std::array<std::array<MoveType, 8>, 8> generateKingMoves(
         Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState,
         const CastlingRights& castlingRights);
     
-    static std::array<std::array<MoveType, 8>, 8> generateQueenMoves(
+     std::array<std::array<MoveType, 8>, 8> generateQueenMoves(
         Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState);
     
-    static std::array<std::array<MoveType, 8>, 8> generateRookMoves(
+     std::array<std::array<MoveType, 8>, 8> generateRookMoves(
         Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState);
     
-    static std::array<std::array<MoveType, 8>, 8> generateBishopMoves(
+     std::array<std::array<MoveType, 8>, 8> generateBishopMoves(
         Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState);
     
-    static std::array<std::array<MoveType, 8>, 8> generateKnightMoves(
+     std::array<std::array<MoveType, 8>, 8> generateKnightMoves(
         Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState);
     
-    static std::array<std::array<MoveType, 8>, 8> generatePawnMoves(
+     std::array<std::array<MoveType, 8>, 8> generatePawnMoves(
         Vector2Int moveOrigin, TeamColor TeamColor, const std::array<std::array<Tile, 8>, 8>& boardState,
         Vector2Int enPassantTargetSquare, bool isFirstMove = false);
 
-    static void clearMoves(std::array<std::array<MoveType, 8>, 8>& moves);
+     void clearMoves(std::array<std::array<MoveType, 8>, 8>& moves);
 };
