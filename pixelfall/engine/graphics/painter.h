@@ -26,7 +26,7 @@ public:
     void begin(); // Called by engine before onRender() — binds FBO and sets up projection
     void end();   // Called by engine after onRender() — applies FXAA and blits to screen
 
-    // Basic shapes
+    // Primitives
     void drawPolygon(const std::vector<Vector2>& points, Color color);
     void drawTriangle(Vector2 a, Vector2 b, Vector2 c, Color color);
     void drawQuad(Vector2 a, Vector2 b, Vector2 c, Vector2 d, Color color);
@@ -43,12 +43,16 @@ public:
         Color tint = painter::defaults::textureTint);
 
     // Complex Shapes
-    void drawRectangleHollow(Vector2 position, Vector2 size, Vector2 innerSize, Color color);
-    void drawCircleHollow(Vector2 center, float radius, float innerRadius, Color color);
     void drawRectangleRound(
-        Vector2 position, Vector2 size, Color color, Vector4 cornerRadius, int segments = 20);  // Vector4 radius
+        Vector2 position, Vector2 size, Color color, Vector4 cornerRadius, int segments = 20);
     void drawRectangleRound(
-        Vector2 position, Vector2 size, Color color, float cornerRadius, int segments = 20);    // Single float radius
+        Vector2 position, Vector2 size, Color color, float cornerRadius, int segments = 20);  // Float
+    void drawBorder(Vector2 position, Vector2 size, Vector2 innerSize, Color color);
+    void drawCircleBorder(Vector2 center, float radius, float innerRadius, Color color);
+    void drawBorderRound(
+        Vector2 position, Vector2 size, float lineWeight, Color color, Vector4 cornerRadius, int segments = 20);
+    void drawBorderRound(
+        Vector2 position, Vector2 size, float lineWeight, Color color, float cornerRadius, int segments = 20); // Float
 
     // Public Members
     std::unique_ptr<TextureCache> textureCache;

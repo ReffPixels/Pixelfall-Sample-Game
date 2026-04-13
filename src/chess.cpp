@@ -78,9 +78,7 @@ void Chess::onRender() {
     BoardState boardState = state.getBoardState();
 
     // Draw Background
-    Color backgroundColor{
-        gameOutcome == Outcome::Playing ?
-        Color::fromHexcode("#1b1b1d") : Color::fromHexcode("#33ff00")};
+    Color backgroundColor{Color::fromHexcode("#1b1b1d")};
     
     painter->drawRectangle(
         Vector2::Zero,
@@ -89,29 +87,14 @@ void Chess::onRender() {
     );
 
     // Draw board
-    float oSize{10.0f};
     float bCornerRadius{board.getTileSize().x * 0.25f};
-    float oCornerRadius{board.getTileSize().x * 0.35f};
-
-    // Board Outline
-    painter->drawRectangleRound(
-        board.getPosition() - Vector2(oSize, oSize),
-        (board.getTileSize() * 8.0f) + Vector2(oSize, oSize) * 2,
-        Color::fromHexcode("#35373a"),
-        oCornerRadius
-    );
-
-    // Board Tiles
     board.drawRound(*painter, bCornerRadius);
 
-    // Draw Attacked Squares (Player)
-    if (appInput->isKeyDown(KeyCode::Q)) tile_highlights::highlightAttackedSquares(move_generation::getAttackedSquares(
-        false, boardState.playerToMove, boardState.tiles, boardState.castlingRights), board, *painter);
+    // Board Outline is drawn later so it layers on top of highlights
+    float oLineWeight{10.0f};
+    float oCornerRadius{board.getTileSize().x * 0.35f};
 
-    // Draw Attacked Squares (Opponent)
-    if (appInput->isKeyDown(KeyCode::E)) tile_highlights::highlightAttackedSquares(move_generation::getAttackedSquares(
-        false, state.getOpponent(), boardState.tiles, boardState.castlingRights), board, *painter,
-        Color::fromHexcode("#0000ff88"));
+    // Board Tiles
 
     // Draw Highlights
     Move lastMove = state.getLastMove();
@@ -122,10 +105,30 @@ void Chess::onRender() {
         tile_highlights::highlightMoves(selectedPieceMoves, board, *painter);
     }
 
+    // Draw Attacked Squares (Player)
+    if (appInput->isKeyDown(KeyCode::E)) tile_highlights::highlightAttackedSquares(move_generation::getAttackedSquares(
+        false, state.getOpponent(), boardState.tiles, boardState.castlingRights), board, *painter,
+        Color::fromHexcode("#ff0000ce"));
+    
+    // Draw Attacked Squares (Opponent)
+    if (appInput->isKeyDown(KeyCode::Q)) tile_highlights::highlightAttackedSquares(move_generation::getAttackedSquares(
+        false, boardState.playerToMove, boardState.tiles, boardState.castlingRights), board, *painter,
+        Color::fromHexcode("#ff9900ce"));
+
     bool dragAndDrop = inputState == InputState::PieceSelected
         && appInput->isMouseButtonDown(MouseButton::Left);
     // Draw Drag and Drop Highlight (Under pieces)
     if (dragAndDrop) tile_highlights::highlightHoveredSquare(cursorPos, board, *painter, selectedPiece.position);
+
+    // Draw board outline
+    painter->drawBorderRound(
+        board.getPosition() - Vector2(oLineWeight, oLineWeight),
+        (board.getTileSize() * 8.0f) + Vector2(oLineWeight, oLineWeight) * 2,
+        oLineWeight,
+        gameOutcome == Outcome::Playing ?
+        Color::fromHexcode("#35373a") : Color::fromHexcode("#dc3333"),
+        oCornerRadius
+    );
 
     // Draw the pieces
     drawPieces(dragAndDrop);

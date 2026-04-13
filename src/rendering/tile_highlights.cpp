@@ -53,7 +53,7 @@ void tile_highlights::highlightHoveredSquare(Vector2& cursorPos, ChessBoard& boa
     };
 
     // Draw highlight border
-    painter.drawRectangleHollow(
+    painter.drawBorder(
         snappedPositionInBoard,
         board.getTileSize(),
         board.getTileSize() * 0.9f,
@@ -81,7 +81,7 @@ void tile_highlights::highlightMoves(std::array<std::array<MoveType, 8>, 8> vali
             else if ((validMoves[file][rank] == MoveType::Capture)
                 || (validMoves[file][rank] == MoveType::EnPassant)
                 || (validMoves[file][rank] == MoveType::CapturePromotion)) {
-                painter.drawCircleHollow(
+                painter.drawCircleBorder(
                     Vector2(board.getPosition().x + (float)file * board.getTileSize().x + board.getTileSize().x / 2,
                         board.getPosition().y + (float)board.getRankByDirection(rank) * board.getTileSize().y + board.getTileSize().y / 2),
                     board.getTileSize().x * 0.45f,

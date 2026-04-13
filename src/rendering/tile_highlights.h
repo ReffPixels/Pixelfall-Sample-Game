@@ -17,7 +17,7 @@ namespace tile_highlights {
 
     // Debug
     void highlightAttackedSquares(std::array<std::array<bool, 8>, 8> attackedSquares,
-        ChessBoard& board, Painter& painter, Color color = Color::fromHexcode("#ff000088"));
+        ChessBoard& board, Painter& painter, Color color);
 };
 
 // [TODO] Lerp animation piece when clicking instead of dragging

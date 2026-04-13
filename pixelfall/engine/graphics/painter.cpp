@@ -213,7 +213,7 @@ void Painter::drawSprite(Vector2 position, Vector2 size, Texture& texture, Color
 }
 
 // Draws a rectangular border by composing 4 rectangles. innerSize is clamped to always be smaller than size.
-void Painter::drawRectangleHollow(Vector2 position, Vector2 size, Vector2 innerSize, Color color) {
+void Painter::drawBorder(Vector2 position, Vector2 size, Vector2 innerSize, Color color) {
     innerSize.x = std::clamp(innerSize.x, 0.0f, size.x);
     innerSize.y = std::clamp(innerSize.y, 0.0f, size.y);
 
@@ -227,7 +227,7 @@ void Painter::drawRectangleHollow(Vector2 position, Vector2 size, Vector2 innerS
 }
 
 // Draws a circle made out of triangular segments (Uses more segments at bigger radius)
-void Painter::drawCircleHollow(Vector2 center, float radius, float innerRadius, Color color) {
+void Painter::drawCircleBorder(Vector2 center, float radius, float innerRadius, Color color) {
     innerRadius = std::clamp(innerRadius, 0.0f, radius);
 
     int segments = std::clamp(
@@ -324,4 +324,82 @@ void Painter::drawRectangleRound(Vector2 position, Vector2 size, Color color, fl
     Vector4 radius {cornerRadius, cornerRadius, cornerRadius, cornerRadius};
 
     drawRectangleRound(position, size, color, radius, segments);
+}
+
+// Draws a hollow rectangle with round corners. The corners can be of 4 different sizes.
+void Painter::drawBorderRound(Vector2 position, Vector2 size, float lineWeight, Color color, Vector4 cornerRadius, int segments) {
+
+    // If all corners are 0, simplify to a hollow rectangle
+    if (cornerRadius.x + cornerRadius.y + cornerRadius.z + cornerRadius.w == 0.0f) {
+        drawBorder(position, size, Vector2{lineWeight, lineWeight}, color);
+        return;
+    }
+
+    // Find corners of the outer rectangle
+    Vector2 rectangleTL{position};
+    Vector2 rectangleTR{position.x + size.x, position.y};
+    Vector2 rectangleBR{position.x + size.x, position.y + size.y};
+    Vector2 rectangleBL{position.x, position.y + size.y};
+
+    // Find center of each corner circle
+    Vector2 cornerCenterTL{rectangleTL.x + cornerRadius.x, rectangleTL.y + cornerRadius.x};
+    Vector2 cornerCenterTR{rectangleTR.x - cornerRadius.y, rectangleTR.y + cornerRadius.y};
+    Vector2 cornerCenterBR{rectangleBR.x - cornerRadius.z, rectangleBR.y - cornerRadius.z};
+    Vector2 cornerCenterBL{rectangleBL.x + cornerRadius.w, rectangleBL.y - cornerRadius.w};
+
+    // Corner angles (clockwise winding)
+    float cornerStartTL = math::conversions::degreesToRadians(180.0f);
+    float cornerEndTL = math::conversions::degreesToRadians(90.0f);
+
+    float cornerStartTR = math::conversions::degreesToRadians(90.0f);
+    float cornerEndTR = math::conversions::degreesToRadians(0.0f);
+
+    float cornerStartBR = math::conversions::degreesToRadians(360.0f);
+    float cornerEndBR = math::conversions::degreesToRadians(270.0f);
+
+    float cornerStartBL = math::conversions::degreesToRadians(270.0f);
+    float cornerEndBL = math::conversions::degreesToRadians(180.0f);
+
+    // Inner corner radii (shrink by lineWeight, but don't go negative)
+    Vector4 innerRadius{
+        std::max(0.0f, cornerRadius.x - lineWeight),
+        std::max(0.0f, cornerRadius.y - lineWeight),
+        std::max(0.0f, cornerRadius.z - lineWeight),
+        std::max(0.0f, cornerRadius.w - lineWeight)
+    };
+
+    // Build outer perimeter points
+    std::vector<Vector2> outer;
+    auto arcTL = getArcPoints(cornerCenterTL, cornerRadius.x, cornerStartTL, cornerEndTL, segments);
+    outer.insert(outer.end(), arcTL.begin(), arcTL.end());
+    auto arcTR = getArcPoints(cornerCenterTR, cornerRadius.y, cornerStartTR, cornerEndTR, segments);
+    outer.insert(outer.end(), arcTR.begin(), arcTR.end());
+    auto arcBR = getArcPoints(cornerCenterBR, cornerRadius.z, cornerStartBR, cornerEndBR, segments);
+    outer.insert(outer.end(), arcBR.begin(), arcBR.end());
+    auto arcBL = getArcPoints(cornerCenterBL, cornerRadius.w, cornerStartBL, cornerEndBL, segments);
+    outer.insert(outer.end(), arcBL.begin(), arcBL.end());
+
+    // Build inner perimeter points (same centers, smaller radii)
+    std::vector<Vector2> inner;
+    auto innerArcTL = getArcPoints(cornerCenterTL, innerRadius.x, cornerStartTL, cornerEndTL, segments);
+    inner.insert(inner.end(), innerArcTL.begin(), innerArcTL.end());
+    auto innerArcTR = getArcPoints(cornerCenterTR, innerRadius.y, cornerStartTR, cornerEndTR, segments);
+    inner.insert(inner.end(), innerArcTR.begin(), innerArcTR.end());
+    auto innerArcBR = getArcPoints(cornerCenterBR, innerRadius.z, cornerStartBR, cornerEndBR, segments);
+    inner.insert(inner.end(), innerArcBR.begin(), innerArcBR.end());
+    auto innerArcBL = getArcPoints(cornerCenterBL, innerRadius.w, cornerStartBL, cornerEndBL, segments);
+    inner.insert(inner.end(), innerArcBL.begin(), innerArcBL.end());
+
+    // Draw quad strip between outer and inner perimeters
+    for (size_t i = 0; i < outer.size(); i++) {
+        size_t next = (i + 1) % outer.size();
+        drawTriangle(outer[i], inner[i], outer[next], color);
+        drawTriangle(inner[i], inner[next], outer[next], color);
+    }
+}
+
+// Draws a hollow rectangle with round corners (uniform radius).
+void Painter::drawBorderRound(Vector2 position, Vector2 size, float lineWeight, Color color, float cornerRadius, int segments) {
+    Vector4 radius{cornerRadius, cornerRadius, cornerRadius, cornerRadius};
+    drawBorderRound(position, size, lineWeight, color, radius, segments);
 }
