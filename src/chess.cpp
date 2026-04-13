@@ -125,6 +125,7 @@ void Chess::onRender() {
     }
 }
 
+// Draws the pieces on the board and the selected piece depending on input type.
 void Chess::drawPieces(bool dragAndDrop) {
     BoardState boardState = state.getBoardState();
 

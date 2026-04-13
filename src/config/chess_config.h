@@ -56,7 +56,7 @@ enum class Outcome {
     DrawStalemate,                      // There are no legal moves for the player but their king is not under check
     DrawInsufficientMaterial,           // Checkmate is impossible (The pieces left on the board are insufficient)
     Draw50Move,                         // [TODO LONG TERM] Button system (50 Move is not automatic)
-    Draw75Move,                         // 75 Half moves have passed since the last capture or pawn move.
+    Draw75Move,                         // 75 moves (150 half-moves) have passed since the last capture or pawn move.
     Draw3FoldRepetition,                // [TODO LONG TERM] Fen snapshots
     Draw5FoldRepetition,                // [TODO LONG TERM] Fen snapshots
     DrawAgreement,                      // [TODO LONG TERM] Button system
@@ -64,7 +64,7 @@ enum class Outcome {
 
 // -------- BOARD REPRESENTATION -------- //
 // We need a way to keep track of the state of the board. There are two main approaches to achieve this:
-// Piece centric (Where we keep a list of every piece, ith their type, colour and position), and 
+// Piece centric (Where we keep a list of every piece, with their type, colour and position), and 
 // Board centric (Where we keep a map of all 64 tiles that says if they are empty or if they hold a specific piece)
 
 // In this project we use both methods at the same time.
@@ -74,7 +74,7 @@ enum class Outcome {
 // by using boardState[x][y] *AND* being able to quickly find a piece from the piece list without having to loop
 // through all the empty squares is incredibly valuable for performance, so keeping this duplication makes sense.
 
-// Stores information about a piece. Used by the pieceState vector
+// Stores information about a piece. Used by the pieceList vector
 struct Piece {
     PieceType type;
     TeamColor team;

@@ -81,11 +81,6 @@ TileColor game_outcome::getTileColor(const Vector2Int& position) {
 // Checks if there is not enough pieces on the board for a checkmate to be delivered.
 // When this happens, a game outcome of Draw by Insufficient Material should be triggered.
 bool game_outcome::hasInsufficientMaterial(const BoardState& boardState) {
-    // Find piece count in array
-    auto getPieceCount = [](const auto& m, PieceType t) -> int {
-        auto it = m.find(t);
-        return it != m.end() ? it->second : 0;
-        };
 
     // King vs King
     if (boardState.pieces.size() == 2) return true;

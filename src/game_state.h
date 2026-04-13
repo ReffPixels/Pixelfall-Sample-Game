@@ -52,7 +52,6 @@ public:
 private:
     // Board State
     BoardState boardState;
-    std::string currentBoardFEN; // [TODO] Description of the current board in FEN
 
     // Board Memory
     Move lastMove;
