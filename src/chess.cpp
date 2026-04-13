@@ -92,7 +92,7 @@ void Chess::onRender() {
 
     // Board Outline is drawn later so it layers on top of highlights
     float oLineWeight{10.0f};
-    float oCornerRadius{board.getTileSize().x * 0.35f};
+    float oCornerRadius{board.getTileSize().x * 0.4f};
 
     // Board Tiles
 
