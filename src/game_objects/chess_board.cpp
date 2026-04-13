@@ -16,6 +16,31 @@ void ChessBoard::draw(Painter& painter) {
     }
 }
 
+// Draw every tile of the board and round the corners
+void ChessBoard::drawRound(Painter& painter, float cornerRadius) {
+
+    Vector4 radius{0.0f, 0.0f, 0.0f, 0.0f};
+
+    for (int rank = 0; rank < 8; rank++) {
+        for (int file = 0; file < 8; file++) {
+            // Round Corners
+            if      (file == 0 && rank == 0) radius = {cornerRadius, 0.0f, 0.0f, 0.0f};
+            else if (file == 7 && rank == 0) radius = {0.0f, cornerRadius, 0.0f, 0.0f};
+            else if (file == 7 && rank == 7) radius = {0.0f, 0.0f, cornerRadius, 0.0f};
+            else if (file == 0 && rank == 7) radius = {0.0f, 0.0f, 0.0f, cornerRadius};
+            
+            painter.drawRectangleRound(
+                {position.x + (file * tileSize.x), position.y + (rank * tileSize.y)},
+                tileSize,
+                ((file + rank + 1) % 2 == 0) ? darkTileColor : lightTileColor,
+                radius
+            );
+            // Reset radius
+            radius = {0.0f, 0.0f, 0.0f, 0.0f};
+        }
+    }
+}
+
 // Check if the cursor is on top of the board
 bool ChessBoard::isBoardOnHover(Vector2 mousePosition) {
     return (mousePosition.x > position.x

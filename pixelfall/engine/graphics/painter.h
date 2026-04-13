@@ -45,6 +45,10 @@ public:
     // Complex Shapes
     void drawRectangleHollow(Vector2 position, Vector2 size, Vector2 innerSize, Color color);
     void drawCircleHollow(Vector2 center, float radius, float innerRadius, Color color);
+    void drawRectangleRound(
+        Vector2 position, Vector2 size, Color color, Vector4 cornerRadius, int segments = 20);  // Vector4 radius
+    void drawRectangleRound(
+        Vector2 position, Vector2 size, Color color, float cornerRadius, int segments = 20);    // Single float radius
 
     // Public Members
     std::unique_ptr<TextureCache> textureCache;

@@ -37,6 +37,7 @@ public:
 
     // Methods
     void draw(Painter& painter);
+    void drawRound(Painter& painter, float cornerRadius);
     bool isBoardOnHover(Vector2 mousePosition);
     Vector2Int getTileOnHover(Vector2 mousePosition);
     int getRankByDirection(int rank);

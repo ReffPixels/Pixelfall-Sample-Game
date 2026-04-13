@@ -80,7 +80,7 @@ void Chess::onRender() {
     // Draw Background
     Color backgroundColor{
         gameOutcome == Outcome::Playing ?
-        Color::fromHexcode("#212121") : Color::fromHexcode("#33ff00")};
+        Color::fromHexcode("#1b1b1d") : Color::fromHexcode("#33ff00")};
     
     painter->drawRectangle(
         Vector2::Zero,
@@ -88,8 +88,21 @@ void Chess::onRender() {
         backgroundColor
     );
 
-    // Draw Board
-    board.draw(*painter);
+    // Draw board
+    float oSize{10.0f};
+    float bCornerRadius{board.getTileSize().x * 0.25f};
+    float oCornerRadius{board.getTileSize().x * 0.35f};
+
+    // Board Outline
+    painter->drawRectangleRound(
+        board.getPosition() - Vector2(oSize, oSize),
+        (board.getTileSize() * 8.0f) + Vector2(oSize, oSize) * 2,
+        Color::fromHexcode("#35373a"),
+        oCornerRadius
+    );
+
+    // Board Tiles
+    board.drawRound(*painter, bCornerRadius);
 
     // Draw Attacked Squares (Player)
     if (appInput->isKeyDown(KeyCode::Q)) tile_highlights::highlightAttackedSquares(move_generation::getAttackedSquares(

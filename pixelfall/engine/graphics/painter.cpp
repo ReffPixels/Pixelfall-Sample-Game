@@ -113,18 +113,10 @@ void Painter::drawRectangle(Vector2 position, Vector2 size, Color color) {
     );
 }
 
-// Draws an arc made out of triangular segments starting and ending at any angle (In degrees)
-void Painter::drawArc(Vector2 center, float radius, float startAngle, float endAngle, Color color, int segments) {
-
-    // Convert angles from degrees to radians
-    startAngle = math::conversions::degreesToRadians(startAngle);
-    endAngle = math::conversions::degreesToRadians(endAngle);
-
-    // Store points of the circle polygon
+// Helper that returns the points in an arc
+static std::vector<Vector2> getArcPoints(Vector2 center, float radius, float startAngle, float endAngle, int segments) {
+    // Store points of the arc
     std::vector<Vector2> points;
-
-    // The center of the circle is Vertex 0
-    points.push_back(center);
 
     // Find Step Size (Angle between each of the segments)
     float stepSize = (endAngle - startAngle) / (float)segments;
@@ -140,6 +132,28 @@ void Painter::drawArc(Vector2 center, float radius, float startAngle, float endA
             center.y - radius * sinf(arcPointAngle) // Using minus to flip the Y axis (More intuitive for the end user)
             ));
     }
+
+    return points;
+}
+
+// Draws an arc made out of triangular segments starting and ending at any angle (In degrees)
+void Painter::drawArc(Vector2 center, float radius, float startAngle, float endAngle, Color color, int segments) {
+
+    // Convert angles from degrees to radians
+    startAngle = math::conversions::degreesToRadians(startAngle);
+    endAngle = math::conversions::degreesToRadians(endAngle);
+
+    // Store points of the arc polygon
+    std::vector<Vector2> points;
+
+    // The center of the circle is Vertex 0
+    points.push_back(center);
+
+    // Get the arc points
+    std::vector<Vector2> arcPoints = getArcPoints(center, radius, startAngle, endAngle, segments);
+
+    // Combine the arc points with the center
+    points.insert(points.end(), arcPoints.begin(), arcPoints.end());
 
     drawPolygon(points, color);
 }
@@ -235,4 +249,79 @@ void Painter::drawCircleHollow(Vector2 center, float radius, float innerRadius, 
 
         drawQuad(outerA, outerB, innerB, innerA, color);
     }
+}
+
+// Draws a rectangle with round corners. The corners can be of 4 different sizes.
+void Painter::drawRectangleRound(Vector2 position, Vector2 size, Color color, Vector4 cornerRadius, int segments) {
+
+    // If all corners are 0, simplify to a rectangle
+    if (cornerRadius.x + cornerRadius.y + cornerRadius.z + cornerRadius.w == 0.0f) {
+        drawRectangle(position, size, color);
+        return;
+    }
+
+    // Find corners of the rectangle
+    Vector2 rectangleTL {position};
+    Vector2 rectangleTR {position.x + size.x, position.y};
+    Vector2 rectangleBR {position.x + size.x, position.y + size.y};
+    Vector2 rectangleBL {position.x, position.y + size.y};
+
+    // Find center of each corner circle
+    Vector2 cornerCenterTL{rectangleTL.x + cornerRadius.x, rectangleTL.y + cornerRadius.x};
+    Vector2 cornerCenterTR{rectangleTR.x - cornerRadius.y, rectangleTR.y + cornerRadius.y};
+    Vector2 cornerCenterBR{rectangleBR.x - cornerRadius.z, rectangleBR.y - cornerRadius.z};
+    Vector2 cornerCenterBL{rectangleBL.x + cornerRadius.w, rectangleBL.y - cornerRadius.w};
+
+    // Convert corner angles from degrees to radians
+    float cornerStartTL = math::conversions::degreesToRadians(180.0f);
+    float cornerEndTL = math::conversions::degreesToRadians(90.0f);
+
+    float cornerStartTR = math::conversions::degreesToRadians(90.0f);
+    float cornerEndTR = math::conversions::degreesToRadians(0.0f);
+
+    float cornerStartBR = math::conversions::degreesToRadians(360.0f);
+    float cornerEndBR = math::conversions::degreesToRadians(270.0f);
+    
+    float cornerStartBL = math::conversions::degreesToRadians(270.0f);
+    float cornerEndBL = math::conversions::degreesToRadians(180.0f);
+
+    // Store all the points here
+    std::vector<Vector2> points;
+
+    // Top Left Arc
+    std::vector<Vector2> arcTL = getArcPoints(
+        cornerCenterTL, cornerRadius.x, cornerStartTL, cornerEndTL, segments);
+    points.insert(points.end(), arcTL.begin(), arcTL.end());
+
+    // Top Right Arc
+    std::vector<Vector2> arcTR = getArcPoints(
+        cornerCenterTR, cornerRadius.y, cornerStartTR, cornerEndTR, segments);
+    points.insert(points.end(), arcTR.begin(), arcTR.end());
+
+    // Bottom Right Arc
+    std::vector<Vector2> arcBR = getArcPoints(
+        cornerCenterBR, cornerRadius.z, cornerStartBR, cornerEndBR, segments);
+    points.insert(points.end(), arcBR.begin(), arcBR.end());
+
+    // Bottom Left Arc
+    std::vector<Vector2> arcBL = getArcPoints(
+        cornerCenterBL, cornerRadius.w, cornerStartBL, cornerEndBL, segments);
+    points.insert(points.end(), arcBL.begin(), arcBL.end());
+
+    drawPolygon(points, color);
+}
+
+// Draws a rectangle with round corners.
+void Painter::drawRectangleRound(Vector2 position, Vector2 size, Color color, float cornerRadius, int segments) {
+
+    // If all corners are 0, simplify to a rectangle
+    if (cornerRadius == 0.0f) {
+        drawRectangle(position, size, color);
+        return;
+    }
+
+    // Make all 4 corners the same
+    Vector4 radius {cornerRadius, cornerRadius, cornerRadius, cornerRadius};
+
+    drawRectangleRound(position, size, color, radius, segments);
 }
