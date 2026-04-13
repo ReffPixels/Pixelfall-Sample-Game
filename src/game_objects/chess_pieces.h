@@ -1,4 +1,4 @@
-// Defines a chess piece object and handles drawing it on the screen.
+// Defines a chess pieces object that handles drawing all the chess pieces on the screen.
 
 #pragma once
 // Engine
@@ -6,55 +6,32 @@
 #include "pixelfall/engine/graphics/painter.h"
 // Standard Library
 #include <array>
-
-enum class PieceType {
-    King,
-    Queen,
-    Rook,
-    Bishop,
-    Knight,
-    Pawn,
-    None
-};
-
-enum class PieceTeam {
-    White,
-    Black,
-    None
-};
-
-struct PieceInfo {
-    PieceType type;
-    PieceTeam team;
-};
-
-struct Piece {
-    PieceInfo info;
-    Vector2Int position;
-};
+// Chess
+#include "config/chess_config.h"
+#include "game_objects/chess_board.h"
 
 class ChessPieces {
 public:
-    // Methods
-    void draw(PieceInfo pieceInfo, Vector2Int piecePosition, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
-        Painter& painter, Vector2 pieceOffset = Vector2::Zero);
+    // Rendering
+    void drawPieces(std::vector<Piece>& pieces, ChessBoard& board, Painter& painter);
+    void drawFree(PieceType type, TeamColor team, Vector2 position, Painter& painter, Vector2 size = Vector2::Zero);
+    Vector2 getDrawPosition(Vector2Int square, ChessBoard& board) const;
+    void pieceFollowCursor(Vector2& cursorPos, ChessBoard& board, PieceType type, TeamColor team,
+        Painter& painter, Vector2 offset = Vector2::Zero);
+    static Vector2 computeDragPivot(Vector2& cursorPos, ChessBoard& board);
 
-    void drawPieces(std::array<std::array<PieceInfo, 8>, 8> pieces, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
-        Painter& painter, Vector2 pieceOffset = Vector2::Zero, Vector2Int selPiecePosition = {-1, -1});
-
-    void drawFree(PieceType type, PieceTeam team, Vector2 physicalPosition, Vector2 spriteSize,
-        Painter& painter);
-
-    // Setters
-    void setHideSelectedPiece(bool hideSelectedPiece) { this->hideSelectedPiece = hideSelectedPiece; };
-    void setFlippedPieces(bool flipPieces) { this->flipPieces = flipPieces; };
-
-    // Getters
-    static Vector2Int getPosFromNotation(std::string gridPosition);
-    static std::string getNotationFromPos(Vector2Int gridPosition);
+    // Theme Setters
+    void setSpriteSize(Vector2 spriteSize) { this->spriteSize = spriteSize; };
+    void setSpritesPath(std::filesystem::path spritesPath) { this->spritesPath = spritesPath; };
+    void setPieceOffset(Vector2 pieceOffset) { this->pieceOffset = pieceOffset; };
 
 private:
-    // Rendering
-    bool hideSelectedPiece{false};
-    bool flipPieces{false};
+    // Theme
+    Vector2 spriteSize{theme::defaults::spriteSize};
+    std::filesystem::path spritesPath{theme::defaults::spritesPath};
+    Vector2 pieceOffset{theme::defaults::pieceOffset};
+
+    // Rendering Methods
+    void drawPiece(Piece& piece, ChessBoard& board, Painter& painter);
+    std::filesystem::path findImagePath(PieceType type, TeamColor team);
 };

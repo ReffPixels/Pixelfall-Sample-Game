@@ -1,8 +1,9 @@
 src/chess.cpp
-src/chess_state.cpp
-src/chess_moves.cpp
-src/chess_visuals.cpp
+src/game_state.cpp
+src/game_outcome.cpp
+src/move_generation.cpp
 src/tools/fen_parser.cpp
 src/game_objects/chess_pieces.cpp
 src/game_objects/chess_board.cpp
-src/game_objects/promotion_ui.cpp
+src/ui/promotion_widget.cpp
+src/rendering/tile_highlights.cpp

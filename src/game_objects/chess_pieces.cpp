@@ -1,124 +1,122 @@
-// Implementation for piece.h
-#include "game_objects/chess_pieces.h"
-#include "config/board_config.h"
-#include <stdexcept>
+// Implementation for chess_pieces.h
 
-// Converts a piece location from grid notation (a1 to h8) into a vector.
-Vector2Int ChessPieces::getPosFromNotation(std::string gridPosition) {
-    return Vector2Int{
-        gridPosition[0] - 'a', // 'a' -> 0, 'h' -> 7
-        '8' - gridPosition[1]  // '8' -> 0, '1' -> 7
+#include "game_objects/chess_pieces.h"
+
+// Draws all the pieces in the pieces vector on the screen.
+void ChessPieces::drawPieces(std::vector<Piece>& pieces, ChessBoard& board, Painter& painter) {
+
+    for (auto& piece : pieces)
+        drawPiece(piece, board, painter);
+};
+
+
+// Draws a piece on the board
+void ChessPieces::drawPiece(Piece& piece, ChessBoard& board, Painter& painter) {
+
+    // Check that this is a valid piece
+    if ((piece.type == PieceType::None) || (piece.team == TeamColor::None)) return;
+
+    // Calculate the final position on the screen
+    Vector2 physicalPosition{getDrawPosition(piece.position, board)};
+
+    // Create a texture with the correct image depending on the piece type and team.
+    Texture& pieceTexture = painter.textureCache->loadTexture(findImagePath(piece.type, piece.team).string());
+
+    painter.drawSprite(
+        physicalPosition,
+        spriteSize,
+        pieceTexture
+    );
+}
+
+// Draws a piece floating in a given position
+void ChessPieces::drawFree(PieceType type, TeamColor team, Vector2 position, Painter& painter, Vector2 size) {
+
+    // Check that this is a valid piece
+    if ((type == PieceType::None) || (team == TeamColor::None)) return;
+
+    // Create a texture with the correct image depending on the piece type and team.
+    Texture& pieceTexture = painter.textureCache->loadTexture(findImagePath(type, team).string());
+
+    // If the sprite size was not provided (Size 0, 0) default to the normal pieces's sprite size
+    if (size == Vector2::Zero) size = spriteSize;
+
+    painter.drawSprite(
+        position,
+        size,
+        pieceTexture
+    );
+}
+
+// Returns the position a piece sprite would be drawn at for the given grid position.
+Vector2 ChessPieces::getDrawPosition(Vector2Int position, ChessBoard& board) const {
+    return {
+        board.getPosition().x
+        + (float)position.x
+        * board.getTileSize().x
+        + (board.getTileSize().x - spriteSize.x) / 2 // Center piece
+        + pieceOffset.x,
+
+        board.getPosition().y
+        + (float)board.getRankByDirection(position.y) // Check if the board is flipped
+        * board.getTileSize().y
+        + (board.getTileSize().y - spriteSize.y) / 2
+        + pieceOffset.y,
     };
 }
 
-// Converts a piece vector location into grid notation (a1 to h8).
-std::string ChessPieces::getNotationFromPos(Vector2Int gridPosition) {
-    return std::string() +
-        char('a' + gridPosition.x) +
-        char('8' - gridPosition.y);
-}
-
 // Returns the path of a chess piece image from it's piece information (Type and team)
-static std::filesystem::path findImagePath(PieceInfo pieceInfo) {
-    if (pieceInfo.team == PieceTeam::White) {
-        switch (pieceInfo.type) {
-        case PieceType::King: return (board::piecesPath / "white_king.png");
-        case PieceType::Queen: return (board::piecesPath / "white_queen.png");
-        case PieceType::Rook: return (board::piecesPath / "white_rook.png");
-        case PieceType::Bishop: return (board::piecesPath / "white_bishop.png");
-        case PieceType::Knight: return (board::piecesPath / "white_knight.png");
-        case PieceType::Pawn: return (board::piecesPath / "white_pawn.png");
+std::filesystem::path ChessPieces::findImagePath(PieceType type, TeamColor team) {
+    if (team == TeamColor::White) {
+        switch (type) {
+        case PieceType::King: return (spritesPath / "white_king.png");
+        case PieceType::Queen: return (spritesPath / "white_queen.png");
+        case PieceType::Rook: return (spritesPath / "white_rook.png");
+        case PieceType::Bishop: return (spritesPath / "white_bishop.png");
+        case PieceType::Knight: return (spritesPath / "white_knight.png");
+        case PieceType::Pawn: return (spritesPath / "white_pawn.png");
         default: throw std::runtime_error("Invalid piece type"); // [Error]
         }
     }
     else {
-        switch (pieceInfo.type) {
-        case PieceType::King: return (board::piecesPath / "black_king.png");
-        case PieceType::Queen: return (board::piecesPath / "black_queen.png");
-        case PieceType::Rook: return (board::piecesPath / "black_rook.png");
-        case PieceType::Bishop: return (board::piecesPath / "black_bishop.png");
-        case PieceType::Knight: return (board::piecesPath / "black_knight.png");
-        case PieceType::Pawn: return (board::piecesPath / "black_pawn.png");
+        switch (type) {
+        case PieceType::King: return (spritesPath / "black_king.png");
+        case PieceType::Queen: return (spritesPath / "black_queen.png");
+        case PieceType::Rook: return (spritesPath / "black_rook.png");
+        case PieceType::Bishop: return (spritesPath / "black_bishop.png");
+        case PieceType::Knight: return (spritesPath / "black_knight.png");
+        case PieceType::Pawn: return (spritesPath / "black_pawn.png");
         default: throw std::runtime_error("Invalid piece type"); // [Error]
         }
     }
 }
 
-// Draws a piece on the board
-void ChessPieces::draw(PieceInfo pieceInfo, Vector2Int piecePosition, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
-    Painter& painter, Vector2 pieceOffset) {
+// Draw a piece attached to the cursor
+void ChessPieces::pieceFollowCursor(Vector2& cursorPos, ChessBoard& board,
+    PieceType type, TeamColor team, Painter& painter, Vector2 offset) {
 
-    // Check that this is a valid piece
-    if ((pieceInfo.type == PieceType::None) || (pieceInfo.team == PieceTeam::None)) return;
-
-    Vector2 physicalPosition{};
-    if (board::projectionType == ThemeProjection::Isometric) {
-        physicalPosition = {
-            boardPosition.x
-            + ((float)piecePosition.x - (float)piecePosition.y)
-            * (tileSize.x / 2.0f)
-            - (spriteSize.x / 2.0f)
+    // Clamp cursor position to inside the board
+    Vector2 positionInBoard{
+        std::clamp(
+            cursorPos.x
+            + (board.getTileSize().x - spriteSize.x) / 2 // Center piece
             + pieceOffset.x,
-                
-            boardPosition.y
-            + ((float)piecePosition.x + (float)piecePosition.y)
-            * (tileSize.y / 2.0f)
-            - (spriteSize.y / 2.0f)
+            board.getPosition().x,
+            board.getPosition().x + board.getTileSize().x * 8),
+        std::clamp(
+            cursorPos.y
+            + (board.getTileSize().y - spriteSize.y) / 2 // Center piece
             + pieceOffset.y,
-        };
-    }
-    else {
-        physicalPosition = {
-            boardPosition.x
-            + (float)piecePosition.x
-            * tileSize.x
-            + pieceOffset.x,
+            board.getPosition().y,
+            board.getPosition().y + board.getTileSize().y * 8)
+    };
 
-            boardPosition.y
-            + (float)piecePosition.y
-            * tileSize.y
-            + pieceOffset.y,
-        };
-    }
-    
-    Texture& pieceTexture = painter.textureCache->loadTexture(findImagePath(pieceInfo).string());
-
-    painter.drawSprite(
-        physicalPosition,
-        spriteSize,
-        pieceTexture
-    );
+    drawFree(type, team, positionInBoard + offset, painter, spriteSize);
 }
 
-
-// Draws a piece floating in a given position
-void ChessPieces::drawFree(PieceType type, PieceTeam team, Vector2 physicalPosition, Vector2 spriteSize,
-    Painter& painter) {
-
-    // Check that this is a valid piece
-    if ((type == PieceType::None) || (team == PieceTeam::None)) return;
-
-    Texture& pieceTexture = painter.textureCache->loadTexture(findImagePath({type, team}).string());
-
-    painter.drawSprite(
-        physicalPosition,
-        spriteSize,
-        pieceTexture
-    );
+// Computes the pivot offset so the dragged piece stays attached at the grab point
+Vector2 ChessPieces::computeDragPivot(Vector2& cursorPos, ChessBoard& board) {
+    Vector2Int piecePosition = board.getTileOnHover(cursorPos);
+    return {(board.getPosition() +
+        Vector2{(float)piecePosition.x, (float)board.getRankByDirection(piecePosition.y)} * board.getTileSize()) - cursorPos};
 }
-
-// Draws all the pieces in the pieces vector on the screen.
-void ChessPieces::drawPieces(std::array<std::array<PieceInfo, 8>, 8> boardState, Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
-    Painter& painter, Vector2 pieceOffset, Vector2Int selPiecePosition) {
-
-    for (int rank = 0; rank < 8; rank++)
-        for (int file = 0; file < 8; file++)
-            // Check if there's a piece in the square
-            if (boardState[file][rank].type != PieceType::None) {
-                if (hideSelectedPiece && Vector2Int{file, rank} == selPiecePosition) {
-                    // Don't draw this piece
-                    continue;
-                }
-                    draw(boardState[file][rank], {file, flipPieces ? 7 - rank : rank}, boardPosition, tileSize, spriteSize, painter, pieceOffset);
-            }
-};

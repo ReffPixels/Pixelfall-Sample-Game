@@ -6,7 +6,7 @@ File Naming Conventions
 
 Code Naming Conventions
 - Classes and Structs use PascalCase
-- Namespaces use camelCase
+- Namespaces use snake_case
 - Functions use camelCase
 - Identifiers use camelCase
 - Constant Identifiers use camelCase

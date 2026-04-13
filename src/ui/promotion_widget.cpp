@@ -1,14 +1,16 @@
-#include "game_objects/promotion_ui.h"
+// [TODO SOON] Clean up
+
+#include "ui/promotion_widget.h"
 
 // Draws promotion piece options above/below the board
-void PromotionInterface::drawPieces(ChessPieces& chessPieces, Vector2Int pawnPosition, PieceTeam playerTeam,
+void promotion_interface::drawPieces(ChessPieces& chessPieces, Vector2Int pawnPosition, TeamColor playerTeam,
     Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
     Painter& painter, bool flipPieces, Color backgroundColor) {
         
     Vector2 physicalPawnPosition{boardPosition.x + (float)pawnPosition.x * tileSize.x,
         boardPosition.y + (flipPieces ? 7 - (float)pawnPosition.y : (float)pawnPosition.y) * tileSize.y};
 
-    bool flipUIPosition{(playerTeam == PieceTeam::White && flipPieces) || (playerTeam == PieceTeam::Black && !flipPieces)};
+    bool flipUIPosition{(playerTeam == TeamColor::White && flipPieces) || (playerTeam == TeamColor::Black && !flipPieces)};
 
     Vector2 backgroundPosition{physicalPawnPosition.x - tileSize.x * 1.5f,
         physicalPawnPosition.y + (flipUIPosition ? tileSize.y : -tileSize.y)};
@@ -28,20 +30,20 @@ void PromotionInterface::drawPieces(ChessPieces& chessPieces, Vector2Int pawnPos
         physicalPawnPosition.y + spriteOffset.y + (flipUIPosition ? tileSize.y : -tileSize.y)};
 
     painter.drawRectangle(backgroundPosition, Vector2{tileSize.x * 4, tileSize.y}, backgroundColor);
-    chessPieces.drawFree(PieceType::Queen, playerTeam, queenPosition, spriteSize, painter);
-    chessPieces.drawFree(PieceType::Rook, playerTeam, rookPosition, spriteSize, painter);
-    chessPieces.drawFree(PieceType::Bishop, playerTeam, bishopPosition, spriteSize, painter);
-    chessPieces.drawFree(PieceType::Knight, playerTeam, knightPosition, spriteSize, painter);
+    chessPieces.drawFree(PieceType::Queen, playerTeam, queenPosition, painter, spriteSize);
+    chessPieces.drawFree(PieceType::Rook, playerTeam, rookPosition, painter, spriteSize);
+    chessPieces.drawFree(PieceType::Bishop, playerTeam, bishopPosition, painter, spriteSize);
+    chessPieces.drawFree(PieceType::Knight, playerTeam, knightPosition, painter, spriteSize);
 }
 
 // Get the specific square under the cursor
-PieceType PromotionInterface::getPieceOnHover(Vector2 mousePos, Vector2Int pawnPosition, PieceTeam playerTeam,
+PieceType promotion_interface::getPieceOnHover(Vector2 mousePos, Vector2Int pawnPosition, TeamColor playerTeam,
     Vector2 boardPosition, Vector2 tileSize, bool flipPieces) {
 
     Vector2 physicalPawnPosition{boardPosition.x + (float)pawnPosition.x * tileSize.x,
         boardPosition.y + (flipPieces ? 7 - (float)pawnPosition.y : (float)pawnPosition.y) * tileSize.y};
 
-    bool flipUIPosition{(playerTeam == PieceTeam::White && flipPieces) || (playerTeam == PieceTeam::Black && !flipPieces)};
+    bool flipUIPosition{(playerTeam == TeamColor::White && flipPieces) || (playerTeam == TeamColor::Black && !flipPieces)};
     
     Vector2 backgroundPosition{physicalPawnPosition.x - tileSize.x * 1.5f,
     physicalPawnPosition.y + (flipUIPosition ? tileSize.y : -tileSize.y)};
