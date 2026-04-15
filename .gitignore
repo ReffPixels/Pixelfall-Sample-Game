@@ -7,6 +7,17 @@
 *.o
 *.obj
 
+# Linker output
+*.ilk
+*.map
+*.exp
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
 # Precompiled Headers
 *.gch
 *.pch
