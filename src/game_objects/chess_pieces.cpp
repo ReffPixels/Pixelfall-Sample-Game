@@ -52,7 +52,7 @@ void ChessPieces::drawFree(PieceType type, TeamColor team, Vector2 position, Pai
 Vector2 ChessPieces::getDrawPosition(Vector2Int position, ChessBoard& board) const {
     return {
         board.getPosition().x
-        + (float)position.x
+        + (float)board.getFileByDirection(position.x) // Check if the board is flipped
         * board.getTileSize().x
         + (board.getTileSize().x - spriteSize.x) / 2 // Center piece
         + pieceOffset.x,
@@ -117,6 +117,11 @@ void ChessPieces::pieceFollowCursor(Vector2& cursorPos, ChessBoard& board,
 // Computes the pivot offset so the dragged piece stays attached at the grab point
 Vector2 ChessPieces::computeDragPivot(Vector2& cursorPos, ChessBoard& board) {
     Vector2Int piecePosition = board.getTileOnHover(cursorPos);
-    return {(board.getPosition() +
-        Vector2{(float)piecePosition.x, (float)board.getRankByDirection(piecePosition.y)} * board.getTileSize()) - cursorPos};
+    return {
+        (board.getPosition()
+        + Vector2{
+            (float)board.getFileByDirection(piecePosition.x),
+            (float)board.getRankByDirection(piecePosition.y)}
+        * board.getTileSize())
+        - cursorPos};
 }

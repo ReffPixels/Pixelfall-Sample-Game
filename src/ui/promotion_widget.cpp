@@ -6,8 +6,8 @@
 void promotion_interface::drawPieces(ChessPieces& chessPieces, Vector2Int pawnPosition, TeamColor playerTeam,
     Vector2 boardPosition, Vector2 tileSize, Vector2 spriteSize,
     Painter& painter, bool flipPieces, Color backgroundColor) {
-        
-    Vector2 physicalPawnPosition{boardPosition.x + (float)pawnPosition.x * tileSize.x,
+
+    Vector2 physicalPawnPosition{boardPosition.x + (flipPieces ? 7 - (float)pawnPosition.x : (float)pawnPosition.x) * tileSize.x,
         boardPosition.y + (flipPieces ? 7 - (float)pawnPosition.y : (float)pawnPosition.y) * tileSize.y};
 
     bool flipUIPosition{(playerTeam == TeamColor::White && flipPieces) || (playerTeam == TeamColor::Black && !flipPieces)};
@@ -40,7 +40,7 @@ void promotion_interface::drawPieces(ChessPieces& chessPieces, Vector2Int pawnPo
 PieceType promotion_interface::getPieceOnHover(Vector2 mousePos, Vector2Int pawnPosition, TeamColor playerTeam,
     Vector2 boardPosition, Vector2 tileSize, bool flipPieces) {
 
-    Vector2 physicalPawnPosition{boardPosition.x + (float)pawnPosition.x * tileSize.x,
+    Vector2 physicalPawnPosition{boardPosition.x + (flipPieces ? 7 - (float)pawnPosition.x : (float)pawnPosition.x) * tileSize.x,
         boardPosition.y + (flipPieces ? 7 - (float)pawnPosition.y : (float)pawnPosition.y) * tileSize.y};
 
     bool flipUIPosition{(playerTeam == TeamColor::White && flipPieces) || (playerTeam == TeamColor::Black && !flipPieces)};

@@ -9,7 +9,7 @@ void tile_highlights::highlightSelected(ChessBoard& board, Vector2Int selPiecePo
     if (selPiecePosition != Vector2Int{-1, -1}) {
         painter.drawRectangle(
             board.getPosition()
-            + Vector2(selPiecePosition.x * board.getTileSize().x,
+            + Vector2(board.getFileByDirection(selPiecePosition.x) * board.getTileSize().x,
                 board.getRankByDirection(selPiecePosition.y) * board.getTileSize().y),
             board.getTileSize(),
             Color::fromHexcode("#ffd94e92")
@@ -23,14 +23,14 @@ void tile_highlights::highlightLastMove(ChessBoard& board, Vector2Int lastMoveOr
     if (lastMoveOrigin != Vector2Int{-1, -1} && lastMoveTarget != Vector2Int{-1, -1}) {
         painter.drawRectangle(
             board.getPosition()
-            + Vector2(lastMoveOrigin.x * board.getTileSize().x,
+            + Vector2(board.getFileByDirection(lastMoveOrigin.x) * board.getTileSize().x,
                 board.getRankByDirection(lastMoveOrigin.y) * board.getTileSize().y),
             board.getTileSize(),
             Color::fromHexcode("#ffd94e92")
         );
         painter.drawRectangle(
             board.getPosition()
-            + Vector2(lastMoveTarget.x * board.getTileSize().x,
+            + Vector2(board.getFileByDirection(lastMoveTarget.x) * board.getTileSize().x,
                 board.getRankByDirection(lastMoveTarget.y) * board.getTileSize().y),
             board.getTileSize(),
             Color::fromHexcode("#ffd94e92")
@@ -46,7 +46,7 @@ void tile_highlights::highlightHoveredSquare(Vector2& cursorPos, ChessBoard& boa
     if (gridPos == selPiecePosition) return; // Don't draw highlight over origin square
 
     Vector2 snappedPositionInBoard{
-        std::clamp(board.getPosition().x + (float)gridPos.x * board.getTileSize().x,
+        std::clamp(board.getPosition().x + board.getFileByDirection(gridPos.x) * board.getTileSize().x,
             board.getPosition().x, board.getPosition().x + board.getTileSize().x * 7),
         std::clamp(board.getPosition().y + board.getRankByDirection(gridPos.y) * board.getTileSize().y,
             board.getPosition().y, board.getPosition().y + board.getTileSize().y * 7)
@@ -72,7 +72,7 @@ void tile_highlights::highlightMoves(std::array<std::array<MoveType, 8>, 8> vali
                 || validMoves[file][rank] == MoveType::Promotion)
 
                 painter.drawCircle(
-                    Vector2(board.getPosition().x + (float)file * board.getTileSize().x + board.getTileSize().x / 2,
+                    Vector2(board.getPosition().x + (float)board.getFileByDirection(file) * board.getTileSize().x + board.getTileSize().x / 2,
                         board.getPosition().y + (float)board.getRankByDirection(rank) * board.getTileSize().y + board.getTileSize().y / 2),
                     board.getTileSize().x * 0.15f,
                     Color::fromHexcode("#0000002a")
@@ -82,7 +82,7 @@ void tile_highlights::highlightMoves(std::array<std::array<MoveType, 8>, 8> vali
                 || (validMoves[file][rank] == MoveType::EnPassant)
                 || (validMoves[file][rank] == MoveType::CapturePromotion)) {
                 painter.drawCircleBorder(
-                    Vector2(board.getPosition().x + (float)file * board.getTileSize().x + board.getTileSize().x / 2,
+                    Vector2(board.getPosition().x + (float)board.getFileByDirection(file) * board.getTileSize().x + board.getTileSize().x / 2,
                         board.getPosition().y + (float)board.getRankByDirection(rank) * board.getTileSize().y + board.getTileSize().y / 2),
                     board.getTileSize().x * 0.45f,
                     board.getTileSize().x * 0.3f,
@@ -99,7 +99,7 @@ void tile_highlights::highlightAttackedSquares(std::array<std::array<bool, 8>, 8
             if (attackedSquares[file][rank])
                 painter.drawRectangle(
                     board.getPosition()
-                    + Vector2(file * board.getTileSize().x, board.getRankByDirection(rank) * board.getTileSize().y),
+                    + Vector2(board.getFileByDirection(file) * board.getTileSize().x, board.getRankByDirection(rank) * board.getTileSize().y),
                     board.getTileSize(),
                     color
                 );

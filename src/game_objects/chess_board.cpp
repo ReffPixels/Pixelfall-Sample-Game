@@ -53,8 +53,16 @@ bool ChessBoard::isBoardOnHover(Vector2 mousePosition) {
 // Get the specific tile under the cursor
 Vector2Int ChessBoard::getTileOnHover(Vector2 mousePosition) {
     Vector2 squarePosition{(mousePosition - position) / tileSize.x};
-    return {static_cast<int>(squarePosition.x),
+    return {getFileByDirection(static_cast<int>(squarePosition.x)),
         getRankByDirection(static_cast<int>(squarePosition.y))};
+}
+
+// Get file adjusted by the board direction (Flipped when black is at the bottom)
+int ChessBoard::getFileByDirection(int file) {
+    if (direction == BoardDirection::BlackOnTop)
+        return file;
+    else
+        return 7 - file;
 }
 
 // Get rank adjusted by the board direction (Flipped when black is at the bottom)

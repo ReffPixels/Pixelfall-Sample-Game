@@ -40,6 +40,7 @@ public:
     void drawRound(Painter& painter, float cornerRadius);
     bool isBoardOnHover(Vector2 mousePosition);
     Vector2Int getTileOnHover(Vector2 mousePosition);
+    int getFileByDirection(int file);
     int getRankByDirection(int rank);
     
 private:
